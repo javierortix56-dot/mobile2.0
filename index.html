@@ -4,341 +4,419 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M Stable V37.5</title>
+    <title>J&M Hybrid V39</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%2310B981'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --bg-app: #F8FAFC; --surface: #FFFFFF;
-            --text-dark: #0F172A; --text-gray: #64748B;
-            --inc-color: #10B981; --inc-bg: #ECFDF5;
-            --exp-color: #EF4444; --exp-bg: #FEF2F2;
-            --primary: #2563EB; --border: #E2E8F0;
+            --bg: #FFFFFF; --bg-sec: #F8FAFC;
+            --txt: #0F172A; --txt-sec: #64748B;
+            --primary: #0F172A; /* Negro/Azul oscuro elegante */
+            --accent: #2563EB; /* Azul vivo para acciones */
+            --inc: #10B981; --exp: #EF4444;
+            --border: #E2E8F0;
         }
 
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-app); margin: 0; color: var(--text-dark); padding-bottom: 100px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--txt); padding-bottom: 90px; padding-top: 60px; }
 
-        /* --- HEADER (RECUPERADO DE LA VERSIÓN FUNCIONAL) --- */
-        .top-bar { background: var(--surface); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
-        .brand { font-weight: 900; color: var(--primary); font-size: 18px; display: flex; flex-direction: column; line-height: 1; }
+        /* --- HEADER FUNCIONAL + ESTÉTICO --- */
+        .top-nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); z-index: 50;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
+        }
+        .brand { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; display:flex; align-items:center; gap:5px; }
+        .sync-dot { width:8px; height:8px; border-radius:50%; background:#CBD5E1; transition:0.3s; }
         
-        /* Badge de Sync visible como antes */
-        .sync-badge { font-size: 9px; font-weight: 700; background: #FEF3C7; color: #B45309; padding: 2px 6px; border-radius: 4px; margin-top: 2px; text-transform: uppercase; width: fit-content; }
-        .sync-badge.ok { background: #DCFCE7; color: #166534; }
-        .sync-badge.error { background: #FEE2E2; color: #991B1B; }
+        .date-pill {
+            background: #F1F5F9; border-radius: 20px; padding: 4px; 
+            display: flex; align-items: center; gap: 5px; border: 1px solid var(--border);
+        }
+        .btn-nav { width: 30px; height: 30px; border-radius: 50%; border:none; background:white; color:var(--txt); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+        .date-txt { font-size: 12px; font-weight: 800; text-transform: uppercase; min-width: 80px; text-align: center; position: relative; }
+        #dateInput { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
 
-        /* Navegación por flechas (Recuperado) */
-        .date-ctrl { 
-            display: flex; align-items: center; background: #F1F5F9; border-radius: 8px; 
-            padding: 2px; border: 1px solid var(--border); position: relative;
+        /* --- STORIES (INGRESOS) --- */
+        .stories-tray {
+            display: flex; gap: 15px; padding: 15px 15px 5px 15px; overflow-x: auto; scrollbar-width: none;
+            background: var(--bg);
         }
-        .btn-arrow { 
-            background: transparent; border: none; width: 45px; height: 35px; 
-            cursor: pointer; color: var(--text-dark); font-size: 18px; 
-            display: flex; align-items: center; justify-content: center; z-index: 10;
-        }
-        .date-display { 
-            font-size: 12px; font-weight: 700; text-transform: uppercase; 
-            min-width: 100px; text-align: center; position: relative;
-        }
-        #dateInput {
-            position: absolute; top: 0; left: 45px; width: 100px; height: 100%;
-            opacity: 0; cursor: pointer; z-index: 5;
-        }
-
-        /* --- TABS DE VISTA --- */
-        .view-tabs { display: flex; padding: 15px 15px 0 15px; gap: 10px; }
-        .v-tab { 
-            flex: 1; text-align: center; padding: 10px; border-radius: 10px; 
-            font-size: 13px; font-weight: 700; color: var(--text-gray); 
-            background: white; border: 1px solid var(--border); cursor: pointer; transition: 0.2s;
-        }
-        .v-tab.active { background: var(--text-dark); color: white; border-color: var(--text-dark); }
-
-        /* --- KPI BALANCE --- */
-        .kpi-wrapper { padding: 15px 15px 5px 15px; }
-        .kpi-card { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; container-type: inline-size; }
-        .kpi-val { font-size: clamp(24px, 12cqw, 34px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; overflow-wrap: break-word; transition: 0.3s; }
+        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 64px; cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        .story-item.active { opacity: 1; transform: scale(1.05); }
         
-        .copy-zone { padding: 15px; margin: 0 15px 10px 15px; display: none; background: white; border-radius: 12px; border: 1px dashed var(--border); }
-        .copy-controls { display: flex; gap: 8px; margin-top: 8px; }
-        .btn-copy-month { flex: 1; background: var(--text-dark); color: white; border: none; padding: 0 12px; border-radius: 8px; font-weight: 700; font-size: 13px; height: 40px; }
+        .ring-container {
+            width: 58px; height: 58px; padding: 3px; border-radius: 50%;
+            background: conic-gradient(var(--border) 100%, transparent 0);
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .avatar {
+            width: 100%; height: 100%; background: #F8FAFC; border-radius: 50%; border: 3px solid var(--bg);
+            display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--txt);
+        }
+        .story-badge {
+            position: absolute; bottom: -2px; background: var(--primary); color: white;
+            font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; border: 2px solid white;
+        }
+        .story-name { font-size: 11px; margin-top: 6px; font-weight: 600; text-align: center; max-width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- VISTA 1: LISTAS T (Clásica) --- */
-        #view-accounting { display: block; }
-        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; align-items: start; }
-        .t-col { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
-        .t-list { max-height: 60vh; overflow-y: auto; scrollbar-width: thin; }
+        /* --- KPI BAR --- */
+        .kpi-bar { margin: 10px 15px; padding: 15px; background: var(--primary); border-radius: 16px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15); }
+        .kpi-label { font-size: 11px; opacity: 0.8; font-weight: 600; text-transform: uppercase; }
+        .kpi-val { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+
+        /* --- FEED LIST --- */
+        .feed-header { padding: 10px 20px 5px 20px; font-size: 13px; font-weight: 800; color: var(--txt-sec); text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; }
+        .feed-list { padding: 0 15px; list-style: none; margin: 0; }
+        .feed-item {
+            padding: 15px 0; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; gap: 15px;
+        }
+        .f-icon {
+            width: 44px; height: 44px; border-radius: 14px; background: #F1F5F9; 
+            display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+        }
+        .f-content { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+        .f-row { display: flex; justify-content: space-between; align-items: center; }
+        .f-desc { font-weight: 700; font-size: 15px; color: var(--txt); }
+        .f-amt { font-weight: 800; font-size: 15px; }
+        .f-meta { font-size: 12px; color: var(--txt-sec); display: flex; gap: 6px; align-items: center; }
         
-        .col-header { padding: 8px; text-align: center; font-size: 11px; font-weight: 800; text-transform: uppercase; color: white; position: sticky; top: 0; z-index: 2; }
-        .bg-inc { background: var(--inc-color); } .bg-exp { background: var(--exp-color); }
-        .col-total { display: block; background: rgba(0,0,0,0.1); margin-top: 2px; border-radius: 4px; padding: 2px; }
+        .pill { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: #F1F5F9; color: var(--txt-sec); }
+        .pill.link { background: #EFF6FF; color: var(--accent); }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
+            background: white; border-top: 1px solid var(--border);
+            display: flex; align-items: flex-start; justify-content: space-around; padding-top: 15px; z-index: 100;
+        }
+        .nav-item { color: #94A3B8; font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--primary); transform: scale(1.1); }
         
-        .row-item { background: white; padding: 12px 8px; border-bottom: 1px solid #F1F5F9; position: relative; }
-        .row-item.executed .desc-text { text-decoration: line-through; color: #94A3B8; }
-        .row-item.executed .amt-text { text-decoration: line-through; opacity: 0.6; }
+        .fab-btn {
+            width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            transform: translateY(-25px); box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3); cursor: pointer;
+            border: 4px solid white;
+        }
 
-        .subtotal-tag { font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-top: 3px; }
-        .st-ok { background: #DCFCE7; color: #166534; } 
-        .st-bad { background: #FEE2E2; color: #991B1B; }
-        .row-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
-
-        /* --- VISTA 2: ALLOCATION (V37) --- */
-        #view-allocation { display: none; padding: 15px; }
-        .alloc-card { background: white; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .alloc-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; border-bottom: 1px solid var(--border); }
-        .alloc-title { font-weight: 800; font-size: 14px; color: var(--text-dark); display: flex; flex-direction: column; }
-        .alloc-total { font-weight: 800; color: var(--inc-color); font-size: 15px; }
-        .alloc-body { padding: 10px 15px; }
-        .alloc-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #E2E8F0; font-size: 13px; }
-        .alloc-footer { background: #F8FAFC; padding: 10px 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .prog-bar-bg { height: 6px; width: 100%; background: #E2E8F0; border-radius: 3px; margin-top: 5px; overflow: hidden; }
-        .prog-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: 0.5s; }
-        .alloc-remain { font-size: 12px; font-weight: 800; }
-        
-        .alloc-card.orphan .alloc-header { background: #FEF2F2; }
-        .alloc-card.orphan .alloc-total { color: var(--exp-color); }
-        .alloc-card.orphan .prog-bar-fill { background: var(--exp-color); }
-
-        /* --- BOTONES ACCIÓN --- */
-        .section-header { padding: 0 20px; margin-top: 25px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .sec-title { font-size: 14px; font-weight: 800; color: var(--text-dark); }
-        .btn-reset-chart { font-size: 11px; color: var(--primary); font-weight: 700; border: none; background: none; cursor: pointer; display: none; }
-        .chart-box { background: var(--surface); margin: 0 15px; padding: 15px; border-radius: 16px; border: 1px solid var(--border); height: 360px; position: relative; }
-
-        .action-btns { padding: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .btn-big { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: white; color: var(--text-dark); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 45%; }
-        .btn-sync { width: 100%; margin-top: 5px; background: var(--primary); color: white; border: none; }
-        .btn-danger-zone { margin-top: 20px; font-size: 10px; color: #CBD5E1; text-decoration: underline; background: none; border: none; }
-
-        /* --- FORMULARIO OPTIMIZADO (CHIPS STYLE - V38) --- */
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--text-dark); color: white; border-radius: 50%; border:none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 24px; z-index: 40; }
-        .sheet { position: fixed; bottom: 0; width: 100%; background: white; z-index: 100; border-radius: 20px 20px 0 0; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; max-height: 90vh; }
+        /* --- SHEET MODAL (CHIPS STYLE) --- */
+        .sheet { position: fixed; inset: 0; background: white; z-index: 200; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; }
         .sheet.open { transform: translateY(0); }
-        .sheet-head { padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .sheet-body { flex: 1; padding: 20px; overflow-y: auto; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; display: none; backdrop-filter: blur(3px); }
+        .sheet-head { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .sheet-body { flex: 1; padding: 0 20px 20px 20px; overflow-y: auto; }
         
-        /* CHIPS (BOTONES DESLIZABLES) */
-        .lbl { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 8px; display: block; margin-top: 15px; }
-        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .lbl { font-size: 11px; font-weight: 800; color: var(--txt-sec); text-transform: uppercase; margin-bottom: 8px; margin-top: 20px; display: block; }
+        
+        /* CHIPS SCROLL */
+        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; flex-wrap: wrap; }
         .chip {
-            padding: 8px 16px; border-radius: 20px; background: #F1F5F9; color: var(--text-gray);
-            font-size: 13px; font-weight: 700; border: 1px solid transparent; white-space: nowrap; cursor: pointer; transition: 0.2s;
+            padding: 10px 18px; border-radius: 30px; background: #F8FAFC; color: var(--txt-sec);
+            font-size: 14px; font-weight: 600; border: 1px solid var(--border); white-space: nowrap; cursor: pointer; transition: 0.2s;
         }
-        .chip.active { background: var(--text-dark); color: white; border-color: var(--text-dark); }
-        .chip.link-chip.active { background: var(--primary); border-color: var(--primary); }
-        
-        .big-input { width: 100%; height: 50px; border: 1px solid var(--border); border-radius: 12px; padding: 0 15px; font-size: 18px; font-weight: 700; background: #F8FAFC; }
-        .btn-save { width: 100%; height: 55px; background: var(--text-dark); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 20px; }
+        .chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(15,23,42,0.2); }
+        .chip.link-chip.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
 
-        .loader-overlay { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center; }
-        .spinner { width:40px; height:40px; border:4px solid #E2E8F0; border-top:4px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; }
-        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
-        .c-inc { color: var(--inc-color); font-weight: 800; } .c-exp { color: var(--exp-color); font-weight: 800; }
+        .big-input { width: 100%; border: none; font-size: 36px; font-weight: 900; color: var(--txt); background: transparent; padding: 10px 0; text-align: center; border-bottom: 1px solid var(--border); border-radius: 0; }
+        .big-input::placeholder { color: #CBD5E1; }
+        
+        .btn-save { width: 100%; height: 56px; background: var(--accent); color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 16px; margin-top: 30px; box-shadow: 0 5px 15px rgba(37,99,235,0.3); }
+
+        .loader { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:300; display:none; align-items:center; justify-content:center; }
+        .view-section { display: none; padding-bottom: 20px; }
+        .view-section.visible { display: block; }
     </style>
 </head>
 <body>
 
-<div id="loader" class="loader-overlay"><div class="spinner"></div></div>
-<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div id="loader" class="loader"><i class="fas fa-circle-notch fa-spin fa-2x" style="color:var(--primary)"></i></div>
 
-<header class="top-bar">
-    <div class="brand">J&M <div id="syncBadge" class="sync-badge">Cargando...</div></div>
-    <div class="date-ctrl">
-        <button class="btn-arrow" type="button" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="date-display"><span id="monthTxt">...</span><input type="month" id="dateInput" onchange="loadData()"></div>
-        <button class="btn-arrow" type="button" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
+<nav class="top-nav">
+    <div class="brand">J&M <div id="syncDot" class="sync-dot"></div></div>
+    <div class="date-pill">
+        <button class="btn-nav" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div class="date-txt"><span id="monthTxt">...</span><input type="month" id="dateInput" onchange="loadData()"></div>
+        <button class="btn-nav" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
-</header>
+    <div onclick="forceSync()" style="font-size:18px; color:var(--txt-sec); cursor:pointer;"><i class="fas fa-sync-alt"></i></div>
+</nav>
 
-<div class="kpi-wrapper">
-    <div class="kpi-card">
-        <div class="kpi-label">Balance Neto</div>
-        <div id="kpiBal" class="kpi-val">$0</div>
-        <div style="margin-top: 10px; font-size: 13px; color: var(--text-gray); display: flex; justify-content: center; gap: 15px;">
-            <span>USD <span id="kpiUsd" style="font-weight:800; color: var(--text-dark);">0.00</span></span>
-            <span>TC: <input type="number" id="usdRate" value="1200" style="width:55px; border:none; background:#F1F5F9; font-weight:700; text-align:right;" onchange="loadData()"></span>
+<div id="view-home" class="view-section visible">
+    
+    <div class="stories-tray" id="storiesTray"></div>
+
+    <div class="kpi-bar" id="kpiBar">
+        <div>
+            <div class="kpi-label">Disponible</div>
+            <div class="kpi-val" id="kpiVal">$0</div>
+        </div>
+        <div style="text-align:right;">
+            <div class="kpi-label">Gastado</div>
+            <div style="font-weight:700;" id="kpiSpent">$0</div>
         </div>
     </div>
+
+    <div class="feed-header">
+        <span id="feedTitle">Todos los movimientos</span>
+        <span style="font-size:11px; background:#F1F5F9; padding:2px 6px; border-radius:4px; cursor:pointer;" onclick="deleteCurrentMonth()">BORRAR MES</span>
+    </div>
+    <ul class="feed-list" id="feedList"></ul>
 </div>
 
-<div class="view-tabs">
-    <div class="v-tab active" id="tab-acc" onclick="switchView('accounting')"><i class="fas fa-list"></i> Cuentas T</div>
-    <div class="v-tab" id="tab-all" onclick="switchView('allocation')"><i class="fas fa-stream"></i> Flujo Fondos</div>
-</div>
-
-<div class="copy-zone" id="copyZone">
-    <div style="font-size:12px; color:var(--text-gray); font-weight:700;">Mes vacío. Importar movimientos de:</div>
-    <div class="copy-controls">
-        <input type="month" id="copySourcePicker" class="inp" style="height:40px; margin:0;">
-        <button class="btn-copy-month" onclick="copyFromSelected()">CLONAR MES</button>
+<div id="view-stats" class="view-section" style="padding:20px;">
+    <h3 style="margin:0 0 20px 0;">Distribución</h3>
+    <div style="height:300px; background:white; border-radius:16px; border:1px solid var(--border); padding:10px;">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div style="margin-top:30px;">
+        <button onclick="backup()" class="chip" style="width:100%; text-align:center; justify-content:center; margin-bottom:10px;">Descargar Backup</button>
+        <button onclick="document.getElementById('fileIn').click()" class="chip" style="width:100%; text-align:center; justify-content:center;">Restaurar Backup</button>
+        <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
     </div>
 </div>
 
-<div id="view-accounting">
-    <div class="t-grid">
-        <div class="t-col">
-            <div class="col-header bg-inc">Ingresos<br><span id="sum-inc" class="col-total">$0</span></div>
-            <div class="t-list" id="list-inc"></div>
-        </div>
-        <div class="t-col">
-            <div class="col-header bg-exp">Egresos<br><span id="sum-exp" class="col-total">$0</span></div>
-            <div class="t-list" id="list-exp"></div>
-        </div>
-    </div>
+<div class="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="nav('home')"><i class="fas fa-home"></i></div>
+    <div class="fab-btn" onclick="openSheet()"><i class="fas fa-plus"></i></div>
+    <div class="nav-item" id="nav-stats" onclick="nav('stats')"><i class="fas fa-chart-pie"></i></div>
 </div>
-
-<div id="view-allocation">
-    <div id="allocation-container"></div>
-</div>
-
-<div class="section-header">
-    <span class="sec-title">Distribución</span>
-    <button id="chartReset" class="btn-reset-chart" onclick="resetChart()">
-        <i class="fas fa-arrow-left"></i> VOLVER
-    </button>
-</div>
-<div class="chart-box">
-    <canvas id="myChart"></canvas>
-    <div id="chartCenterText" style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); font-size:10px; color:#64748B; pointer-events:none; font-weight:600; text-align:center;">Toca para<br>detalle</div>
-</div>
-
-<div class="action-btns">
-    <button class="btn-big" onclick="backup()"><i class="fas fa-download"></i> Backup Local</button>
-    <button class="btn-big" onclick="document.getElementById('fileIn').click()"><i class="fas fa-upload"></i> Restaurar</button>
-    <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
-    <button class="btn-big btn-sync" onclick="forceSync()"><i class="fas fa-sync"></i> Sincronizar Nube</button>
-    <button class="btn-danger-zone" onclick="deleteCurrentMonth()">Eliminar datos del mes actual</button>
-</div>
-
-<button class="fab" onclick="openSheet()"><i class="fas fa-plus"></i></button>
 
 <div class="sheet" id="sheet">
     <div class="sheet-head">
-        <span style="font-size:16px; font-weight:800;" id="formTitle">Nuevo Movimiento</span>
-        <span onclick="closeSheet()" style="font-size:20px; color:#94A3B8;"><i class="fas fa-times"></i></span>
+        <span style="font-weight:800; font-size:18px;">Nuevo</span>
+        <span onclick="closeSheet()" style="font-size:24px; color:var(--txt-sec); cursor:pointer;"><i class="fas fa-times"></i></span>
     </div>
-
     <div class="sheet-body">
         <form id="txForm">
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <div class="chip active" id="chip-exp" onclick="setType('exp')" style="flex:1; text-align:center; padding:12px;">Gasto</div>
-                <div class="chip" id="chip-inc" onclick="setType('inc')" style="flex:1; text-align:center; padding:12px;">Ingreso</div>
+            <div style="text-align:center; margin-bottom:20px;">
+                <input type="number" id="fAmount" class="big-input" placeholder="$0" step="0.01" required>
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+                <div class="chip active" id="type-exp" onclick="setType('exp')">Gasto</div>
+                <div class="chip" id="type-inc" onclick="setType('inc')">Ingreso</div>
             </div>
             <input type="hidden" id="fType" value="exp">
 
-            <label class="lbl">Monto</label>
-            <input type="number" id="fAmount" class="big-input" placeholder="0.00" step="0.01" required>
-
             <label class="lbl">Categoría</label>
             <div class="chip-scroll" id="catChips"></div>
-            <input type="hidden" id="fCat" required>
+            <input type="hidden" id="fCat">
 
             <label class="lbl">Concepto</label>
             <div class="chip-scroll" id="conceptChips"></div>
-            <input type="hidden" id="fConcept" required>
-            <input type="text" id="fConceptCustom" class="big-input" style="margin-top:5px; display:none; height:40px; font-size:14px;" placeholder="Escribe el nombre...">
+            <input type="hidden" id="fConcept">
+            <input type="text" id="fCustomDesc" placeholder="Escribe el nombre..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-top:10px; display:none; background:#F8FAFC;">
 
             <div id="linkGroup">
-                <label class="lbl" style="color:var(--primary);">¿Con qué pagas?</label>
+                <label class="lbl" style="color:var(--accent);">¿Con qué pagas?</label>
                 <div class="chip-scroll" id="linkChips"></div>
                 <input type="hidden" id="fLink">
             </div>
 
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <div style="flex:1;">
-                    <label class="lbl">Fecha</label>
-                    <input type="date" id="fDate" class="big-input" style="height:40px; font-size:14px;" required>
-                </div>
-                <div style="flex:1; display:flex; align-items:center; background:#F1F5F9; border-radius:12px; padding:0 10px;">
-                    <input type="checkbox" id="fExec" checked style="width:20px; height:20px; margin-right:8px;">
-                    <span style="font-size:12px; font-weight:700;">Ejecutado</span>
+            <div style="display:flex; gap:15px; margin-top:20px;">
+                <input type="date" id="fDate" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:#F8FAFC; font-family:'Inter';" required>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="fExec" checked style="width:20px; height:20px;">
+                    <label style="font-size:13px; font-weight:600;">Ejecutado</label>
                 </div>
             </div>
 
             <button type="submit" id="btnSave" class="btn-save">GUARDAR</button>
-            <button type="button" id="btnDel" onclick="del(editId)" style="width:100%; color:red; border:none; background:none; margin-top:15px; font-weight:800; display:none;">ELIMINAR</button>
+            <button type="button" id="btnDel" onclick="delTx()" style="width:100%; padding:15px; color:#EF4444; background:none; border:none; font-weight:700; display:none; margin-top:10px;">Eliminar Transacción</button>
         </form>
     </div>
 </div>
 
 <script>
-    // IMPORTANTE: REEMPLAZA ESTO CON TU URL
+    // --- CONFIGURACIÓN ---
     const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
     
-    let data = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] }, concepts: {} };
-    let editId = null, chartInstance = null, currentTxs = [];
-    let currentView = 'accounting'; 
-    
-    // Variables temporales para el form de chips
-    let tempCat = '', tempLink = '';
+    // --- ESTADO ---
+    let data = { txs: [], cats: { exp:['Super','Casa','Salidas','Servicios'], inc:['Sueldo','Ventas'] }, concepts: { 'Super':['Coto'], 'Casa':['Alquiler'] } };
+    let editId = null, currentTxs = [], chartInstance = null;
+    let filterId = null; // Para filtrar por Story
+
+    // --- TEMPORALES FORMULARIO ---
+    let tempCat='', tempLink='';
 
     window.onload = () => {
         const d = new Date();
         document.getElementById('dateInput').value = d.toISOString().slice(0, 7);
-        let prevM = new Date(); prevM.setMonth(prevM.getMonth()-1);
-        document.getElementById('copySourcePicker').value = prevM.toISOString().slice(0, 7);
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
-        if(localStorage.getItem('usdRate')) document.getElementById('usdRate').value = localStorage.getItem('usdRate');
-        forceSync(); // Recuperado: Conexión automática al inicio
+        forceSync();
     };
 
-    function switchView(view) {
-        currentView = view;
-        document.getElementById('tab-acc').className = `v-tab ${view==='accounting'?'active':''}`;
-        document.getElementById('tab-all').className = `v-tab ${view==='allocation'?'active':''}`;
-        document.getElementById('view-accounting').style.display = view==='accounting'?'block':'none';
-        document.getElementById('view-allocation').style.display = view==='allocation'?'block':'none';
-        if(view === 'allocation') renderAllocationView();
-    }
-
-    /* --- SYNC LOGIC (ESTABLE) --- */
+    // --- SYNC ENGINE (CORE V37) ---
     async function forceSync() {
-        showLoad(true);
+        loader(true);
         try {
             const res = await fetch(API_URL);
-            const cloudData = await res.json();
-            if(cloudData && cloudData.txs) { data = cloudData; loadData(); status("EN LÍNEA", "ok"); }
-        } catch(e) { status("ERROR NUBE", "error"); }
-        showLoad(false);
+            const cloud = await res.json();
+            if(cloud.txs) { 
+                data = cloud; 
+                loadData(); 
+                document.getElementById('syncDot').style.background = '#10B981'; // Green
+            }
+        } catch(e) { 
+            document.getElementById('syncDot').style.background = '#EF4444'; // Red
+        }
+        loader(false);
     }
+
     async function saveData() {
-        showLoad(true);
-        try {
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
-            status("GUARDADO", "ok"); loadData();
-        } catch(e) { status("ERROR NUBE", "error"); }
-        showLoad(false);
+        loader(true);
+        document.getElementById('syncDot').style.background = '#F59E0B'; // Orange saving
+        try { await fetch(API_URL, {method:'POST', body:JSON.stringify(data)}); loadData(); document.getElementById('syncDot').style.background='#10B981'; } 
+        catch(e) { document.getElementById('syncDot').style.background='#EF4444'; }
+        loader(false);
     }
 
     function loadData() {
         const ym = document.getElementById('dateInput').value;
         const [y, m] = ym.split('-');
-        const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+        const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
-        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
-        document.getElementById('copyZone').style.display = currentTxs.length === 0 ? 'block' : 'none';
         
-        renderLists(currentTxs); 
-        resetChart(); 
-        if(currentView === 'allocation') renderAllocationView();
+        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
+        renderStories();
+        renderFeed(filterId);
+        renderChart();
     }
 
-    /* --- LOGICA FORMULARIO CON CHIPS (INNOVACIÓN V38) --- */
+    // --- RENDERIZADO: STORIES (INNOVACIÓN V38 FUNCIONAL) ---
+    function renderStories() {
+        const tray = document.getElementById('storiesTray');
+        const incomes = currentTxs.filter(t => t.type === 'inc').sort((a,b)=>b.amount-a.amount);
+        const expenses = currentTxs.filter(t => t.type === 'exp');
+        
+        let html = '';
+        
+        // Botón "Todo"
+        html += `
+        <div class="story-item ${filterId===null?'active':''}" onclick="setFilter(null)">
+            <div class="ring-container" style="background:conic-gradient(var(--primary) 100%, transparent 0);">
+                <div class="avatar" style="background:var(--primary); color:white;"><i class="fas fa-wallet"></i></div>
+            </div>
+            <span class="story-name">Todo</span>
+        </div>`;
+
+        incomes.forEach(inc => {
+            // Calcular cuánto queda de este ingreso
+            const spent = expenses.filter(e => e.linkId == inc.id).reduce((a,b)=>a+b.amount, 0);
+            const remain = inc.amount - spent;
+            const pct = inc.amount > 0 ? (remain / inc.amount) * 100 : 0;
+            const color = remain < 0 ? '#EF4444' : (pct > 20 ? '#10B981' : '#F59E0B');
+            
+            html += `
+            <div class="story-item ${filterId==inc.id?'active':''}" onclick="setFilter(${inc.id})">
+                <div class="ring-container" style="background:conic-gradient(${color} ${Math.max(0, pct)}%, #E2E8F0 0);">
+                    <div class="avatar"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="story-badge">${Math.floor(remain/1000)}k</div>
+                </div>
+                <span class="story-name">${inc.desc}</span>
+            </div>`;
+        });
+        
+        tray.innerHTML = html;
+    }
+
+    function setFilter(id) {
+        filterId = id;
+        renderStories(); // Actualiza clases active
+        renderFeed(id);
+    }
+
+    // --- RENDERIZADO: FEED & KPI ---
+    function renderFeed(fId) {
+        const list = document.getElementById('feedList');
+        list.innerHTML = '';
+        
+        let txs = [...currentTxs];
+        let title = "Todos los movimientos";
+        let totalInc = 0, totalExp = 0;
+
+        // Si hay filtro de Story
+        if(fId) {
+            const inc = txs.find(t => t.id == fId);
+            if(inc) title = `Gastos de: ${inc.desc}`;
+            txs = txs.filter(t => t.id == fId || t.linkId == fId);
+        }
+
+        // Ordenar
+        txs.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+        // Calcular Totales Generales (para el KPI Top)
+        const allInc = currentTxs.filter(t=>t.type=='inc');
+        const allExp = currentTxs.filter(t=>t.type=='exp');
+        const sumInc = allInc.reduce((a,b)=>a+b.amount,0);
+        const sumExp = allExp.reduce((a,b)=>a+b.amount,0);
+
+        document.getElementById('kpiVal').innerText = `$${(sumInc-sumExp).toLocaleString()}`;
+        document.getElementById('kpiSpent').innerText = `$${sumExp.toLocaleString()}`;
+        document.getElementById('feedTitle').innerText = title;
+
+        txs.forEach(t => {
+            const isInc = t.type === 'inc';
+            const li = document.createElement('li');
+            li.className = 'feed-item';
+            li.onclick = () => edit(t.id);
+            
+            const icon = isInc ? 'fa-arrow-down' : (t.cat=='Super'?'fa-shopping-cart': (t.cat=='Casa'?'fa-home':'fa-receipt'));
+            const color = isInc ? 'var(--inc)' : 'var(--txt)';
+            const bg = isInc ? '#ECFDF5' : '#F1F5F9';
+            
+            // Buscar nombre del Link si existe
+            let linkName = '';
+            if(t.linkId && !isInc) {
+                const p = currentTxs.find(x=>x.id==t.linkId);
+                if(p) linkName = p.desc;
+            }
+
+            li.innerHTML = `
+                <div class="f-icon" style="background:${bg}; color:${isInc?'var(--inc)':'var(--txt-sec)'}"><i class="fas ${icon}"></i></div>
+                <div class="f-content">
+                    <div class="f-row">
+                        <span class="f-desc" style="${t.exec?'':'text-decoration:line-through; opacity:0.5'}">${t.desc}</span>
+                        <span class="f-amt" style="color:${color}">${isInc?'+':'-'} $${Math.floor(t.amount).toLocaleString()}</span>
+                    </div>
+                    <div class="f-meta">
+                        <span class="pill">${t.cat}</span>
+                        <span>${t.date.split('-')[2]}</span>
+                        ${linkName ? `<span class="pill link"><i class="fas fa-link"></i> ${linkName}</span>` : ''}
+                    </div>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+        
+        if(txs.length===0) list.innerHTML = '<div style="text-align:center; padding:30px; color:#94A3B8;">Sin movimientos aquí</div>';
+    }
+
+    // --- FORMULARIO CHIPS (LÓGICA MEJORADA) ---
+    function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); }
+    function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
+    
+    function resetForm() {
+        editId=null; document.getElementById('txForm').reset();
+        document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('btnDel').style.display='none';
+        document.getElementById('btnSave').innerText = 'GUARDAR';
+        setType('exp');
+        tempCat=''; tempLink=''; renderLinkChips();
+    }
+
     function setType(t) {
         document.getElementById('fType').value = t;
-        document.getElementById('chip-exp').className = `chip ${t=='exp'?'active':''}`;
-        document.getElementById('chip-inc').className = `chip ${t=='inc'?'active':''}`;
-        document.getElementById('linkGroup').style.display = t === 'exp' ? 'block' : 'none';
+        document.getElementById('type-exp').className = `chip ${t=='exp'?'active':''}`;
+        document.getElementById('type-inc').className = `chip ${t=='inc'?'active':''}`;
+        document.getElementById('linkGroup').style.display = t==='exp'?'block':'none';
         renderCatChips(t);
     }
 
@@ -347,38 +425,25 @@
         div.innerHTML = '';
         const cats = data.cats[type] || [];
         
-        // Botón Nueva Categoría
-        const addBtn = document.createElement('div');
-        addBtn.className = 'chip';
-        addBtn.innerHTML = '<i class="fas fa-plus"></i>';
-        addBtn.onclick = () => {
-            const n = prompt('Nueva Categoría:');
-            if(n) { data.cats[type].push(n); data.concepts[n]=[]; saveData(); renderCatChips(type); selectCat(n); }
-        };
+        // Add Button
+        const addBtn = document.createElement('div'); addBtn.className='chip'; addBtn.innerHTML='<i class="fas fa-plus"></i>';
+        addBtn.onclick = () => { const n=prompt('Nueva Categoria:'); if(n){data.cats[type].push(n); data.concepts[n]=[]; saveData(); renderCatChips(type); pickCat(n);} };
         div.appendChild(addBtn);
 
         cats.forEach(c => {
-            const chip = document.createElement('div');
-            chip.className = `chip ${tempCat===c ? 'active' : ''}`;
-            chip.innerText = c;
-            chip.onclick = () => selectCat(c);
-            div.appendChild(chip);
+            const el = document.createElement('div');
+            el.className = `chip ${tempCat===c?'active':''}`;
+            el.innerText = c;
+            el.onclick = () => pickCat(c);
+            div.appendChild(el);
         });
-        
-        // Si hay categoría seleccionada, renderizar conceptos
         if(tempCat && cats.includes(tempCat)) renderConceptChips(tempCat);
-        else document.getElementById('conceptChips').innerHTML = '';
+        else document.getElementById('conceptChips').innerHTML='';
     }
 
-    function selectCat(c) {
-        tempCat = c;
-        document.getElementById('fCat').value = c;
-        // Redibujar cats para actualizar activo
-        const chips = document.getElementById('catChips').children;
-        for(let chip of chips) {
-            chip.className = `chip ${chip.innerText===c ? 'active' : ''}`;
-            if(chip.innerHTML.includes('plus')) chip.className = 'chip'; // reset add btn
-        }
+    function pickCat(c) {
+        tempCat = c; document.getElementById('fCat').value = c;
+        renderCatChips(document.getElementById('fType').value); // Re-render to show active
         renderConceptChips(c);
     }
 
@@ -387,33 +452,28 @@
         div.innerHTML = '';
         const concepts = data.concepts[cat] || [];
         
-        const addBtn = document.createElement('div');
-        addBtn.className = 'chip';
-        addBtn.innerHTML = '+ Nuevo';
-        addBtn.onclick = () => {
-            document.getElementById('fConcept').value = 'new_c';
-            document.getElementById('fConceptCustom').style.display = 'block';
-            document.getElementById('fConceptCustom').value = '';
-            document.getElementById('fConceptCustom').focus();
-            // Desmarcar otros
-            for(let ch of div.children) ch.classList.remove('active');
-            addBtn.classList.add('active');
+        const customBtn = document.createElement('div'); customBtn.className='chip'; customBtn.innerText='+ Nuevo';
+        customBtn.onclick = () => { 
+            document.getElementById('fConcept').value='new_c'; 
+            document.getElementById('fCustomDesc').style.display='block'; 
+            document.getElementById('fCustomDesc').focus();
+            renderConceptChips(cat); // clear active
+            customBtn.classList.add('active');
         };
-        div.appendChild(addBtn);
+        div.appendChild(customBtn);
 
         concepts.forEach(c => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.innerText = c;
-            chip.onclick = () => {
+            const el = document.createElement('div');
+            el.className = 'chip';
+            if(document.getElementById('fConcept').value === c) el.classList.add('active');
+            el.innerText = c;
+            el.onclick = () => {
                 document.getElementById('fConcept').value = c;
-                document.getElementById('fConceptCustom').style.display = 'none';
-                for(let ch of div.children) ch.classList.remove('active');
-                chip.classList.add('active');
+                document.getElementById('fCustomDesc').style.display='none';
+                Array.from(div.children).forEach(x=>x.classList.remove('active'));
+                el.classList.add('active');
             };
-            // Si estamos editando y coincide
-            if(document.getElementById('fConcept').value === c) chip.classList.add('active');
-            div.appendChild(chip);
+            div.appendChild(el);
         });
     }
 
@@ -421,186 +481,119 @@
         const div = document.getElementById('linkChips');
         div.innerHTML = '';
         
-        // Opción General
-        const gen = document.createElement('div');
-        gen.className = `chip link-chip ${!tempLink ? 'active' : ''}`;
-        gen.innerText = "Fondo General";
-        gen.onclick = () => { tempLink=''; document.getElementById('fLink').value=''; renderLinkChips(); };
-        div.appendChild(gen);
+        const def = document.createElement('div'); 
+        def.className=`chip link-chip ${!tempLink?'active':''}`; def.innerText="Fondo General";
+        def.onclick=()=>{ tempLink=''; document.getElementById('fLink').value=''; renderLinkChips(); };
+        div.appendChild(def);
 
-        // Ingresos del mes
-        const incomes = currentTxs.filter(t => t.type === 'inc');
-        incomes.forEach(inc => {
-            const chip = document.createElement('div');
-            chip.className = `chip link-chip ${tempLink==inc.id ? 'active' : ''}`;
-            chip.innerText = `${inc.desc} ($${Math.floor(inc.amount)})`;
-            chip.onclick = () => { tempLink=inc.id; document.getElementById('fLink').value=inc.id; renderLinkChips(); };
-            div.appendChild(chip);
+        const incs = currentTxs.filter(t=>t.type=='inc');
+        incs.forEach(i => {
+            const el = document.createElement('div');
+            el.className=`chip link-chip ${tempLink==i.id?'active':''}`; 
+            el.innerText = `${i.desc} ($${Math.floor(i.amount)})`;
+            el.onclick=()=>{ tempLink=i.id; document.getElementById('fLink').value=i.id; renderLinkChips(); };
+            div.appendChild(el);
         });
     }
 
-    /* --- VISTAS & RENDERERS --- */
-    function renderAllocationView() {
-        const container = document.getElementById('allocation-container');
-        container.innerHTML = '';
-        const incomes = currentTxs.filter(t => t.type === 'inc').sort((a,b) => b.amount - a.amount);
-        const expenses = currentTxs.filter(t => t.type === 'exp');
-
-        incomes.forEach(inc => {
-            const linkedExps = expenses.filter(e => e.linkId == inc.id);
-            const totalSpent = linkedExps.reduce((acc, curr) => acc + curr.amount, 0);
-            const remaining = inc.amount - totalSpent;
-            const percent = inc.amount > 0 ? (totalSpent / inc.amount) * 100 : 0;
-
-            let listHtml = '';
-            linkedExps.forEach(ex => {
-                listHtml += `<div class="alloc-item" onclick="edit(${ex.id})"><span class="alloc-desc">${ex.desc}</span><span class="alloc-amt">$${Math.floor(ex.amount).toLocaleString()}</span></div>`;
-            });
-
-            const card = document.createElement('div');
-            card.className = 'alloc-card';
-            card.innerHTML = `
-                <div class="alloc-header" onclick="edit(${inc.id})">
-                    <div class="alloc-title"><span>${inc.desc}</span><span style="font-size:10px; color:#64748B;">${inc.cat}</span></div>
-                    <div class="alloc-total">$${Math.floor(inc.amount).toLocaleString()}</div>
-                </div>
-                <div class="alloc-body">${linkedExps.length ? listHtml : '<div style="font-size:12px;color:#ccc;text-align:center;">Sin gastos</div>'}</div>
-                <div class="alloc-footer">
-                    <div style="flex:1; margin-right:15px;">
-                        <div class="alloc-remain" style="color:${remaining>=0?'#166534':'#991B1B'}">Quedan: $${Math.floor(remaining).toLocaleString()}</div>
-                        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${Math.min(percent, 100)}%; background:${remaining<0?'#EF4444':'#2563EB'}"></div></div>
-                    </div>
-                </div>`;
-            container.appendChild(card);
-        });
-        
-        // Huérfanos
-        const orphanExps = expenses.filter(e => !e.linkId || !incomes.find(i => i.id == e.linkId));
-        if (orphanExps.length > 0) {
-            let html = ''; orphanExps.forEach(ex => html += `<div class="alloc-item" onclick="edit(${ex.id})"><span class="alloc-desc">${ex.desc}</span><span class="alloc-amt">$${Math.floor(ex.amount).toLocaleString()}</span></div>`);
-            const oCard = document.createElement('div'); oCard.className = 'alloc-card orphan';
-            oCard.innerHTML = `<div class="alloc-header"><div class="alloc-title"><span>Sin Asignar</span></div><div class="alloc-total">$${Math.floor(orphanExps.reduce((a,b)=>a+b.amount,0)).toLocaleString()}</div></div><div class="alloc-body">${html}</div>`;
-            container.appendChild(oCard);
-        }
-    }
-
-    function renderLists(txs) {
-        const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
-        lInc.innerHTML = ''; lExp.innerHTML = '';
-        let tIncTotal=0, tExpTotal=0;
-        let timeLine = [...txs].sort((a,b) => {
-            if (a.date !== b.date) return a.date.localeCompare(b.date);
-            if (a.type !== b.type) return a.type === 'inc' ? -1 : 1;
-            return Math.abs(b.amount) - Math.abs(a.amount);
-        });
-
-        let runningBalance = 0;
-        timeLine.forEach(t => {
-            const amt = Math.abs(t.amount);
-            if(t.type === 'inc') { runningBalance += amt; tIncTotal += amt; } else { runningBalance -= amt; tExpTotal += amt; }
-            t._calculatedBal = runningBalance;
-        });
-
-        timeLine.filter(t => t.type === 'inc').forEach(t => lInc.appendChild(createRow(t, true, null)));
-        timeLine.filter(t => t.type === 'exp').forEach(t => lExp.appendChild(createRow(t, false, t._calculatedBal)));
-
-        document.getElementById('sum-inc').innerText = `$${tIncTotal.toLocaleString()}`;
-        document.getElementById('sum-exp').innerText = `$${tExpTotal.toLocaleString()}`;
-        const bal = tIncTotal - tExpTotal;
-        const balEl = document.getElementById('kpiBal');
-        balEl.innerText = `$${bal.toLocaleString()}`;
-        balEl.style.color = bal >= 0 ? '#10B981' : '#EF4444';
-        const rate = parseFloat(document.getElementById('usdRate').value) || 1;
-        document.getElementById('kpiUsd').innerText = (bal/rate).toFixed(2);
-    }
-
-    function createRow(t, isInc, balanceVal) {
-        const div = document.createElement('div');
-        div.className = `row-item ${t.exec ? 'executed' : ''}`;
-        div.onclick = () => edit(t.id);
-        let balHtml = (!isInc && balanceVal !== null) ? `<span class="subtotal-tag ${balanceVal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(balanceVal).toLocaleString()}</span>` : '';
-        let linkHtml = (t.linkId && !isInc) ? `<span style="font-size:9px;color:#2563EB;background:#EFF6FF;padding:2px 4px;border-radius:4px;margin-right:5px;"><i class="fas fa-link"></i> Link</span>` : '';
-
-        div.innerHTML = `
-            <div class="desc-text" style="font-weight:800;font-size:13px">${t.desc}</div>
-            <div class="row-meta">
-                <div style="font-size:10px;color:gray;font-weight:700;">${linkHtml}${t.cat} | DÍA ${t.date.split('-')[2]}</div>
-                <div style="font-size:12px; font-weight:800; text-align:right;"><span class="${isInc?'c-inc':'c-exp'}">$${Math.floor(Math.abs(t.amount)).toLocaleString()}</span></div>
-            </div>
-            <div style="text-align:right;">${balHtml}</div>`;
-        return div;
-    }
-
-    function renderChart(txs, filterCat) {
-        // ... (Mismo código de gráfico estable de V37) ...
-        const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
-        const btnReset = document.getElementById('chartReset'); const centerTxt = document.getElementById('chartCenterText');
-        let exps = (txs||currentTxs).filter(t => t.type === 'exp');
-        let totalVal = 0;
-        let map = !filterCat ? exps.reduce((a,t)=>{ a[t.cat]=(a[t.cat]||0)+t.amount; totalVal+=t.amount; return a; }, {}) : exps.filter(t => t.cat === filterCat).reduce((a,t)=>{ a[t.desc]=(a[t.desc]||0)+t.amount; totalVal+=t.amount; return a; }, {});
-        btnReset.style.display = filterCat ? 'block' : 'none'; centerTxt.innerText = filterCat || "Toca para detalle";
-        chartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#6366F1'], borderWidth: 2, borderColor: '#ffffff' }] }, options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }, tooltip: { enabled: true } }, onClick: (e, el) => { if (el.length > 0 && !filterCat) renderChart(currentTxs, Object.keys(map)[el[0].index]); } } });
-    }
-
-    /* --- BASIC UTILS --- */
-    function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); document.getElementById('overlay').style.display='block'; }
-    function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; }
-    function resetForm() { 
-        editId=null; document.getElementById('txForm').reset(); document.getElementById('fDate').value=new Date().toISOString().split('T')[0]; 
-        document.getElementById('btnDel').style.display='none'; 
-        tempCat=''; tempLink=''; setType('exp'); renderLinkChips();
-    }
-    
-    // GUARDAR (Lógica actualizada para usar valores ocultos de los chips)
+    // --- ACCIONES ---
     document.getElementById('txForm').onsubmit = (e) => {
         e.preventDefault();
         let cat = document.getElementById('fCat').value;
         let desc = document.getElementById('fConcept').value;
-        if(desc==='new_c') { desc = document.getElementById('fConceptCustom').value; if(!data.concepts[cat]) data.concepts[cat]=[]; data.concepts[cat].push(desc); }
+        if(desc==='new_c' || !desc) {
+            desc = document.getElementById('fCustomDesc').value;
+            if(!cat) return alert("Selecciona categoría");
+            if(desc && !data.concepts[cat].includes(desc)) data.concepts[cat].push(desc);
+        }
         
-        const tx = { 
-            id: editId||Date.now(), 
-            date: document.getElementById('fDate').value, 
-            amount: parseFloat(document.getElementById('fAmount').value), 
-            type: document.getElementById('fType').value, 
-            cat, desc, 
+        const tx = {
+            id: editId || Date.now(),
+            date: document.getElementById('fDate').value,
+            amount: parseFloat(document.getElementById('fAmount').value),
+            type: document.getElementById('fType').value,
+            cat: cat,
+            desc: desc,
             exec: document.getElementById('fExec').checked,
-            linkId: document.getElementById('fType').value === 'exp' ? document.getElementById('fLink').value : null
+            linkId: document.getElementById('fType').value==='exp' ? document.getElementById('fLink').value : null
         };
-        if(editId) { const i=data.txs.findIndex(x=>x.id==editId); data.txs[i]=tx; } else { if(!data.txs) data.txs=[]; data.txs.push(tx); }
+
+        if(editId) {
+            const idx = data.txs.findIndex(x=>x.id==editId);
+            data.txs[idx] = tx;
+        } else {
+            data.txs.push(tx);
+        }
         saveData(); closeSheet();
     }
 
     function edit(id) {
-        const t = data.txs.find(x=>x.id==id); editId=id; 
-        document.getElementById('fDate').value=t.date; 
-        document.getElementById('fAmount').value=Math.abs(t.amount); 
-        document.getElementById('fExec').checked=t.exec;
+        const t = data.txs.find(x=>x.id==id);
+        if(!t) return;
+        editId = id;
+        document.getElementById('fAmount').value = t.amount;
+        document.getElementById('fDate').value = t.date;
+        document.getElementById('fExec').checked = t.exec;
+        document.getElementById('btnDel').style.display='block';
+        document.getElementById('btnSave').innerText = 'ACTUALIZAR';
         
-        setType(t.type); 
-        selectCat(t.cat); // Esto activa los chips de categoria y concepto
+        setType(t.type);
+        pickCat(t.cat);
         
-        // Set Concept
         document.getElementById('fConcept').value = t.desc;
-        renderConceptChips(t.cat); // Asegurar que el concepto se pinte activo
+        renderConceptChips(t.cat); // Activa el chip correcto
         
-        // Set Link
         tempLink = t.linkId || '';
         document.getElementById('fLink').value = tempLink;
         renderLinkChips();
         
-        document.getElementById('btnDel').style.display='block'; openSheet();
+        openSheet();
     }
 
-    function navMonth(n) { const i = document.getElementById('dateInput'); let [y,m]=i.value.split('-'); const d = new Date(y, m-1+n, 1); i.value = d.toISOString().slice(0,7); loadData(); }
-    function resetChart() { renderChart(currentTxs, null); }
-    function copyFromSelected() { const s=document.getElementById('copySourcePicker').value; const t=document.getElementById('dateInput').value; if(!s||s===t) return alert("Error mes"); const src=data.txs.filter(x=>x.date.startsWith(s)); if(!src.length)return alert("Vacío"); data.txs=[...data.txs, ...src.map(x=>({...x, id:Date.now()+Math.random(), date:`${t}-${x.date.split('-')[2]}`, exec:false, linkId:null}))]; saveData(); }
-    function deleteCurrentMonth() { if(confirm('¿Borrar todo este mes?')) { const ym=document.getElementById('dateInput').value; data.txs=data.txs.filter(t=>!t.date.startsWith(ym)); saveData(); } }
-    function del(id) { if(confirm('¿Borrar?')) { data.txs=data.txs.filter(x=>x.id!=id); saveData(); closeSheet(); } }
-    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`Finanzas_JM.json`; a.click(); }
+    function delTx() {
+        if(confirm("¿Eliminar?")) {
+            data.txs = data.txs.filter(x=>x.id!=editId);
+            saveData(); closeSheet();
+        }
+    }
+
+    // --- UTILS ---
+    function navMonth(n) { 
+        const i = document.getElementById('dateInput'); 
+        let [y,m]=i.value.split('-'); 
+        const d = new Date(y, m-1+n, 1); 
+        i.value = d.toISOString().slice(0,7); 
+        loadData(); 
+    }
+    
+    function deleteCurrentMonth() {
+        if(confirm("¿BORRAR TODO EL MES ACTUAL?")) {
+            const ym = document.getElementById('dateInput').value;
+            data.txs = data.txs.filter(t => !t.date.startsWith(ym));
+            saveData();
+        }
+    }
+
+    function nav(view) {
+        document.querySelectorAll('.view-section').forEach(x=>x.classList.remove('visible'));
+        document.getElementById('view-'+view).classList.add('visible');
+        document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+        document.getElementById('nav-'+view).classList.add('active');
+    }
+    
+    function loader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`Backup.json`; a.click(); }
     function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{ data=JSON.parse(e.target.result); saveData(); }; r.readAsText(i.files[0]); }
-    function showLoad(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
-    function status(t, c) { const b = document.getElementById('syncBadge'); b.innerText = t; b.className = `sync-badge ${c}`; }
+
+    function renderChart() {
+        const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
+        const map = {}; currentTxs.filter(t=>t.type=='exp').forEach(t=>map[t.cat]=(map[t.cat]||0)+t.amount);
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ['#2563EB','#10B981','#F59E0B','#EF4444','#8B5CF6'], borderWidth:0 }] },
+            options: { maintainAspectRatio:false, plugins:{legend:{position:'right', labels:{boxWidth:10}}} }
+        });
+    }
 </script>
 </body>
 </html>
