@@ -4,508 +4,440 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V42 Principal</title>
+    <title>J&M Sheets Edition</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%2310B981'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         :root {
-            --bg: #FFFFFF; --bg-sec: #F8FAFC;
-            --txt: #0F172A; --txt-sec: #64748B;
-            --primary: #0F172A; --accent: #2563EB;
-            --inc: #10B981; --exp: #EF4444;
-            --border: #E2E8F0;
+            --bg-app: #F8FAFC; --surface: #FFFFFF;
+            --text-dark: #0F172A; --text-gray: #64748B;
+            --inc-color: #10B981; --inc-bg: #ECFDF5;
+            --exp-color: #EF4444; --exp-bg: #FEF2F2;
+            --primary: #2563EB; --border: #E2E8F0;
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--txt); padding-top: 105px; padding-bottom: 80px; }
-
-        /* --- HEADER FIXED --- */
-        .fixed-header {
-            position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.98);
-            border-bottom: 1px solid var(--border); z-index: 50; padding-bottom: 0;
-        }
-        .top-row {
-            height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
-        }
-        .brand { font-weight: 900; font-size: 16px; display:flex; align-items:center; gap:6px; }
-        .sync-dot { width:8px; height:8px; border-radius:50%; background:#CBD5E1; transition:0.3s; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-app); margin: 0; color: var(--text-dark); padding-bottom: 100px; }
         
-        .date-ctrl { display: flex; align-items: center; background: #F1F5F9; border-radius: 6px; padding: 2px; }
-        .btn-arrow { width: 32px; height: 28px; border:none; background:transparent; font-size:14px; color:var(--txt); cursor:pointer; display:flex; align-items:center; justify-content:center; }
-        .date-display { font-size: 11px; font-weight: 800; text-transform: uppercase; min-width: 80px; text-align: center; position: relative; }
-        #dateInput { position: absolute; inset: 0; opacity: 0; width: 100%; height:100%; cursor:pointer; }
-
-        .kpi-row {
-            display: flex; justify-content: space-between; align-items: center; padding: 5px 15px 8px 15px; 
-            font-size: 11px; border-bottom: 1px solid #F1F5F9; background: #F8FAFC;
-        }
-        .inp-tc { width: 50px; border: 1px solid #CBD5E1; border-radius: 4px; text-align: right; font-weight: 700; padding: 2px; font-size: 10px; }
-
-        /* TABS (Solo 2 ahora) */
-        .tabs-row { display: flex; padding: 0 15px; gap: 5px; margin-top: 5px; background: white; }
-        .tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--txt-sec); border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-
-        /* VISTAS */
-        .view-section { display: none; padding: 10px 15px; }
-        .view-section.visible { display: block; }
-
-        /* --- VISTA PRINCIPAL (T + CHART) --- */
-        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; margin-bottom: 20px; }
-        .t-col { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-        .col-head { padding: 5px; text-align: center; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
-        .bg-inc { background: var(--inc); } .bg-exp { background: var(--exp); }
+        /* HEADER */
+        .top-bar { background: var(--surface); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+        .brand { font-weight: 900; color: var(--primary); font-size: 18px; display: flex; flex-direction: column; line-height: 1; }
+        .sync-badge { font-size: 9px; font-weight: 700; background: #FEF3C7; color: #B45309; padding: 2px 6px; border-radius: 4px; margin-top: 2px; text-transform: uppercase; width: fit-content; }
+        .sync-badge.ok { background: #DCFCE7; color: #166534; } .sync-badge.error { background: #FEE2E2; color: #991B1B; }
         
-        .row-compact { padding: 8px 6px; border-bottom: 1px solid #F1F5F9; font-size: 11px; position: relative; }
-        .row-compact.executed .r-desc { text-decoration: line-through; opacity: 0.5; }
-        .row-compact.executed .r-amt { opacity: 0.5; }
+        /* DATE NAV */
+        .date-ctrl { display: flex; align-items: center; background: #F1F5F9; border-radius: 8px; padding: 2px; border: 1px solid var(--border); position: relative; }
+        .btn-arrow { background: transparent; border: none; width: 45px; height: 35px; cursor: pointer; color: var(--text-dark); font-size: 18px; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .date-display { font-size: 12px; font-weight: 700; text-transform: uppercase; min-width: 100px; text-align: center; position: relative; }
+        #dateInput { position: absolute; top: 0; left: 45px; width: 100px; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
         
-        .r-top { display: flex; justify-content: space-between; align-items: center; }
-        .r-desc { font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85px; }
-        .r-amt { font-weight: 800; text-align: right; }
-        .r-meta { font-size: 9px; color: #94A3B8; margin-top: 2px; display:flex; justify-content:space-between; }
+        /* TABS */
+        .view-tabs { display: flex; padding: 15px 15px 0 15px; gap: 10px; }
+        .v-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--text-gray); background: white; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+        .v-tab.active { background: var(--text-dark); color: white; border-color: var(--text-dark); }
         
-        .tag-link { background: #EFF6FF; color: var(--accent); padding: 1px 4px; border-radius: 3px; font-size: 9px; margin-right: 4px; }
-        .subtotal-pill { display: inline-block; padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: 700; margin-top: 2px; float: right; }
+        /* KPI */
+        .kpi-wrapper { padding: 15px 15px 5px 15px; }
+        .kpi-card { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+        .kpi-val { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+        
+        /* COPY ZONE */
+        .copy-zone { padding: 15px; margin: 0 15px 10px 15px; display: none; background: white; border-radius: 12px; border: 1px dashed var(--border); }
+        .copy-controls { display: flex; gap: 8px; margin-top: 8px; }
+        .btn-copy-month { flex: 1; background: var(--text-dark); color: white; border: none; padding: 0 12px; border-radius: 8px; font-weight: 700; font-size: 13px; height: 40px; }
+        
+        /* ACCOUNTS */
+        #view-accounting { display: block; }
+        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; align-items: start; }
+        .t-col { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+        .t-list { max-height: 60vh; overflow-y: auto; scrollbar-width: thin; }
+        .col-header { padding: 8px; text-align: center; font-size: 11px; font-weight: 800; text-transform: uppercase; color: white; position: sticky; top: 0; z-index: 2; }
+        .bg-inc { background: var(--inc-color); } .bg-exp { background: var(--exp-color); }
+        .col-total { display: block; background: rgba(0,0,0,0.1); margin-top: 2px; border-radius: 4px; padding: 2px; }
+        .row-item { background: white; padding: 12px 8px; border-bottom: 1px solid #F1F5F9; }
+        .row-item.executed .desc-text { text-decoration: line-through; color: #94A3B8; }
+        .row-item.executed .amt-text { text-decoration: line-through; opacity: 0.6; }
+        .subtotal-tag { font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-top: 3px; }
         .st-ok { background: #DCFCE7; color: #166534; } .st-bad { background: #FEE2E2; color: #991B1B; }
-
-        /* CHART & LEGEND */
-        .chart-container { margin-top: 10px; padding: 15px; background: #F8FAFC; border-radius: 12px; border: 1px solid var(--border); }
-        .chart-box { height: 220px; position: relative; }
-        .legend-list { margin-top: 15px; display: flex; flex-direction: column; gap: 6px; }
-        .legend-item { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding-bottom: 4px; border-bottom: 1px dashed #E2E8F0; }
-        .l-cat { display: flex; align-items: center; gap: 6px; font-weight: 600; }
-        .l-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .l-val { font-weight: 800; color: var(--txt); }
-
-        /* ADMIN ZONE */
-        .admin-zone { margin-top: 30px; padding: 15px; background: #F1F5F9; border-radius: 8px; border: 1px dashed #CBD5E1; }
-        .admin-title { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--txt-sec); margin-bottom: 10px; }
-        .btn-admin { width: 100%; padding: 10px; background: white; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--txt); margin-bottom: 8px; }
-        .btn-danger { color: #EF4444; border-color: #FECACA; }
-
-        /* --- VISTA FLUJO --- */
-        .stories-tray { display: flex; gap: 10px; padding: 5px 0 15px 0; overflow-x: auto; scrollbar-width: none; }
-        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 50px; opacity: 0.5; transition:0.2s; }
-        .story-item.active { opacity: 1; }
-        .ring { width: 44px; height: 44px; padding: 2px; border-radius: 50%; display:flex; align-items:center; justify-content:center; }
-        .avatar { width: 100%; height: 100%; background: #F8FAFC; border-radius: 50%; border: 2px solid white; display:flex; align-items:center; justify-content:center; font-size:16px; }
-        .s-name { font-size: 9px; margin-top: 4px; font-weight: 700; max-width: 55px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .alloc-card { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-        .alloc-head { padding: 8px 12px; background: #F8FAFC; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F1F5F9; }
-        .alloc-body { padding: 0 12px; }
-        .alloc-item { padding: 6px 0; border-bottom: 1px dashed #E2E8F0; font-size: 11px; display: flex; justify-content: space-between; }
-        .alloc-foot { padding: 6px 12px; background: white; }
-        .bar-bg { height: 4px; background: #E2E8F0; border-radius: 2px; overflow: hidden; margin-top: 4px; }
-        .bar-fill { height: 100%; background: var(--accent); }
-
-        /* --- FORMULARIOS --- */
-        .fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; border:none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 20px; z-index: 40; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        .sheet { position: fixed; inset: 0; background: white; z-index: 200; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; }
-        .sheet.open { transform: translateY(0); }
-        .sheet-head { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .sheet-body { flex: 1; padding: 15px; overflow-y: auto; }
-
-        .chip-group { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .chip { padding: 6px 12px; border-radius: 20px; background: #F1F5F9; font-size: 11px; font-weight: 700; color: var(--txt-sec); border: 1px solid transparent; white-space: nowrap; cursor: pointer; }
-        .chip.active { background: var(--primary); color: white; }
-        .chip.link-chip.active { background: var(--accent); color: white; }
+        .row-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
         
-        .big-inp { width: 100%; border: none; border-bottom: 1px solid var(--border); font-size: 28px; font-weight: 900; text-align: center; padding: 10px; border-radius: 0; background: transparent; }
-        .lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #94A3B8; margin-top: 15px; display: block; margin-bottom: 5px; }
-        .btn-save { width: 100%; padding: 15px; background: var(--accent); color: white; font-weight: 800; border: none; border-radius: 10px; margin-top: 20px; font-size: 14px; }
-
-        .loader { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:300; display:none; align-items:center; justify-content:center; }
+        /* ALLOCATION */
+        #view-allocation { display: none; padding: 15px; }
+        .alloc-card { background: white; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .alloc-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; border-bottom: 1px solid var(--border); }
+        .alloc-title { font-weight: 800; font-size: 14px; color: var(--text-dark); display: flex; flex-direction: column; }
+        .alloc-total { font-weight: 800; color: var(--inc-color); font-size: 15px; }
+        .alloc-body { padding: 10px 15px; }
+        .alloc-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #E2E8F0; font-size: 13px; }
+        .alloc-item:last-child { border-bottom: none; }
+        .alloc-desc { color: var(--text-gray); font-weight: 500; }
+        .alloc-amt { font-weight: 700; color: var(--exp-color); }
+        .alloc-footer { background: #F8FAFC; padding: 10px 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .prog-bar-bg { height: 6px; width: 100%; background: #E2E8F0; border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .prog-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: 0.5s; }
+        .alloc-remain { font-size: 12px; font-weight: 800; }
+        .alloc-card.orphan .alloc-header { background: #FEF2F2; } .alloc-card.orphan .alloc-total { color: var(--exp-color); } .alloc-card.orphan .prog-bar-fill { background: var(--exp-color); }
+        
+        /* CHART & BUTTONS */
+        .chart-box { background: var(--surface); margin: 0 15px; padding: 15px; border-radius: 16px; border: 1px solid var(--border); height: 360px; position: relative; margin-top: 20px; }
+        .action-btns { padding: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .btn-big { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: white; color: var(--text-dark); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 45%; }
+        .btn-sync { width: 100%; margin-top: 5px; background: var(--primary); color: white; border: none; }
+        .btn-danger-zone { margin-top: 20px; font-size: 10px; color: #CBD5E1; text-decoration: underline; background: none; border: none; }
+        
+        /* FORM */
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--text-dark); color: white; border-radius: 50%; border:none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 24px; z-index: 40; }
+        .sheet { position: fixed; bottom: 0; width: 100%; background: white; z-index: 100; border-radius: 20px 20px 0 0; transform: translateY(100%); transition: 0.3s; padding: 25px 20px; max-height: 90vh; overflow-y: auto; }
+        .sheet.open { transform: translateY(0); }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; display: none; backdrop-filter: blur(3px); }
+        .sw-container { display: flex; background: #F1F5F9; padding: 5px; border-radius: 12px; margin-bottom: 20px; gap: 5px; }
+        .sw-item { flex: 1; padding: 15px; text-align: center; font-size: 14px; font-weight: 700; border-radius: 10px; cursor: pointer; color: var(--text-gray); display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s; }
+        .sw-item.active.exp { background: var(--exp-color); color: white; } .sw-item.active.inc { background: var(--inc-color); color: white; }
+        .inp { width: 100%; height: 48px; border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; background: #F8FAFC; margin-bottom: 12px; font-size: 16px; font-family: 'Inter'; }
+        .lbl { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .btn-save { width: 100%; height: 55px; background: var(--text-dark); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px; }
+        #linkGroup { display: none; background: #FFF7ED; padding: 10px; border-radius: 8px; border: 1px solid #FFEDD5; margin-bottom: 12px; }
+        
+        .loader-overlay { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center; }
+        .spinner { width:40px; height:40px; border:4px solid #E2E8F0; border-top:4px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        .c-inc { color: var(--inc-color); font-weight: 800; } .c-exp { color: var(--exp-color); font-weight: 800; }
     </style>
 </head>
 <body>
 
-<div id="loader" class="loader"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+<div id="loader" class="loader-overlay"><div class="spinner"></div></div>
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
 
-<div class="fixed-header">
-    <div class="top-row">
-        <div class="brand">J&M <div id="syncDot" class="sync-dot"></div></div>
-        <div class="date-ctrl">
-            <button class="btn-arrow" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-            <div class="date-display"><span id="monthTxt">...</span><input type="month" id="dateInput" onchange="loadData()"></div>
-            <button class="btn-arrow" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div onclick="forceSync()" style="font-size:14px; color:var(--txt-sec);"><i class="fas fa-sync"></i></div>
+<header class="top-bar">
+    <div class="brand">J&M <div id="syncBadge" class="sync-badge">Cargando...</div></div>
+    <div class="date-ctrl">
+        <button class="btn-arrow" type="button" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div class="date-display"><span id="monthTxt">...</span><input type="month" id="dateInput" onchange="loadData()"></div>
+        <button class="btn-arrow" type="button" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
-    
-    <div class="kpi-row">
-        <div>Total: <span style="font-weight:800; font-size:13px;" id="kpiVal">$0</span></div>
-        <div style="display:flex; align-items:center; gap:5px;">
-            <span>USD <span id="kpiUsd" style="font-weight:800;">0</span></span>
-            <span style="color:#ccc;">|</span>
-            TC: <input type="number" id="usdRate" class="inp-tc" value="1200" onchange="loadData()">
-        </div>
-    </div>
+</header>
 
-    <div class="tabs-row">
-        <div class="tab active" id="tab-main" onclick="nav('main')">Principal</div>
-        <div class="tab" id="tab-alloc" onclick="nav('alloc')">Flujo</div>
+<div class="kpi-wrapper">
+    <div class="kpi-card">
+        <div class="kpi-label">Balance Neto</div>
+        <div id="kpiBal" class="kpi-val">$0</div>
+        <div style="margin-top: 10px; font-size: 13px; color: var(--text-gray); display: flex; justify-content: center; gap: 15px;">
+            <span>USD <span id="kpiUsd" style="font-weight:800; color: var(--text-dark);">0.00</span></span>
+            <span>TC: <input type="number" id="usdRate" value="1200" style="width:55px; border:none; background:#F1F5F9; font-weight:700; text-align:right;" onchange="loadData()"></span>
+        </div>
     </div>
 </div>
 
-<div id="view-main" class="view-section visible">
-    
+<div class="view-tabs">
+    <div class="v-tab active" id="tab-acc" onclick="switchView('accounting')"><i class="fas fa-list"></i> Cuentas T</div>
+    <div class="v-tab" id="tab-all" onclick="switchView('allocation')"><i class="fas fa-stream"></i> Flujo Fondos</div>
+</div>
+
+<div class="copy-zone" id="copyZone">
+    <div style="font-size:12px; color:var(--text-gray); font-weight:700;">Mes vacío. Importar movimientos de:</div>
+    <div class="copy-controls">
+        <input type="month" id="copySourcePicker" class="inp" style="height:40px; margin:0;">
+        <button class="btn-copy-month" onclick="copyFromSelected()">CLONAR MES</button>
+    </div>
+</div>
+
+<div id="view-accounting">
     <div class="t-grid">
         <div class="t-col">
-            <div class="col-head bg-inc">Ingresos <span id="sum-inc" style="opacity:0.8">$0</span></div>
-            <div id="list-inc"></div>
+            <div class="col-header bg-inc">Ingresos<br><span id="sum-inc" class="col-total">$0</span></div>
+            <div class="t-list" id="list-inc"></div>
         </div>
         <div class="t-col">
-            <div class="col-head bg-exp">Egresos <span id="sum-exp" style="opacity:0.8">$0</span></div>
-            <div id="list-exp"></div>
-        </div>
-    </div>
-
-    <div style="font-size:11px; font-weight:800; color:var(--txt-sec); margin-bottom:5px;">DISTRIBUCIÓN DEL GASTO</div>
-    <div class="chart-container">
-        <div class="chart-box">
-            <canvas id="myChart"></canvas>
-        </div>
-        <div id="chartLegend" class="legend-list"></div>
-    </div>
-
-    <div class="admin-zone">
-        <div class="admin-title">Herramientas (Cuidado)</div>
-        <button class="btn-admin" onclick="cloneMonth()">Clonar del Mes Anterior</button>
-        <button class="btn-admin btn-danger" onclick="deleteCurrentMonth()">Eliminar Datos Mes Actual</button>
-        <div style="margin-top:10px; display:flex; gap:5px;">
-            <button class="btn-admin" onclick="backup()">Backup</button>
-            <button class="btn-admin" onclick="document.getElementById('fileIn').click()">Restaurar</button>
-            <input type="file" hidden id="fileIn" onchange="restoreSmart(this)">
+            <div class="col-header bg-exp">Egresos<br><span id="sum-exp" class="col-total">$0</span></div>
+            <div class="t-list" id="list-exp"></div>
         </div>
     </div>
 </div>
 
-<div id="view-alloc" class="view-section">
-    <div class="stories-tray" id="storiesTray"></div>
-    <div id="alloc-list"></div>
+<div id="view-allocation">
+    <div id="allocation-container"></div>
+</div>
+
+<div class="chart-box">
+    <canvas id="myChart"></canvas>
+    <div id="chartCenterText" style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); font-size:10px; color:#64748B; pointer-events:none; font-weight:600; text-align:center;">Toca para<br>detalle</div>
+    <button id="chartReset" onclick="resetChart()" style="position:absolute; bottom:10px; right:10px; border:none; background:none; color:var(--primary); font-weight:700; font-size:11px; display:none;">VOLVER</button>
+</div>
+
+<div class="action-btns">
+    <button class="btn-big" onclick="backup()"><i class="fas fa-download"></i> Backup Local</button>
+    <button class="btn-big" onclick="document.getElementById('fileIn').click()"><i class="fas fa-upload"></i> Restaurar</button>
+    <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
+    <button class="btn-big btn-sync" onclick="forceSync()"><i class="fas fa-sync"></i> Sincronizar Nube</button>
+    <button class="btn-danger-zone" onclick="deleteCurrentMonth()">Eliminar datos del mes actual</button>
 </div>
 
 <button class="fab" onclick="openSheet()"><i class="fas fa-plus"></i></button>
 
 <div class="sheet" id="sheet">
-    <div class="sheet-head">
-        <span style="font-weight:800;">Nuevo</span>
-        <span onclick="closeSheet()"><i class="fas fa-times"></i></span>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <span style="font-size:18px; font-weight:800;" id="formTitle">Nuevo</span>
+        <span onclick="closeSheet()" style="font-size:20px; color:#94A3B8;"><i class="fas fa-times"></i></span>
     </div>
-    <div class="sheet-body">
-        <form id="txForm">
-            <input type="number" id="fAmount" class="big-inp" placeholder="$0" step="0.01" required>
-            
-            <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
-                <div class="chip active" id="chip-exp" onclick="setType('exp')">Gasto</div>
-                <div class="chip" id="chip-inc" onclick="setType('inc')">Ingreso</div>
-            </div>
-            <input type="hidden" id="fType" value="exp">
+    <form id="txForm">
+        <div class="sw-container">
+            <div class="sw-item" id="sw-exp" onclick="setType('exp')"><i class="fas fa-minus-circle"></i> Gasto</div>
+            <div class="sw-item" id="sw-inc" onclick="setType('inc')"><i class="fas fa-plus-circle"></i> Ingreso</div>
+        </div>
+        <input type="hidden" id="fType" value="exp">
+        
+        <div id="linkGroup">
+            <label class="lbl" style="color:#C2410C;">Pagar con Ingreso:</label>
+            <select id="fLink" class="inp" style="margin-bottom:0; border-color:#FED7AA;">
+                <option value="">-- Fondo General (Sin asignar) --</option>
+            </select>
+        </div>
 
-            <label class="lbl">Categoría</label>
-            <div class="chip-group" id="catChips"></div>
-            <input type="hidden" id="fCat">
-
-            <label class="lbl">Concepto</label>
-            <div class="chip-group" id="conChips"></div>
-            <input type="text" id="fCustomDesc" class="big-inp" style="font-size:14px; text-align:left; border:1px solid #E2E8F0; border-radius:8px; margin-top:5px; display:none;" placeholder="Nombre...">
-            <input type="hidden" id="fConcept">
-
-            <div id="linkSection">
-                <label class="lbl" style="color:var(--accent)">Pagar con:</label>
-                <div class="chip-group" id="linkChips"></div>
-                <input type="hidden" id="fLink">
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <input type="date" id="fDate" style="flex:1; padding:10px; background:#F1F5F9; border:none; border-radius:8px;" required>
-                <div style="display:flex; align-items:center; gap:5px;">
-                    <input type="checkbox" id="fExec" checked> <span style="font-size:11px; font-weight:700;">Ejecutado</span>
-                </div>
-            </div>
-
-            <button type="submit" id="btnSave" class="btn-save">GUARDAR</button>
-            <button type="button" id="btnDel" onclick="delTx()" style="display:none; width:100%; background:none; color:red; border:none; margin-top:10px; font-weight:700;">Eliminar</button>
-        </form>
-    </div>
+        <label class="lbl">Monto</label>
+        <input type="number" id="fAmount" class="inp" placeholder="0.00" step="0.01" required>
+        
+        <label class="lbl">Fecha</label>
+        <input type="date" id="fDate" class="inp" required>
+        
+        <label class="lbl">Categoría</label>
+        <select id="fCat" class="inp" onchange="renderConcepts()" required></select>
+        
+        <label class="lbl">Concepto</label>
+        <select id="fConcept" class="inp" onchange="checkNewConcept()" required></select>
+        <input type="text" id="fConceptCustom" class="inp" style="margin-top:5px; display:none;" placeholder="Nombre...">
+        
+        <div style="margin:20px 0; display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="fExec" checked style="width:22px; height:22px;"> 
+            <label style="font-weight:700; font-size:14px;">Ejecutado (Consolidado)</label>
+        </div>
+        
+        <button type="submit" id="btnSave" class="btn-save">GUARDAR</button>
+        <button type="button" id="btnDel" onclick="del(editId)" style="width:100%; color:red; border:none; background:none; margin-top:15px; font-weight:800; display:none;">ELIMINAR</button>
+    </form>
 </div>
 
 <script>
-    // --- PEGA TU URL DE SCRIPT AQUI ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbwDELBCfaHd3zxKO1gKmwDO24RKKLF8WD_Zay9D0ahfeomVCxpKZ4BNM6q3C2w8AykE/exec";
-    
-    // UTILS
-    function uid() { return String(Date.now()) + "-" + Math.random().toString(16).slice(2); }
+    // --- PEGA AQUI TU URL DEL SCRIPT (EL QUE GUARDA EN A1) ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
 
-    let data = { txs: [], cats: { exp:['Super','Casa','Salidas'], inc:['Sueldo','Ventas'] }, concepts: {} };
-    let currentTxs = [], editId = null, filterId = null, chartInstance=null;
-    let tempCat='', tempLink='';
+    let data = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] }, concepts: {} };
+    let editId = null, chartInstance = null, currentTxs = [];
+    let currentView = 'accounting';
 
     window.onload = () => {
         const d = new Date();
         document.getElementById('dateInput').value = d.toISOString().slice(0, 7);
+        let prevM = new Date(); prevM.setMonth(prevM.getMonth()-1);
+        document.getElementById('copySourcePicker').value = prevM.toISOString().slice(0, 7);
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
         if(localStorage.getItem('usdRate')) document.getElementById('usdRate').value = localStorage.getItem('usdRate');
         forceSync();
     };
 
-    // --- SYNC ---
-    async function fetchJSON(url, opts) {
-        const res = await fetch(url, opts);
-        if(!res.ok) throw new Error(res.status);
-        return await res.json();
-    }
-    
-    function mergeData(local, incoming) {
-        const mergedTxs = [...local.txs];
-        const localMap = new Map(local.txs.map(t=>[String(t.id), t]));
-        if(incoming.txs) {
-            incoming.txs.forEach(inTx => {
-                const existing = localMap.get(String(inTx.id));
-                if(!existing) { mergedTxs.push(inTx); localMap.set(String(inTx.id), inTx); } 
-                else if((inTx.updatedAt||0) >= (existing.updatedAt||0)) {
-                    const idx = mergedTxs.findIndex(x=>String(x.id)===String(inTx.id));
-                    if(idx!==-1) mergedTxs[idx]=inTx;
-                }
-            });
-        }
-        const mergeArr = (a, b) => [...new Set([...(a||[]), ...(b||[])])];
-        const cats = { exp: mergeArr(local.cats.exp, incoming.cats?.exp), inc: mergeArr(local.cats.inc, incoming.cats?.inc) };
-        const concepts = { ...local.concepts };
-        if(incoming.concepts) for(let k in incoming.concepts) concepts[k] = mergeArr(concepts[k], incoming.concepts[k]);
-        return { rev: Math.max(local.rev||0, incoming.rev||0), txs: mergedTxs, cats, concepts };
+    function switchView(view) {
+        currentView = view;
+        document.getElementById('tab-acc').className = `v-tab ${view==='accounting'?'active':''}`;
+        document.getElementById('tab-all').className = `v-tab ${view==='allocation'?'active':''}`;
+        document.getElementById('view-accounting').style.display = view==='accounting'?'block':'none';
+        document.getElementById('view-allocation').style.display = view==='allocation'?'block':'none';
+        if(view === 'allocation') renderAllocationView();
     }
 
     async function forceSync() {
-        loader(true);
+        showLoad(true);
         try {
-            const cloud = await fetchJSON(API_URL);
-            if(cloud) data = mergeData(data, cloud);
-            loadData();
-            const synced = await fetchJSON(API_URL, { method:'POST', body:JSON.stringify(data) });
-            if(synced) data = mergeData(data, synced);
-            loadData(); document.getElementById('syncDot').style.background='#10B981';
-        } catch(e) { document.getElementById('syncDot').style.background='#EF4444'; }
-        loader(false);
-    }
-    async function saveData() {
-        loader(true); document.getElementById('syncDot').style.background='#F59E0B';
-        localStorage.setItem('usdRate', document.getElementById('usdRate').value);
-        try { 
-            const synced = await fetchJSON(API_URL, { method:'POST', body:JSON.stringify(data) });
-            if(synced) data = mergeData(data, synced);
-            loadData(); document.getElementById('syncDot').style.background='#10B981'; 
-        } catch(e){ document.getElementById('syncDot').style.background='#EF4444'; }
-        loader(false);
+            const res = await fetch(API_URL);
+            const cloudData = await res.json();
+            if(cloudData && cloudData.txs) { data = cloudData; loadData(); status("EN LÍNEA", "ok"); }
+        } catch(e) { status("ERROR DE RED", "error"); }
+        showLoad(false);
     }
 
-    // --- CORE ---
+    async function saveData() {
+        showLoad(true);
+        try {
+            // El script devuelve texto "OK", no JSON. Por eso solo verificamos respuesta ok.
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
+            status("GUARDADO", "ok"); 
+            loadData();
+        } catch(e) { status("ERROR AL GUARDAR", "error"); }
+        showLoad(false);
+    }
+
     function loadData() {
         const ym = document.getElementById('dateInput').value;
         const [y, m] = ym.split('-');
-        const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+        const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
+        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
+        document.getElementById('copyZone').style.display = currentTxs.length === 0 ? 'block' : 'none';
         
-        currentTxs = (data.txs || []).filter(t => !t.deletedAt && t.date.startsWith(ym));
-        currentTxs.sort((a,b) => {
-            if(a.date !== b.date) return a.date.localeCompare(b.date);
-            if(a.type !== b.type) return a.type==='inc' ? -1 : 1;
-            return a.id - b.id;
+        renderLists(currentTxs); 
+        resetChart(); 
+        renderCats();
+        if(currentView === 'allocation') renderAllocationView();
+    }
+
+    // --- CORRECCION DE FLECHAS: EL FIX REAL ---
+    function navMonth(n) {
+        const i = document.getElementById('dateInput');
+        // Parseo manual para evitar timezone
+        const [yStr, mStr] = i.value.split('-');
+        let year = parseInt(yStr);
+        let month = parseInt(mStr);
+        let d = new Date(year, month - 1 + n, 1);
+        let newY = d.getFullYear();
+        let newM = d.getMonth() + 1;
+        let mFormatted = newM < 10 ? '0' + newM : newM;
+        i.value = `${newY}-${mFormatted}`;
+        loadData();
+    }
+
+    /* RESTO DE FUNCIONES UI */
+    function renderAllocationView() {
+        const container = document.getElementById('allocation-container'); container.innerHTML = '';
+        const incomes = currentTxs.filter(t => t.type === 'inc').sort((a,b) => b.amount - a.amount);
+        const expenses = currentTxs.filter(t => t.type === 'exp');
+        
+        incomes.forEach(inc => {
+            const linkedExps = expenses.filter(e => e.linkId == inc.id);
+            const totalSpent = linkedExps.reduce((acc, curr) => acc + curr.amount, 0);
+            const remaining = inc.amount - totalSpent;
+            const percent = inc.amount > 0 ? (totalSpent / inc.amount) * 100 : 0;
+            let listHtml = '';
+            linkedExps.forEach(ex => { listHtml += `<div class="alloc-item" onclick="edit(${ex.id})"><span class="alloc-desc">${ex.desc}</span><span class="alloc-amt">$${Math.floor(ex.amount).toLocaleString()}</span></div>`; });
+            const card = document.createElement('div'); card.className = 'alloc-card';
+            card.innerHTML = `<div class="alloc-header" onclick="edit(${inc.id})"><div class="alloc-title"><span>${inc.desc}</span><span style="font-size:10px; color:#64748B; font-weight:500;">${inc.cat}</span></div><div class="alloc-total">$${Math.floor(inc.amount).toLocaleString()}</div></div><div class="alloc-body">${linkedExps.length ? listHtml : '<div style="font-size:12px;color:#ccc;text-align:center;">Sin gastos asignados</div>'}</div><div class="alloc-footer"><div style="flex:1; margin-right:15px;"><div class="alloc-remain" style="color:${remaining>=0 ? '#166534' : '#991B1B'}">Quedan: $${Math.floor(remaining).toLocaleString()}</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${Math.min(percent, 100)}%; background:${remaining<0?'#EF4444':'#2563EB'}"></div></div></div><div style="font-size:10px; font-weight:700; color:#64748B;">${Math.round(percent)}%</div></div>`;
+            container.appendChild(card);
         });
-
-        calcKPI();
-        renderClassic();
-        renderStories();
-        renderAlloc();
-        renderChart();
+        const orphanExps = expenses.filter(e => !e.linkId || !incomes.find(i => i.id == e.linkId));
+        if (orphanExps.length > 0) {
+            const totalOrphan = orphanExps.reduce((a,b)=>a+b.amount,0);
+            let orphanHtml = ''; orphanExps.forEach(ex => { orphanHtml += `<div class="alloc-item" onclick="edit(${ex.id})"><span class="alloc-desc">${ex.desc}</span><span class="alloc-amt">$${Math.floor(ex.amount).toLocaleString()}</span></div>`; });
+            const oCard = document.createElement('div'); oCard.className = 'alloc-card orphan';
+            oCard.innerHTML = `<div class="alloc-header"><div class="alloc-title"><span>Sin Asignar</span><span style="font-size:10px; color:#64748B; font-weight:500;">Fondo Común</span></div><div class="alloc-total">$${Math.floor(totalOrphan).toLocaleString()}</div></div><div class="alloc-body">${orphanHtml}</div>`;
+            container.appendChild(oCard);
+        }
     }
 
-    function calcKPI() {
-        const inc = currentTxs.filter(t=>t.type=='inc').reduce((a,b)=>a+b.amount,0);
-        const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
-        const bal = inc - exp;
-        document.getElementById('kpiVal').innerText = `$${bal.toLocaleString()}`;
-        document.getElementById('kpiVal').style.color = bal >= 0 ? '#10B981' : '#EF4444';
-        const tc = parseFloat(document.getElementById('usdRate').value) || 1;
-        document.getElementById('kpiUsd').innerText = Math.round(bal/tc).toLocaleString();
-        document.getElementById('sum-inc').innerText = `$${inc.toLocaleString()}`;
-        document.getElementById('sum-exp').innerText = `$${exp.toLocaleString()}`;
-    }
-
-    // --- RENDER ---
-    function renderClassic() {
+    function renderLists(txs) {
         const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
         lInc.innerHTML = ''; lExp.innerHTML = '';
+        let tIncTotal=0, tExpTotal=0;
+        let timeLine = [...txs];
+        timeLine.sort((a,b) => {
+            if (a.date !== b.date) return a.date.localeCompare(b.date);
+            if (a.type !== b.type) return a.type === 'inc' ? -1 : 1;
+            if (a.exec !== b.exec) return b.exec - a.exec;
+            return Math.abs(b.amount) - Math.abs(a.amount);
+        });
         let runningBalance = 0;
-        currentTxs.forEach(t => {
-            if(t.type === 'inc') runningBalance += t.amount; else runningBalance -= t.amount;
-            const el = document.createElement('div');
-            el.className = `row-compact ${t.exec?'executed':''}`;
-            el.onclick = () => edit(t.id);
-            let linkTag = '';
-            if(t.linkId && t.type === 'exp') {
-                const p = currentTxs.find(x=>String(x.id)===String(t.linkId));
-                if(p) linkTag = `<span class="tag-link"><i class="fas fa-link"></i> ${p.desc.substring(0,8)}</span>`;
-            }
-            let subTag = '';
-            if(t.type === 'exp') subTag = `<div class="subtotal-pill ${runningBalance>=0?'st-ok':'st-bad'}">Quedan: $${Math.floor(runningBalance)}</div>`;
-            
-            el.innerHTML = `
-                <div class="r-top">
-                    <div class="r-desc">${t.desc}</div>
-                    <div class="r-amt" style="color:${t.type=='inc'?'var(--inc)':'var(--txt)'}">$${Math.floor(t.amount).toLocaleString()}</div>
-                </div>
-                <div class="r-meta"><div>${linkTag}${t.cat} | ${t.date.split('-')[2]}</div>${subTag}</div>`;
-            if(t.type === 'inc') lInc.appendChild(el); else lExp.appendChild(el);
+        timeLine.forEach(t => {
+            const amt = Math.abs(t.amount);
+            if(t.type === 'inc') { runningBalance += amt; tIncTotal += amt; } else { runningBalance -= amt; tExpTotal += amt; }
+            t._calculatedBal = runningBalance;
         });
+        let incs = timeLine.filter(t => t.type === 'inc');
+        let exps = timeLine.filter(t => t.type === 'exp');
+        incs.forEach(t => lInc.appendChild(createRow(t, true, null)));
+        exps.forEach(t => lExp.appendChild(createRow(t, false, t._calculatedBal)));
+        document.getElementById('sum-inc').innerText = `$${tIncTotal.toLocaleString()}`;
+        document.getElementById('sum-exp').innerText = `$${tExpTotal.toLocaleString()}`;
+        const bal = tIncTotal - tExpTotal;
+        const balEl = document.getElementById('kpiBal'); balEl.innerText = `$${bal.toLocaleString()}`; balEl.style.color = bal >= 0 ? '#10B981' : '#EF4444';
+        const rate = parseFloat(document.getElementById('usdRate').value) || 1; document.getElementById('kpiUsd').innerText = (bal/rate).toFixed(2);
     }
 
-    function renderStories() {
-        const tray = document.getElementById('storiesTray');
-        const incomes = currentTxs.filter(t => t.type === 'inc');
-        const exps = currentTxs.filter(t => t.type === 'exp');
-        let html = `<div class="story-item ${filterId===null?'active':''}" onclick="setFilter(null)"><div class="ring" style="background:conic-gradient(#0F172A 100%, transparent 0)"><div class="avatar" style="background:#0F172A; color:white;">All</div></div><span class="s-name">Todo</span></div>`;
-        incomes.forEach(inc => {
-            const spent = exps.filter(e => String(e.linkId) === String(inc.id)).reduce((a,b)=>a+b.amount,0);
-            const remain = inc.amount - spent;
-            const pct = inc.amount>0 ? (remain/inc.amount)*100 : 0;
-            const color = remain<0 ? '#EF4444' : (pct>20 ? '#10B981' : '#F59E0B');
-            html += `<div class="story-item ${filterId==inc.id?'active':''}" onclick="setFilter('${inc.id}')"><div class="ring" style="background:conic-gradient(${color} ${Math.max(0,pct)}%, #E2E8F0 0)"><div class="avatar">$</div></div><span class="s-name">${inc.desc}</span></div>`;
-        });
-        tray.innerHTML = html;
+    function createRow(t, isInc, balanceVal) {
+        const div = document.createElement('div');
+        div.className = `row-item ${t.exec ? 'executed' : ''}`;
+        div.onclick = () => edit(t.id);
+        let balHtml = ''; if (!isInc && balanceVal !== null) { balHtml = `<span class="subtotal-tag ${balanceVal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(balanceVal).toLocaleString()}</span>`; }
+        let linkBadge = ''; if(t.linkId && !isInc) { const parent = currentTxs.find(x => x.id == t.linkId); if(parent) linkBadge = `<div style="font-size:9px; background:#EFF6FF; color:#1D4ED8; padding:1px 4px; border-radius:3px; display:inline-block; margin-right:5px;"><i class="fas fa-link"></i> ${parent.desc.substring(0,8)}...</div>`; }
+        div.innerHTML = `<div class="desc-text" style="font-weight:800;font-size:13px">${t.desc}</div><div class="row-meta"><div style="font-size:10px;color:gray;font-weight:700;">${linkBadge} ${t.cat} | DÍA ${t.date.split('-')[2]}</div><div style="font-size:12px; font-weight:800; text-align:right;"><span class="${isInc?'c-inc':'c-exp'}">$${Math.floor(Math.abs(t.amount)).toLocaleString()}</span></div></div><div style="text-align:right;">${balHtml}</div>`;
+        return div;
     }
 
-    function renderAlloc() {
-        const cont = document.getElementById('alloc-list'); cont.innerHTML = '';
-        let txs = filterId ? currentTxs.filter(t=>String(t.id)===String(filterId) || String(t.linkId)===String(filterId)) : currentTxs;
-        const incs = txs.filter(t=>t.type=='inc'); const exps = txs.filter(t=>t.type=='exp');
-        incs.forEach(inc => {
-            const sub = exps.filter(e => String(e.linkId) === String(inc.id));
-            const spent = sub.reduce((a,b)=>a+b.amount,0);
-            const remain = inc.amount - spent;
-            const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
-            let items = '';
-            sub.forEach(s => items += `<div class="alloc-item" onclick="edit('${s.id}')"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`);
-            cont.innerHTML += `<div class="alloc-card"><div class="alloc-head" onclick="edit('${inc.id}')"><span style="font-weight:700; font-size:12px;">${inc.desc}</span><span style="font-weight:800; color:var(--inc); font-size:12px;">$${Math.floor(inc.amount)}</span></div><div class="alloc-body">${items||'<div style="font-size:10px;text-align:center;padding:5px;color:#ccc;">Sin gastos asignados</div>'}</div><div class="alloc-foot"><div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700;"><span>Gastado: $${Math.floor(spent)}</span><span style="color:${remain<0?'red':'green'}">Queda: $${Math.floor(remain)}</span></div><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(pct,100)}%; background:${remain<0?'red':'#2563EB'}"></div></div></div></div>`;
-        });
-    }
-
-    function renderChart() {
+    function renderChart(txs, filterCat) {
         const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
-        const legend = document.getElementById('chartLegend'); legend.innerHTML = '';
-        const map = {}; let totalExp = 0;
-        currentTxs.filter(t=>t.type=='exp').forEach(t=>{ map[t.cat]=(map[t.cat]||0)+t.amount; totalExp+=t.amount; });
-        
-        const colors = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#6366F1'];
-        const labels = Object.keys(map); const dataPts = Object.values(map);
-        
-        // Render Custom Legend with % and Amount
-        labels.forEach((lbl, i) => {
-            const val = dataPts[i];
-            const pct = totalExp > 0 ? Math.round((val/totalExp)*100) : 0;
-            const color = colors[i % colors.length];
-            legend.innerHTML += `
-            <div class="legend-item">
-                <div class="l-cat"><div class="l-dot" style="background:${color}"></div>${lbl}</div>
-                <div class="l-val">$${Math.floor(val).toLocaleString()} <span style="color:#94A3B8; margin-left:4px;">(${pct}%)</span></div>
-            </div>`;
-        });
-
-        chartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: labels, datasets: [{ data: dataPts, backgroundColor: colors, borderWidth:1 }] },
-            options: { maintainAspectRatio:false, plugins:{ legend:{display:false} } } // Hide default legend
+        const btnReset = document.getElementById('chartReset'); const centerTxt = document.getElementById('chartCenterText');
+        let exps = txs.filter(t => t.type === 'exp');
+        let totalVal = 0;
+        let map = !filterCat ? exps.reduce((a,t)=>{ a[t.cat]=(a[t.cat]||0)+t.amount; totalVal+=t.amount; return a; }, {}) 
+                             : exps.filter(t => t.cat === filterCat).reduce((a,t)=>{ a[t.desc]=(a[t.desc]||0)+t.amount; totalVal+=t.amount; return a; }, {});
+        btnReset.style.display = filterCat ? 'block' : 'none'; centerTxt.innerText = filterCat || "Toca para detalle";
+        chartInstance = new Chart(ctx, { 
+            type: 'doughnut', 
+            data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#6366F1'], borderWidth: 2, borderColor: '#ffffff' }] }, 
+            options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }, tooltip: { enabled: true } }, onClick: (e, el) => { if (el.length > 0 && !filterCat) renderChart(txs, Object.keys(map)[el[0].index]); } } 
         });
     }
 
-    function setFilter(id) { filterId = id; renderStories(); renderAlloc(); }
-
-    // --- NAV FIXED ---
-    function navMonth(n) { 
-        const i = document.getElementById('dateInput');
-        let [y, m] = i.value.split('-');
-        // Crear fecha segura sumando/restando meses
-        const d = new Date(parseInt(y), parseInt(m) - 1 + n, 1);
-        const nextY = d.getFullYear();
-        const nextM = (d.getMonth() + 1).toString().padStart(2, '0');
-        i.value = `${nextY}-${nextM}`;
-        loadData(); 
+    function copyFromSelected() {
+        const sourceYM = document.getElementById('copySourcePicker').value; const targetYM = document.getElementById('dateInput').value;
+        if(!sourceYM || sourceYM === targetYM) return alert("Selecciona un mes origen distinto al actual");
+        const sourceTxs = (data.txs || []).filter(t => t.date.startsWith(sourceYM));
+        if(sourceTxs.length === 0) return alert("El mes origen no tiene datos");
+        const newTxs = sourceTxs.map(t => { const day = t.date.split('-')[2]; return { ...t, id: Date.now() + Math.random(), date: `${targetYM}-${day}`, exec: false, linkId: null }; });
+        data.txs = [...data.txs, ...newTxs]; saveData();
     }
     
-    function nav(view) {
-        document.querySelectorAll('.view-section').forEach(x=>x.classList.remove('visible'));
-        document.getElementById('view-'+view).classList.add('visible');
-        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-        document.getElementById('tab-'+view).classList.add('active');
-    }
-
-    // --- ADMIN ACTIONS ---
-    function cloneMonth() {
-        const ym = document.getElementById('dateInput').value;
-        const [y, m] = ym.split('-');
-        // Calcular mes anterior
-        const d = new Date(parseInt(y), parseInt(m)-2, 1); // Mes actual - 1
-        const prevY = d.getFullYear();
-        const prevM = (d.getMonth() + 1).toString().padStart(2, '0');
-        const prevYM = `${prevY}-${prevM}`;
-
-        if(!confirm(`¿Clonar todos los movimientos de ${prevYM} a este mes?`)) return;
-
-        // Buscar txs del mes anterior activo
-        const sourceTxs = data.txs.filter(t => !t.deletedAt && t.date.startsWith(prevYM));
-        
-        if(sourceTxs.length === 0) return alert("No hay datos en el mes anterior.");
-
-        sourceTxs.forEach(t => {
-            const newTx = { ...t };
-            newTx.id = uid(); // Nuevo ID
-            newTx.date = `${y}-${m}-${t.date.split('-')[2]}`; // Misma dia, mes actual
-            newTx.exec = false; // Resetear ejecutado
-            newTx.updatedAt = Date.now();
-            data.txs.push(newTx);
-        });
-        saveData();
-    }
-
     function deleteCurrentMonth() {
-        if(!confirm("¿ESTÁS SEGURO? Se borrará todo lo de este mes.")) return;
         const ym = document.getElementById('dateInput').value;
-        data.txs.forEach(t => {
-            if(t.date.startsWith(ym) && !t.deletedAt) {
-                t.deletedAt = Date.now();
-                t.updatedAt = Date.now();
-            }
-        });
-        saveData();
+        if(confirm(`ATENCIÓN: ¿Borrar mes ${ym}?`)) { data.txs = data.txs.filter(t => !t.date.startsWith(ym)); saveData(); }
     }
-
-    // --- FORM ---
-    function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); }
-    function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
-    function resetForm() { editId=null; document.getElementById('txForm').reset(); document.getElementById('fDate').value = new Date().toISOString().split('T')[0]; document.getElementById('btnDel').style.display='none'; document.getElementById('btnSave').innerText='GUARDAR'; setType('exp'); tempCat=''; tempLink=''; renderLinkChips(); }
-
-    function setType(t) { document.getElementById('fType').value = t; document.getElementById('chip-exp').className=`chip ${t=='exp'?'active':''}`; document.getElementById('chip-inc').className=`chip ${t=='inc'?'active':''}`; document.getElementById('linkSection').style.display = t=='exp'?'block':'none'; renderCatChips(t); }
-    function renderCatChips(type) { const div = document.getElementById('catChips'); div.innerHTML = ''; const cats = data.cats[type] || []; const add = document.createElement('div'); add.className='chip'; add.innerText='+'; add.onclick=()=>{ const n=prompt('Nueva Cat:'); if(n){data.cats[type].push(n);data.concepts[n]=[];saveData();renderCatChips(type);pickCat(n);} }; div.appendChild(add); cats.forEach(c => { const el = document.createElement('div'); el.className=`chip ${tempCat==c?'active':''}`; el.innerText=c; el.onclick=()=>{pickCat(c)}; div.appendChild(el); }); if(tempCat && cats.includes(tempCat)) renderConChips(tempCat); else document.getElementById('conChips').innerHTML=''; }
-    function pickCat(c) { tempCat=c; document.getElementById('fCat').value=c; renderCatChips(document.getElementById('fType').value); renderConChips(c); }
-    function renderConChips(cat) { const div = document.getElementById('conChips'); div.innerHTML=''; const cons = data.concepts[cat] || []; const add = document.createElement('div'); add.className='chip'; add.innerText='+ Manual'; add.onclick=()=>{ document.getElementById('fConcept').value='new'; document.getElementById('fCustomDesc').style.display='block'; }; div.appendChild(add); cons.forEach(c => { const el = document.createElement('div'); el.className='chip'; el.innerText=c; if(document.getElementById('fConcept').value==c) el.classList.add('active'); el.onclick=()=>{ document.getElementById('fConcept').value=c; document.getElementById('fCustomDesc').style.display='none'; Array.from(div.children).forEach(x=>x.classList.remove('active')); el.classList.add('active'); }; div.appendChild(el); }); }
-    function renderLinkChips() { const div = document.getElementById('linkChips'); div.innerHTML=''; const def = document.createElement('div'); def.className=`chip link-chip ${!tempLink?'active':''}`; def.innerText='General'; def.onclick=()=>{tempLink=''; document.getElementById('fLink').value=''; renderLinkChips();}; div.appendChild(def); currentTxs.filter(t=>t.type=='inc').forEach(i => { const el = document.createElement('div'); el.className=`chip link-chip ${String(tempLink)===String(i.id)?'active':''}`; el.innerText=`${i.desc} ($${Math.floor(i.amount)})`; el.onclick=()=>{tempLink=i.id; document.getElementById('fLink').value=i.id; renderLinkChips();}; div.appendChild(el); }); }
-
-    document.getElementById('txForm').onsubmit = (e) => { e.preventDefault(); let cat=document.getElementById('fCat').value, desc=document.getElementById('fConcept').value; if(desc=='new' || !desc) { desc=document.getElementById('fCustomDesc').value; if(desc && !data.concepts[cat].includes(desc)) data.concepts[cat].push(desc); } const tx = { id: editId || uid(), date: document.getElementById('fDate').value, amount: parseFloat(document.getElementById('fAmount').value), type: document.getElementById('fType').value, cat: cat, desc: desc, exec: document.getElementById('fExec').checked, linkId: document.getElementById('fType').value=='exp' ? document.getElementById('fLink').value : null, updatedAt: Date.now() }; const idx = data.txs.findIndex(x=>String(x.id)===String(tx.id)); if(idx!==-1) data.txs[idx]=tx; else data.txs.push(tx); saveData(); closeSheet(); }
-    function edit(id) { const t = data.txs.find(x=>String(x.id)===String(id)); editId=id; document.getElementById('fAmount').value=t.amount; document.getElementById('fDate').value=t.date; document.getElementById('fExec').checked=t.exec; document.getElementById('btnDel').style.display='block'; setType(t.type); pickCat(t.cat); document.getElementById('fConcept').value=t.desc; renderConChips(t.cat); tempLink=t.linkId||''; document.getElementById('fLink').value=tempLink; renderLinkChips(); openSheet(); }
-    function delTx() { if(confirm('Borrar?')){ const t = data.txs.find(x=>String(x.id)===String(editId)); if(t) { t.deletedAt=Date.now(); t.updatedAt=Date.now(); } saveData(); closeSheet(); } }
     
-    function loader(s) { document.getElementById('loader').style.display=s?'flex':'none'; }
-    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download='Backup.json'; a.click(); }
-    function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{data=mergeData(data, JSON.parse(e.target.result)); saveData();}; r.readAsText(i.files[0]); }
+    function setType(t) { 
+        document.getElementById('fType').value = t; 
+        document.getElementById('sw-inc').className = `sw-item ${t=='inc'?'active inc':''}`; 
+        document.getElementById('sw-exp').className = `sw-item ${t=='exp'?'active exp':''}`; 
+        document.getElementById('linkGroup').style.display = t === 'exp' ? 'block' : 'none';
+        renderCats(); 
+    }
+    
+    function populateLinkSelect() {
+        const sel = document.getElementById('fLink'); const currentLink = sel.value; sel.innerHTML = '<option value="">-- Fondo General (Sin asignar) --</option>';
+        const incomes = currentTxs.filter(t => t.type === 'inc');
+        incomes.forEach(inc => { const opt = document.createElement('option'); opt.value = inc.id; opt.text = `${inc.desc} ($${Math.floor(inc.amount)})`; sel.appendChild(opt); });
+        sel.value = currentLink;
+    }
+    
+    function renderCats() { const t = document.getElementById('fType').value, s = document.getElementById('fCat'); s.innerHTML=''; (data.cats[t]||[]).forEach(c=>s.add(new Option(c,c))); s.add(new Option('+ Crear...','new')); renderConcepts(); }
+    function renderConcepts() { const cVal = document.getElementById('fCat').value; if(cVal==='new'){ const n=prompt('Nueva Categoría:'); if(n){ data.cats[document.getElementById('fType').value].push(n); data.concepts[n]=[]; saveData(); renderCats(); document.getElementById('fCat').value=n; } else { renderCats(); return; } } const s = document.getElementById('fConcept'); s.innerHTML=''; (data.concepts[cVal]||[]).forEach(c=>s.add(new Option(c,c))); s.add(new Option('+ Nuevo...','new_c')); checkNewConcept(); }
+    function checkNewConcept() { const isNew = document.getElementById('fConcept').value==='new_c'; document.getElementById('fConceptCustom').style.display=isNew?'block':'none'; }
+    function openSheet() { if(!editId) resetForm(); populateLinkSelect(); document.getElementById('sheet').classList.add('open'); document.getElementById('overlay').style.display='block'; }
+    function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; }
+    function resetForm() { editId=null; document.getElementById('txForm').reset(); document.getElementById('fDate').value=new Date().toISOString().split('T')[0]; document.getElementById('btnDel').style.display='none'; setType('exp'); document.getElementById('fLink').value = ""; }
+    function resetChart() { renderChart(currentTxs, null); }
+    
+    document.getElementById('txForm').onsubmit = (e) => {
+        e.preventDefault();
+        let cat = document.getElementById('fCat').value, desc = document.getElementById('fConcept').value;
+        if(desc==='new_c') { desc=document.getElementById('fConceptCustom').value; if(!data.concepts[cat]) data.concepts[cat]=[]; data.concepts[cat].push(desc); }
+        const linkId = document.getElementById('fLink').value || null;
+        const tx = { 
+            id: editId||Date.now(), date: document.getElementById('fDate').value, amount: parseFloat(document.getElementById('fAmount').value), 
+            type: document.getElementById('fType').value, cat, desc, exec: document.getElementById('fExec').checked, linkId: linkId 
+        };
+        if(editId) { const i=data.txs.findIndex(x=>x.id==editId); data.txs[i]=tx; } else { if(!data.txs) data.txs=[]; data.txs.push(tx); }
+        saveData(); closeSheet();
+    }
+    function edit(id) {
+        const t = data.txs.find(x=>x.id==id); editId=id; document.getElementById('fDate').value=t.date; document.getElementById('fAmount').value=Math.abs(t.amount); document.getElementById('fExec').checked=t.exec;
+        setType(t.type); document.getElementById('fCat').value=t.cat; renderConcepts(); document.getElementById('fConcept').value=t.desc;
+        populateLinkSelect(); if(t.linkId) document.getElementById('fLink').value = t.linkId;
+        document.getElementById('btnDel').style.display='block'; openSheet();
+    }
+    function del(id) { if(confirm('¿Borrar?')) { data.txs=data.txs.filter(x=>x.id!=id); saveData(); closeSheet(); } }
+    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`Finanzas_JM.json`; a.click(); }
+    function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{ data=JSON.parse(e.target.result); saveData(); }; r.readAsText(i.files[0]); }
+    function showLoad(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
+    function status(t, c) { const b = document.getElementById('syncBadge'); b.innerText = t; b.className = `sync-badge ${c}`; }
 </script>
 </body>
 </html>
