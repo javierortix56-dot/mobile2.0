@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V45.1 Fixed</title>
+    <title>J&M V46 Compact Tools & Drilldown</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -18,17 +18,15 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--txt); padding-top: 60px; padding-bottom: 80px; height: 100vh; overflow: hidden; }
 
-        /* HEADER */
+        /* HEADER & CUSTOM DATE NAV */
         .header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
         .brand { font-weight: 900; font-size: 20px; letter-spacing: -0.5px; display:flex; gap:6px; align-items:center;}
         .sync-dot { width:8px; height:8px; border-radius:50%; background:#CBD5E1; transition:0.3s; }
-        
-        /* DATE NAV */
         .date-pill { background: #F1F5F9; border-radius: 12px; padding: 6px 10px; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 14px; border: 1px solid var(--border); cursor: pointer; }
         .btn-arrow { background: none; border: none; font-size: 16px; color: var(--txt); cursor: pointer; padding: 0 5px; display:flex; align-items:center; height:100%; z-index: 2; }
         .date-txt { position: relative; min-width: 85px; text-align: center; text-transform: uppercase; user-select: none; }
 
-        /* DATE MODAL */
+        /* CUSTOM DATE PICKER MODAL */
         .date-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .date-modal.open { display: flex; }
         .picker-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -37,11 +35,11 @@
         .month-btn { padding: 12px; text-align: center; background: #F8FAFC; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; border: 1px solid var(--border); }
         .month-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* VIEWS */
+        /* VISTAS */
         .view-section { display: none; height: 100%; overflow-y: auto; padding-bottom: 80px; } 
         .view-section.active { display: block; }
 
-        /* KPI DASHBOARD */
+        /* DASHBOARD KPI */
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
         .kpi-card { background: var(--surface); padding: 15px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .kpi-card.main { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; }
@@ -50,12 +48,12 @@
         .kpi-val-small { font-size: 18px; font-weight: 800; }
         .tc-inp { width: 40px; border: none; background: #F1F5F9; border-radius: 4px; text-align: right; font-weight: 700; font-size: 12px; padding: 2px; color: var(--txt-sec); }
 
-        /* TABS */
+        /* TABS INTERNOS */
         .int-tabs { padding: 0 15px; display:flex; gap:20px; border-bottom: 1px solid var(--border); background: var(--surface); }
         .i-tab { font-weight: 700; font-size: 13px; color: var(--txt-sec); cursor: pointer; padding: 12px 0; border-bottom: 3px solid transparent; }
         .i-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* LISTAS T */
+        /* CUENTAS T */
         .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 15px; height: calc(100% - 220px); }
         .t-col { display: flex; flex-direction: column; background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
         .col-head { padding: 8px; text-align: center; font-size: 11px; font-weight: 800; color: white; text-transform: uppercase; flex-shrink: 0; }
@@ -68,7 +66,7 @@
         .executed { text-decoration: line-through; opacity: 0.5; }
         .amt-inc { color: var(--inc); } .amt-exp { color: var(--txt); }
 
-        /* FLUJO */
+        /* ALLOCATION CON ACORDEON */
         .alloc-list { padding: 15px; }
         .alloc-group { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
         .alloc-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #F8FAFC; }
@@ -85,24 +83,32 @@
         .bar-fill { height: 100%; transition: 0.5s; }
         .alloc-footer { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--txt-sec); }
 
-        /* CHART & ADMIN */
-        .chart-container { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 15px; margin-bottom: 20px; }
+        /* GRAFICOS & ADMIN COMPACTO */
+        .chart-container { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; position: relative; }
+        .chart-title { margin:0 0 15px 0; font-size:13px; text-transform:uppercase; color:var(--txt-sec); display: flex; justify-content: space-between; align-items: center; }
         .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
-        .l-dot { width: 10px; height: 10px; border-radius: 50%; }
-        
-        .admin-box { background: #F1F5F9; padding: 20px; border-radius: 16px; margin-top: 25px; }
-        .btn-adm { width: 100%; padding: 12px; background: white; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 13px; font-weight: 700; cursor:pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-danger { color: #EF4444; border-color: #FECACA; background: #FEF2F2; }
-        .btn-sync { background: var(--primary); color: white; border: none; }
+        .l-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .btn-back-chart { border: none; background: none; color: var(--accent); font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-        /* NAV & FAB */
+        .admin-box-compact { background: #F8FAFC; padding: 15px; border-radius: 16px; margin-top: 20px; border: 1px solid var(--border); }
+        .admin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+        .btn-adm-c { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 5px; cursor: pointer; gap: 5px; }
+        .btn-adm-c i { font-size: 18px; color: var(--txt-sec); }
+        .btn-adm-c span { font-size: 10px; font-weight: 700; color: var(--txt); text-align: center; }
+        .btn-adm-row { display: flex; gap: 10px; }
+        .btn-adm-wide { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 700; color: var(--txt); cursor: pointer; }
+        .btn-danger { color: #EF4444; border-color: #FECACA; background: #FEF2F2; }
+        .btn-sync-c { background: var(--primary); color: white; border: none; } .btn-sync-c i { color: white; } .btn-sync-c span { color: white; }
+        .clone-sel-c { flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 10px; font-family: 'Inter'; font-size: 12px; background: var(--surface); }
+
+        /* BOTTOM NAV & FAB */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 40; padding-bottom: 10px; }
         .nav-btn { font-size: 22px; color: #94A3B8; background: none; border: none; padding: 10px; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
         .fab { width: 55px; height: 55px; background: var(--primary); border-radius: 20px; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2); transform: translateY(-15px); border: 4px solid white; cursor: pointer; }
 
-        /* SHEET */
+        /* SHEET FORM */
         .sheet { position: fixed; inset: 0; background: var(--surface); z-index: 100; transform: translateY(100%); transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
         .sheet.open { transform: translateY(0); }
         .sheet-head { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -191,25 +197,32 @@
 </div>
 
 <div id="view-stats" class="view-section" style="padding:20px;">
-    <div class="chart-container">
-        <h4 style="margin:0 0 15px 0; font-size:13px; text-transform:uppercase; color:var(--txt-sec);">Distribución de Gasto</h4>
-        <div style="height:220px;"><canvas id="doughnutChart"></canvas></div>
-        <div id="doughnutLegend" class="legend-grid"></div>
+    <div class="chart-container" id="chartExpBox">
+        <div class="chart-title">
+            <span>Distribución de Gasto</span>
+            <button class="btn-back-chart" id="btnBackExp" style="display:none;" onclick="resetDrillDown()"><i class="fas fa-arrow-left"></i> Volver</button>
+        </div>
+        <div style="height:220px;"><canvas id="doughnutChartExp"></canvas></div>
+        <div id="doughnutLegendExp" class="legend-grid"></div>
     </div>
 
-    <div class="admin-box">
-        <h4 style="margin:0 0 15px 0; font-size:12px; text-transform:uppercase; color:var(--txt-sec); text-align:center;">Herramientas</h4>
-        <button class="btn-adm btn-sync" onclick="forceSync()"><i class="fas fa-cloud-upload-alt"></i> Sincronizar Nube</button>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="btn-adm" onclick="backup()"><i class="fas fa-file-download"></i> Backup</button>
-            <button class="btn-adm" onclick="document.getElementById('fileIn').click()"><i class="fas fa-file-upload"></i> Restaurar</button>
+    <div class="chart-container">
+        <h4 class="chart-title">Distribución de Ingresos</h4>
+        <div style="height:220px;"><canvas id="doughnutChartInc"></canvas></div>
+        <div id="doughnutLegendInc" class="legend-grid"></div>
+    </div>
+
+    <div class="admin-box-compact">
+        <h4 style="margin:0 0 15px 0; font-size:11px; text-transform:uppercase; color:var(--txt-sec); text-align:center;">Herramientas</h4>
+        <div class="admin-grid">
+            <button class="btn-adm-c btn-sync-c" onclick="forceSync()"><i class="fas fa-cloud-upload-alt"></i><span>Sincronizar</span></button>
+            <button class="btn-adm-c" onclick="backup()"><i class="fas fa-file-download"></i><span>Backup</span></button>
+            <button class="btn-adm-c" onclick="document.getElementById('fileIn').click()"><i class="fas fa-file-upload"></i><span>Restaurar</span></button>
+            <button class="btn-adm-c btn-danger" onclick="deleteCurrentMonth()"><i class="fas fa-trash-alt"></i><span>Eliminar Mes</span></button>
         </div>
-        <div style="margin-top:15px; padding-top:15px; border-top:1px solid #E2E8F0;">
-             <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <select id="cloneSource" class="inp-std" style="padding:8px;"><option>Cargando...</option></select>
-                <button class="btn-adm" style="flex:1; margin:0;" onclick="cloneFromSelected()"><i class="fas fa-copy"></i> Clonar</button>
-            </div>
-            <button class="btn-adm btn-danger" onclick="deleteCurrentMonth()"><i class="fas fa-trash-alt"></i> Eliminar Mes Actual</button>
+        <div class="btn-adm-row">
+            <select id="cloneSource" class="clone-sel-c"><option>Cargando meses...</option></select>
+            <button class="btn-adm-wide" style="flex:0 0 auto;" onclick="cloneFromSelected()"><i class="fas fa-copy"></i> Clonar</button>
         </div>
     </div>
 </div>
@@ -265,15 +278,17 @@
 <input type="file" hidden id="fileIn" onchange="restoreSmart(this)">
 
 <script>
-    // --- PEGA AQUI TU URL ---
+    // --- CONFIG ---
     const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
     const MONTHS_ES = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+    const COLORS = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#06B6D4','#84CC16'];
 
     let data = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas'] }, concepts: {} };
-    let currentTxs = [], editId = null, doughnutChart = null;
+    let currentTxs = [], editId = null, chartExp = null, chartInc = null;
     let tempCat = '', tempLink = '';
     let currentDate = new Date(); currentDate.setDate(1); 
     let pickerYear = currentDate.getFullYear();
+    let drillDownCat = null;
 
     window.onload = () => {
         updateDateUI(); initMonthGrid();
@@ -281,64 +296,35 @@
         forceSync();
     };
 
-    function updateDateUI() {
-        document.getElementById('monthTxt').innerText = `${MONTHS_ES[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-        loadData(); updateCloneSelector();
-    }
+    // --- DATE ---
+    function updateDateUI() { document.getElementById('monthTxt').innerText = `${MONTHS_ES[currentDate.getMonth()]} ${currentDate.getFullYear()}`; loadData(); updateCloneSelector(); }
     function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); updateDateUI(); }
     function openDatePicker() { pickerYear = currentDate.getFullYear(); updatePickerUI(); document.getElementById('dateModal').classList.add('open'); }
     function closeDatePicker() { document.getElementById('dateModal').classList.remove('open'); }
     function changePickerYear(delta) { pickerYear += delta; updatePickerUI(); }
-    
-    function initMonthGrid() {
-        const grid = document.getElementById('monthsGrid');
-        MONTHS_ES.forEach((m, i) => {
-            const btn = document.createElement('div'); btn.className = 'month-btn'; btn.innerText = m;
-            btn.onclick = () => { currentDate.setFullYear(pickerYear); currentDate.setMonth(i); updateDateUI(); closeDatePicker(); };
-            grid.appendChild(btn);
-        });
-    }
-    function updatePickerUI() {
-        document.getElementById('pickerYearTxt').innerText = pickerYear;
-        Array.from(document.getElementById('monthsGrid').children).forEach((btn, i) => {
-            btn.classList.toggle('active', i === currentDate.getMonth() && pickerYear === currentDate.getFullYear());
-        });
-    }
+    function initMonthGrid() { const grid = document.getElementById('monthsGrid'); MONTHS_ES.forEach((m, i) => { const btn = document.createElement('div'); btn.className = 'month-btn'; btn.innerText = m; btn.onclick = () => { currentDate.setFullYear(pickerYear); currentDate.setMonth(i); updateDateUI(); closeDatePicker(); }; grid.appendChild(btn); }); }
+    function updatePickerUI() { document.getElementById('pickerYearTxt').innerText = pickerYear; Array.from(document.getElementById('monthsGrid').children).forEach((btn, i) => { btn.classList.toggle('active', i === currentDate.getMonth() && pickerYear === currentDate.getFullYear()); }); }
 
-    // --- DATA LOAD (FIX DE FECHA + ORDEN) ---
+    // --- DATA ---
     function loadData() {
-        const y = currentDate.getFullYear(), m = currentDate.getMonth(); // 0-11
-        
-        currentTxs = (data.txs || []).filter(t => {
-            if(t.deletedAt) return false;
-            // Parseamos manualmente para evitar Timezone Shift
-            const [tY, tM, tD] = t.date.split('-').map(Number);
-            return tY === y && tM === (m + 1); // tM viene en base 1 (01, 02...)
-        });
-
-        // ORDEN: Dia 1 arriba (ASCENDENTE) -> ID
-        currentTxs.sort((a,b) => {
-            if (a.date !== b.date) return a.date.localeCompare(b.date);
-            return a.id - b.id;
-        });
-        
-        calcKPI(); renderClassic(); renderAllocWithAccordions(); renderCharts();
+        const y = currentDate.getFullYear(), m = currentDate.getMonth();
+        currentTxs = (data.txs || []).filter(t => !t.deletedAt && new Date(t.date).getFullYear() === y && new Date(t.date).getMonth() === m);
+        currentTxs.sort((a,b) => a.date.localeCompare(b.date) || a.id - b.id);
+        calcKPI(); renderClassic(); renderAllocWithAccordions(); resetDrillDown(); renderCharts();
     }
 
     function calcKPI() {
         const inc = currentTxs.filter(t=>t.type=='inc').reduce((a,b)=>a+b.amount,0);
         const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
         const bal = inc - exp;
-        const kpi = document.getElementById('kpiBal'); kpi.innerText = `$${Math.floor(bal).toLocaleString()}`; kpi.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
-        const tc = parseFloat(document.getElementById('usdRate').value) || 1; 
-        document.getElementById('kpiUsd').innerText = Math.round(bal/tc).toLocaleString();
-        document.getElementById('sum-inc').innerText = `$${Math.floor(inc).toLocaleString()}`;
-        document.getElementById('sum-exp').innerText = `$${Math.floor(exp).toLocaleString()}`;
+        document.getElementById('kpiBal').innerText = `$${Math.floor(bal).toLocaleString()}`; document.getElementById('kpiBal').style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
+        const tc = parseFloat(document.getElementById('usdRate').value) || 1; document.getElementById('kpiUsd').innerText = Math.round(bal/tc).toLocaleString();
+        document.getElementById('sum-inc').innerText = `$${Math.floor(inc).toLocaleString()}`; document.getElementById('sum-exp').innerText = `$${Math.floor(exp).toLocaleString()}`;
     }
 
+    // --- RENDERERS ---
     function renderClassic() {
-        const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
-        lInc.innerHTML = ''; lExp.innerHTML = ''; let runningBal = 0;
+        const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp'); lInc.innerHTML = ''; lExp.innerHTML = ''; let runningBal = 0;
         currentTxs.forEach(t => {
             if(t.type === 'inc') runningBal += t.amount; else runningBal -= t.amount;
             const el = document.createElement('div'); el.className = `row-item ${t.exec?'executed':''}`; el.onclick = () => edit(t.id);
@@ -353,69 +339,44 @@
         const cont = document.getElementById('alloc-container'); cont.innerHTML = '';
         const incs = currentTxs.filter(t=>t.type=='inc'); const exps = currentTxs.filter(t=>t.type=='exp');
         incs.forEach(inc => {
-            const sub = exps.filter(e => e.linkId == inc.id);
-            const spent = sub.reduce((a,b)=>a+b.amount,0); const remain = inc.amount - spent; const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
+            const sub = exps.filter(e => e.linkId == inc.id); const spent = sub.reduce((a,b)=>a+b.amount,0); const remain = inc.amount - spent; const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
             let rows = ''; sub.forEach(s => rows += `<div class="alloc-row" onclick="edit(${s.id})"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`);
-            const group = document.createElement('div'); group.className = 'alloc-group';
-            group.innerHTML = `<div class="alloc-header" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">${inc.desc}</div><div class="ah-meta"><span class="ah-amt amt-inc">$${Math.floor(inc.amount)}</span><i class="fas fa-chevron-down chevron"></i></div></div><div class="alloc-details">${rows||'<div style="text-align:center;color:#ccc;padding:10px;">Sin asignar</div>'}<div style="margin-top:10px;"><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(pct,100)}%; background:${remain<0?'var(--exp)':'var(--accent)'}"></div></div><div class="alloc-footer"><span>Gastado: $${Math.floor(spent)}</span><span style="color:${remain<0?'var(--exp)':'var(--inc)'}">Queda: $${Math.floor(remain)}</span></div></div></div>`;
-            cont.appendChild(group);
+            cont.innerHTML += `<div class="alloc-group"><div class="alloc-header" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">${inc.desc}</div><div class="ah-meta"><span class="ah-amt amt-inc">$${Math.floor(inc.amount)}</span><i class="fas fa-chevron-down chevron"></i></div></div><div class="alloc-details">${rows||'<div style="text-align:center;color:#ccc;padding:10px;">Sin asignar</div>'}<div style="margin-top:10px;"><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(pct,100)}%; background:${remain<0?'var(--exp)':'var(--accent)'}"></div></div><div class="alloc-footer"><span>Gastado: $${Math.floor(spent)}</span><span style="color:${remain<0?'var(--exp)':'var(--inc)'}">Queda: $${Math.floor(remain)}</span></div></div></div></div>`;
         });
-        const orphans = exps.filter(e => !e.linkId);
-        if(orphans.length > 0) {
-             const total = orphans.reduce((a,b)=>a+b.amount,0);
-             let rows = ''; orphans.forEach(s => rows += `<div class="alloc-row" onclick="edit(${s.id})"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`);
-             const group = document.createElement('div'); group.className = 'alloc-group';
-             group.innerHTML = `<div class="alloc-header orphan" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">Fondo Común</div><div class="ah-meta"><span class="ah-amt amt-exp">$${Math.floor(total)}</span><i class="fas fa-chevron-down chevron"></i></div></div><div class="alloc-details">${rows}</div>`;
-             cont.appendChild(group);
-        }
+        const orphans = exps.filter(e => !e.linkId); if(orphans.length > 0) { const total = orphans.reduce((a,b)=>a+b.amount,0); let rows = ''; orphans.forEach(s => rows += `<div class="alloc-row" onclick="edit(${s.id})"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`); cont.innerHTML += `<div class="alloc-group"><div class="alloc-header orphan" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">Fondo Común</div><div class="ah-meta"><span class="ah-amt amt-exp">$${Math.floor(total)}</span><i class="fas fa-chevron-down chevron"></i></div></div><div class="alloc-details">${rows}</div></div>`; }
     }
 
+    // --- CHARTS ---
     function renderCharts() {
-        const ctxD = document.getElementById('doughnutChart'); if(doughnutChart) doughnutChart.destroy();
-        const legend = document.getElementById('doughnutLegend'); legend.innerHTML = '';
-        const map = {}; let total=0; currentTxs.filter(t=>t.type=='exp').forEach(t=>{ map[t.cat]=(map[t.cat]||0)+t.amount; total+=t.amount; });
-        const colors = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899'];
-        Object.keys(map).forEach((lbl, i) => { const val=map[lbl]; const pct=total>0?Math.round((val/total)*100):0; legend.innerHTML += `<div class="legend-item"><div class="l-dot" style="background:${colors[i%colors.length]}"></div>${lbl}: <b>$${Math.floor(val).toLocaleString()}</b> (${pct}%)</div>`; });
-        doughnutChart = new Chart(ctxD, { type:'doughnut', data:{labels:Object.keys(map), datasets:[{data:Object.values(map), backgroundColor:colors, borderWidth:0}]}, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, layout:{padding:10}} });
+        renderDoughnut('doughnutChartExp', 'doughnutLegendExp', 'exp', drillDownCat);
+        renderDoughnut('doughnutChartInc', 'doughnutLegendInc', 'inc', null);
     }
 
-    function updateCloneSelector() {
-        const sel = document.getElementById('cloneSource'); sel.innerHTML = '';
-        const currentYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`;
-        const monthsMap = new Set();
-        (data.txs||[]).forEach(t => { if(!t.deletedAt) monthsMap.add(t.date.slice(0,7)); });
-        Array.from(monthsMap).sort().reverse().forEach(ym => {
-            if(ym !== currentYM) {
-                const [y, m] = ym.split('-'); const opt = document.createElement('option');
-                opt.value = ym; opt.text = `${MONTHS_ES[parseInt(m)-1]} ${y}`; sel.appendChild(opt);
-            }
-        });
-        if(sel.options.length === 0) sel.add(new Option("No hay meses previos", ""));
+    function renderDoughnut(canvasId, legendId, type, filterCat) {
+        const ctx = document.getElementById(canvasId); if(type=='exp' && chartExp) chartExp.destroy(); if(type=='inc' && chartInc) chartInc.destroy();
+        const legend = document.getElementById(legendId); legend.innerHTML = '';
+        const map = {}; let total=0;
+        const txs = currentTxs.filter(t=>t.type==type);
+        txs.forEach(t=>{ if(!filterCat || t.cat==filterCat) { const key = filterCat ? t.desc : t.cat; map[key]=(map[key]||0)+t.amount; total+=t.amount; }});
+        Object.keys(map).forEach((lbl, i) => { const val=map[lbl]; const pct=total>0?Math.round((val/total)*100):0; legend.innerHTML += `<div class="legend-item"><div class="l-dot" style="background:${COLORS[i%COLORS.length]}"></div><div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${lbl}</div><div style="font-weight:700;">$${Math.floor(val).toLocaleString()} (${pct}%)</div></div>`; });
+        
+        const chartConfig = { type:'doughnut', data:{labels:Object.keys(map), datasets:[{data:Object.values(map), backgroundColor:COLORS, borderWidth:0}]}, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, layout:{padding:10}} };
+        if(type == 'exp' && !filterCat) {
+            chartConfig.options.onClick = (e, el) => { if(el.length > 0) { drillDownCat = chartConfig.data.labels[el[0].index]; document.getElementById('btnBackExp').style.display='flex'; renderCharts(); }};
+        }
+        if(type=='exp') chartExp = new Chart(ctx, chartConfig); else chartInc = new Chart(ctx, chartConfig);
     }
+    function resetDrillDown() { drillDownCat = null; document.getElementById('btnBackExp').style.display='none'; renderCharts(); }
 
-    function cloneFromSelected() {
-        const srcYM = document.getElementById('cloneSource').value;
-        if(!srcYM) return alert("Selecciona un mes origen válido");
-        if(!confirm(`¿Clonar datos de ${srcYM} a este mes?`)) return;
-        const srcTxs = data.txs.filter(t => !t.deletedAt && t.date.startsWith(srcYM));
-        const targetYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`;
-        srcTxs.forEach(t => data.txs.push({ ...t, id: Date.now()+Math.random(), date: `${targetYM}-${t.date.split('-')[2]}`, exec: false, linkId: null }));
-        saveData();
-    }
-    function deleteCurrentMonth() {
-        const ym = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`;
-        if(confirm(`¿ELIMINAR TODO EN ${MONTHS_ES[currentDate.getMonth()]} ${currentDate.getFullYear()}?`)) { data.txs.forEach(t => { if(t.date.startsWith(ym)) t.deletedAt = Date.now(); }); saveData(); }
-    }
+    // --- ADMIN ---
+    function updateCloneSelector() { const sel = document.getElementById('cloneSource'); sel.innerHTML = ''; const currentYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; const monthsMap = new Set(); (data.txs||[]).forEach(t => { if(!t.deletedAt) monthsMap.add(t.date.slice(0,7)); }); Array.from(monthsMap).sort().reverse().forEach(ym => { if(ym !== currentYM) { const [y, m] = ym.split('-'); const opt = document.createElement('option'); opt.value = ym; opt.text = `${MONTHS_ES[parseInt(m)-1]} ${y}`; sel.appendChild(opt); } }); if(sel.options.length === 0) sel.add(new Option("No hay meses previos", "")); }
+    function cloneFromSelected() { const srcYM = document.getElementById('cloneSource').value; if(!srcYM) return alert("Selecciona origen"); if(!confirm(`¿Clonar de ${srcYM}?`)) return; const srcTxs = data.txs.filter(t => !t.deletedAt && t.date.startsWith(srcYM)); const targetYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; srcTxs.forEach(t => data.txs.push({ ...t, id: Date.now()+Math.random(), date: `${targetYM}-${t.date.split('-')[2]}`, exec: false, linkId: null })); saveData(); }
+    function deleteCurrentMonth() { if(confirm(`¿ELIMINAR MES ACTUAL?`)) { const ym = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; data.txs.forEach(t => { if(t.date.startsWith(ym)) t.deletedAt = Date.now(); }); saveData(); } }
 
+    // --- FORM ---
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
-    function resetForm() { editId=null; document.getElementById('txForm').reset(); 
-        const today = new Date(); const isCurrent = today.getMonth() === currentDate.getMonth() && today.getFullYear() === currentDate.getFullYear();
-        let dayStr = isCurrent ? today.getDate().toString().padStart(2,'0') : '01';
-        let mStr = (currentDate.getMonth()+1).toString().padStart(2,'0');
-        document.getElementById('fDate').value = `${currentDate.getFullYear()}-${mStr}-${dayStr}`;
-        document.getElementById('btnDel').style.display='none'; setType('exp'); tempCat=''; tempLink=''; renderLinkChips(); 
-    }
+    function resetForm() { editId=null; document.getElementById('txForm').reset(); const today=new Date(); const isCur = today.getMonth()===currentDate.getMonth() && today.getFullYear()===currentDate.getFullYear(); document.getElementById('fDate').value=`${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}-${isCur?today.getDate().toString().padStart(2,'0'):'01'}`; document.getElementById('btnDel').style.display='none'; setType('exp'); tempCat=''; tempLink=''; renderLinkChips(); }
     function setType(t) { document.getElementById('fType').value = t; document.getElementById('seg-exp').className=`seg-btn ${t=='exp'?'active':''}`; document.getElementById('seg-inc').className=`seg-btn ${t=='inc'?'active':''}`; document.getElementById('linkSection').style.display = t=='exp'?'block':'none'; renderCatChips(t); }
     function renderCatChips(type) { const div = document.getElementById('catChips'); div.innerHTML = ''; (data.cats[type]||[]).forEach(c => { const el = document.createElement('div'); el.className=`chip ${tempCat==c?'active':''}`; el.innerText=c; el.onclick=()=>{tempCat=c;document.getElementById('fCat').value=c;renderCatChips(type);renderConChips(c);}; div.appendChild(el); }); const add=document.createElement('div'); add.className='chip'; add.innerHTML='<i class="fas fa-plus"></i>'; add.onclick=()=>{const n=prompt('Nueva Cat:');if(n){data.cats[type].push(n);data.concepts[n]=[];saveData();renderCatChips(type);}}; div.appendChild(add); if(tempCat && data.cats[type].includes(tempCat)) renderConChips(tempCat); else document.getElementById('conChips').innerHTML=''; }
     function renderConChips(cat) { const div = document.getElementById('conChips'); div.innerHTML=''; (data.concepts[cat]||[]).forEach(c => { const el = document.createElement('div'); el.className=`chip ${document.getElementById('fConcept').value==c?'active':''}`; el.innerText=c; el.onclick=()=>{document.getElementById('fConcept').value=c;document.getElementById('fCustomDesc').style.display='none';renderConChips(cat);}; div.appendChild(el); }); const add=document.createElement('div'); add.className='chip'; add.innerText='+'; add.onclick=()=>{document.getElementById('fConcept').value='new';document.getElementById('fCustomDesc').style.display='block';document.getElementById('fCustomDesc').focus();}; div.appendChild(add); }
@@ -425,6 +386,7 @@
     function edit(id) { const t = data.txs.find(x=>x.id==id); editId=id; document.getElementById('fAmount').value=t.amount; document.getElementById('fDate').value=t.date; document.getElementById('fExec').checked=t.exec; document.getElementById('btnDel').style.display='block'; setType(t.type); tempCat=t.cat; document.getElementById('fCat').value=t.cat; renderCatChips(t.type); document.getElementById('fConcept').value=t.desc; renderConChips(t.cat); tempLink=t.linkId||''; document.getElementById('fLink').value=tempLink; renderLinkChips(); openSheet(); }
     function delTx() { if(confirm('¿Borrar?')) { data.txs.find(x=>x.id==editId).deletedAt=Date.now(); saveData(); closeSheet(); } }
 
+    // --- SYNC & UTILS ---
     async function forceSync() { loader(true); try{ let r=await fetch(API_URL); let c=await r.json(); if(c.txs){data=c;loadData();document.getElementById('syncDot').style.background='#10B981';} }catch(e){document.getElementById('syncDot').style.background='#EF4444';} loader(false); }
     async function saveData() { loader(true); document.getElementById('syncDot').style.background='#F59E0B'; localStorage.setItem('usdRate',document.getElementById('usdRate').value); try{ await fetch(API_URL,{method:'POST',body:JSON.stringify(data)}); loadData(); document.getElementById('syncDot').style.background='#10B981'; }catch(e){} loader(false); }
     function loader(s) { document.getElementById('loader').style.display=s?'flex':'none'; }
