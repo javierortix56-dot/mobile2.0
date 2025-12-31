@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V49 Optimized</title>
+    <title>J&M V50 Final</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -39,7 +39,7 @@
         .view-section { display: none; height: 100%; overflow-y: auto; padding-bottom: 80px; } 
         .view-section.active { display: block; }
 
-        /* KPI DASHBOARD */
+        /* KPI DASHBOARD - ORIGINAL RESTAURADO */
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
         .kpi-card { background: var(--surface); padding: 15px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .kpi-card.main { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; }
@@ -66,7 +66,7 @@
         .executed { text-decoration: line-through; opacity: 0.5; }
         .amt-inc { color: var(--inc); } .amt-exp { color: var(--txt); }
 
-        /* ALLOCATION (ASIGNACIÓN) - IMPROVED */
+        /* ALLOCATION (ASIGNACIÓN) */
         .alloc-list { padding: 15px; }
         .alloc-group { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
         .alloc-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #F8FAFC; }
@@ -79,7 +79,7 @@
         .alloc-details { display: none; padding: 0 15px 15px 15px; border-top: 1px solid var(--border); }
         .alloc-group.open .alloc-details { display: block; }
         
-        /* NEW ALLOC ROW STYLE */
+        /* ESTILO FILA ASIGNACIÓN MEJORADO */
         .alloc-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dashed #E2E8F0; font-size: 12px; gap: 10px; }
         .ar-date { font-family: 'Inter'; font-weight: 600; color: var(--txt-sec); font-size: 10px; background: #F1F5F9; padding: 2px 6px; border-radius: 4px; min-width: 45px; text-align: center; }
         .ar-desc { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -115,7 +115,7 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 40; padding-bottom: 10px; }
         .nav-btn { font-size: 22px; color: #94A3B8; background: none; border: none; padding: 10px; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
-        /* FAB UPDATED to ensure click resets form first */
+        /* FAB UPDATED: resetForm evita que se sobrescriban datos viejos */
         .fab { width: 55px; height: 55px; background: var(--primary); border-radius: 20px; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2); transform: translateY(-15px); border: 4px solid white; cursor: pointer; }
         
         .sheet { position: fixed; inset: 0; background: var(--surface); z-index: 100; transform: translateY(100%); transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
@@ -300,8 +300,8 @@
     let pickerYear = currentDate.getFullYear();
     let drillDownCat = null;
 
-    // --- HELPER FORMATO ARGENTINA ---
-    const fmt = (n) => new Intl.NumberFormat('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 2}).format(Math.floor(n));
+    // Helper para formato 1.000,00 (Argentina)
+    const fmt = (n) => n.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 2});
 
     window.onload = () => {
         updateDateUI(); initMonthGrid();
@@ -318,7 +318,7 @@
     function initMonthGrid() { const grid = document.getElementById('monthsGrid'); MONTHS_ES.forEach((m, i) => { const btn = document.createElement('div'); btn.className = 'month-btn'; btn.innerText = m; btn.onclick = () => { currentDate.setFullYear(pickerYear); currentDate.setMonth(i); updateDateUI(); closeDatePicker(); }; grid.appendChild(btn); }); }
     function updatePickerUI() { document.getElementById('pickerYearTxt').innerText = pickerYear; Array.from(document.getElementById('monthsGrid').children).forEach((btn, i) => { btn.classList.toggle('active', i === currentDate.getMonth() && pickerYear === currentDate.getFullYear()); }); }
 
-    // --- DATA ---
+    // --- DATA & KPI (RESTAURADO) ---
     function loadData() {
         const y = currentDate.getFullYear(), m = currentDate.getMonth() + 1;
         currentTxs = (data.txs || []).filter(t => !t.deletedAt && parseInt(t.date.split('-')[0]) === y && parseInt(t.date.split('-')[1]) === m);
@@ -331,7 +331,10 @@
         const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
         const bal = inc - exp;
         
-        const kpiBal = document.getElementById('kpiBal'); kpiBal.innerText = `$${fmt(bal)}`; kpiBal.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
+        // Logica Original Restaurada con Formato
+        const kpiBal = document.getElementById('kpiBal'); 
+        kpiBal.innerText = `$${fmt(bal)}`; 
+        kpiBal.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
         
         const tc = parseFloat(document.getElementById('usdRate').value) || 1; 
         const kpiUsd = document.getElementById('kpiUsd');
@@ -362,7 +365,8 @@
         incs.forEach(inc => {
             const sub = exps.filter(e => e.linkId == inc.id);
             const spent = sub.reduce((a,b)=>a+b.amount,0); const remaining = inc.amount - spent; const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
-            // MEJORA VISUAL y FECHA AQUI:
+            
+            // FILAS CON FECHA AGREGADA
             let rows = ''; 
             sub.forEach(s => {
                 const day = s.date.split('-')[2]; const month = s.date.split('-')[1];
