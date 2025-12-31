@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V40 Compact</title>
+    <title>J&M V41.0 Stable</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -23,12 +23,12 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--txt); padding-top: 100px; padding-bottom: 80px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--txt); padding-top: 105px; padding-bottom: 80px; }
 
-        /* --- HEADER FIXED (Compacto) --- */
+        /* --- HEADER FIXED --- */
         .fixed-header {
             position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.98);
-            border-bottom: 1px solid var(--border); z-index: 50; padding-bottom: 5px;
+            border-bottom: 1px solid var(--border); z-index: 50; padding-bottom: 0;
         }
         .top-row {
             height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
@@ -36,7 +36,7 @@
         .brand { font-weight: 900; font-size: 16px; display:flex; align-items:center; gap:6px; }
         .sync-dot { width:8px; height:8px; border-radius:50%; background:#CBD5E1; }
 
-        /* Controles Fecha <> */
+        /* Controles Fecha */
         .date-ctrl {
             display: flex; align-items: center; background: #F1F5F9; border-radius: 6px; padding: 2px;
         }
@@ -45,54 +45,61 @@
             display:flex; align-items:center; justify-content:center;
         }
         .date-display {
-            font-size: 11px; font-weight: 800; text-transform: uppercase; width: 80px; text-align: center; position: relative;
+            font-size: 11px; font-weight: 800; text-transform: uppercase; min-width: 80px; text-align: center; position: relative;
         }
         #dateInput { position: absolute; inset: 0; opacity: 0; width: 100%; height:100%; cursor:pointer; }
 
-        /* --- TABS NAVEGACION (Compacto) --- */
-        .tabs-row { display: flex; padding: 0 15px; gap: 5px; margin-top: 2px; }
+        /* KPI Header (USD/TC) */
+        .kpi-row {
+            display: flex; justify-content: space-between; align-items: center; padding: 5px 15px 8px 15px; 
+            font-size: 11px; border-bottom: 1px solid #F1F5F9; background: #F8FAFC;
+        }
+        .inp-tc { width: 50px; border: 1px solid #CBD5E1; border-radius: 4px; text-align: right; font-weight: 700; padding: 2px; font-size: 10px; }
+
+        /* TABS */
+        .tabs-row { display: flex; padding: 0 15px; gap: 5px; margin-top: 5px; background: white; }
         .tab {
-            flex: 1; text-align: center; padding: 6px 0; font-size: 12px; font-weight: 700; color: var(--txt-sec);
+            flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--txt-sec);
             border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s;
         }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* --- VISTAS --- */
+        /* VISTAS */
         .view-section { display: none; padding: 10px 15px; }
         .view-section.visible { display: block; }
 
-        /* STORIES (Solo para Flujo y Feed) */
-        .stories-tray {
-            display: flex; gap: 10px; padding: 10px 15px; overflow-x: auto; scrollbar-width: none;
-            border-bottom: 1px solid #F1F5F9; margin-bottom: 5px;
-        }
+        /* --- VISTA 1: CLASICA T (Restaurada) --- */
+        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+        .t-col { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .col-head { padding: 5px; text-align: center; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
+        .bg-inc { background: var(--inc); } .bg-exp { background: var(--exp); }
+        
+        .row-compact { padding: 8px 6px; border-bottom: 1px solid #F1F5F9; font-size: 11px; position: relative; }
+        
+        /* Estado Ejecutado */
+        .row-compact.executed .r-desc { text-decoration: line-through; opacity: 0.5; }
+        .row-compact.executed .r-amt { opacity: 0.5; }
+
+        .r-top { display: flex; justify-content: space-between; align-items: center; }
+        .r-desc { font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+        .r-amt { font-weight: 800; text-align: right; }
+        
+        .r-meta { font-size: 9px; color: #94A3B8; margin-top: 2px; display:flex; justify-content:space-between; }
+        
+        /* Etiquetas y Subtotales */
+        .tag-link { background: #EFF6FF; color: var(--accent); padding: 1px 4px; border-radius: 3px; font-size: 9px; margin-right: 4px; }
+        .subtotal-pill { display: inline-block; padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: 700; margin-top: 2px; float: right; }
+        .st-ok { background: #DCFCE7; color: #166534; }
+        .st-bad { background: #FEE2E2; color: #991B1B; }
+
+        /* --- VISTA 2: FLUJO --- */
+        .stories-tray { display: flex; gap: 10px; padding: 5px 0 15px 0; overflow-x: auto; scrollbar-width: none; }
         .story-item { display: flex; flex-direction: column; align-items: center; min-width: 50px; opacity: 0.5; transition:0.2s; }
         .story-item.active { opacity: 1; }
         .ring { width: 44px; height: 44px; padding: 2px; border-radius: 50%; display:flex; align-items:center; justify-content:center; }
         .avatar { width: 100%; height: 100%; background: #F8FAFC; border-radius: 50%; border: 2px solid white; display:flex; align-items:center; justify-content:center; font-size:16px; }
         .s-name { font-size: 9px; margin-top: 4px; font-weight: 700; max-width: 55px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* KPI COMPACTO */
-        .kpi-mini {
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 8px 15px; background: #F8FAFC; border-radius: 8px; margin: 0 15px 10px 15px;
-            font-size: 11px; font-weight: 700; color: var(--txt-sec); border: 1px solid var(--border);
-        }
-        .kpi-num { font-size: 14px; font-weight: 800; color: var(--txt); }
-
-        /* --- VISTA 1: CLASICA T (Compacta) --- */
-        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
-        .t-col { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-        .col-head { padding: 5px; text-align: center; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
-        .bg-inc { background: var(--inc); } .bg-exp { background: var(--exp); }
-        
-        .row-compact { padding: 6px 8px; border-bottom: 1px solid #F1F5F9; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
-        .row-compact:last-child { border-bottom: none; }
-        .r-desc { font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
-        .r-amt { font-weight: 700; text-align: right; }
-        .r-meta { font-size: 9px; color: #94A3B8; display: block; }
-
-        /* --- VISTA 2: FLUJO (Allocation) --- */
         .alloc-card { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .alloc-head { padding: 8px 12px; background: #F8FAFC; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F1F5F9; }
         .alloc-body { padding: 0 12px; }
@@ -101,17 +108,14 @@
         .bar-bg { height: 4px; background: #E2E8F0; border-radius: 2px; overflow: hidden; margin-top: 4px; }
         .bar-fill { height: 100%; background: var(--accent); }
 
-        /* --- VISTA 3: FEED (Todos) --- */
-        .feed-item { padding: 8px 0; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; gap: 10px; }
+        /* --- VISTA 3: RESUMEN (Feed + Charts) --- */
+        .feed-item { padding: 10px 0; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; gap: 10px; }
         .f-icon-s { width: 32px; height: 32px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-        .f-main { flex: 1; }
-        .f-top { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; }
-        .f-bot { display: flex; justify-content: space-between; font-size: 10px; color: var(--txt-sec); margin-top: 1px; }
+        .chart-box { padding: 15px; border: 1px solid var(--border); border-radius: 12px; margin-top: 20px; background: #F8FAFC; height: 300px; }
 
-        /* --- BOTON FLOTANTE --- */
+        /* --- BOTON FLOTANTE & FORM --- */
         .fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; border:none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 20px; z-index: 40; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* --- SHEET FORM (Chips) --- */
         .sheet { position: fixed; inset: 0; background: white; z-index: 200; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; }
         .sheet.open { transform: translateY(0); }
         .sheet-head { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
@@ -143,41 +147,50 @@
         </div>
         <div onclick="forceSync()" style="font-size:14px; color:var(--txt-sec);"><i class="fas fa-sync"></i></div>
     </div>
+    
+    <div class="kpi-row">
+        <div>Total: <span style="font-weight:800; font-size:13px;" id="kpiVal">$0</span></div>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <span>USD <span id="kpiUsd" style="font-weight:800;">0</span></span>
+            <span style="color:#ccc;">|</span>
+            TC: <input type="number" id="usdRate" class="inp-tc" value="1200" onchange="loadData()">
+        </div>
+    </div>
+
     <div class="tabs-row">
         <div class="tab active" id="tab-classic" onclick="nav('classic')">Clásica T</div>
         <div class="tab" id="tab-alloc" onclick="nav('alloc')">Flujo</div>
-        <div class="tab" id="tab-feed" onclick="nav('feed')">Todos</div>
+        <div class="tab" id="tab-feed" onclick="nav('feed')">Resumen</div>
     </div>
-</div>
-
-<div id="storiesContainer" style="display:none;">
-    <div class="stories-tray" id="storiesTray"></div>
-</div>
-
-<div class="kpi-mini">
-    <span>Balance Neto</span>
-    <span class="kpi-num" id="kpiVal">$0</span>
 </div>
 
 <div id="view-classic" class="view-section visible">
     <div class="t-grid">
         <div class="t-col">
-            <div class="col-head bg-inc">Ingresos</div>
+            <div class="col-head bg-inc">Ingresos <span id="sum-inc" style="opacity:0.8">$0</span></div>
             <div id="list-inc"></div>
         </div>
         <div class="t-col">
-            <div class="col-head bg-exp">Egresos</div>
+            <div class="col-head bg-exp">Egresos <span id="sum-exp" style="opacity:0.8">$0</span></div>
             <div id="list-exp"></div>
         </div>
     </div>
 </div>
 
 <div id="view-alloc" class="view-section">
+    <div class="stories-tray" id="storiesTray"></div>
     <div id="alloc-list"></div>
 </div>
 
 <div id="view-feed" class="view-section">
+    <div style="font-size:12px; font-weight:800; margin-bottom:10px;">HISTORIAL</div>
     <div id="feed-list"></div>
+    
+    <div style="font-size:12px; font-weight:800; margin-top:30px;">DISTRIBUCIÓN</div>
+    <div class="chart-box">
+        <canvas id="myChart"></canvas>
+    </div>
+
     <div style="margin-top:20px; text-align:center;">
         <button onclick="backup()" style="font-size:10px; padding:5px 10px; background:#F1F5F9; border:none; border-radius:4px;">Descargar Backup</button>
         <button onclick="document.getElementById('fileIn').click()" style="font-size:10px; padding:5px 10px; background:#F1F5F9; border:none; border-radius:4px;">Restaurar</button>
@@ -235,13 +248,14 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
 
     let data = { txs: [], cats: { exp:['Super','Casa','Salidas'], inc:['Sueldo','Ventas'] }, concepts: {} };
-    let currentTxs = [], editId = null, filterId = null;
+    let currentTxs = [], editId = null, filterId = null, chartInstance=null;
     let tempCat='', tempLink='';
 
     window.onload = () => {
         const d = new Date();
         document.getElementById('dateInput').value = d.toISOString().slice(0, 7);
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
+        if(localStorage.getItem('usdRate')) document.getElementById('usdRate').value = localStorage.getItem('usdRate');
         forceSync();
     };
 
@@ -257,6 +271,7 @@
     }
     async function saveData() {
         loader(true); document.getElementById('syncDot').style.background='#F59E0B';
+        localStorage.setItem('usdRate', document.getElementById('usdRate').value);
         try { await fetch(API_URL, {method:'POST', body:JSON.stringify(data)}); loadData(); document.getElementById('syncDot').style.background='#10B981'; } catch(e){}
         loader(false);
     }
@@ -268,29 +283,87 @@
         const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
         
-        // 1. Filtrar por mes
         currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
         
-        // 2. Ordenar por fecha ASCENDENTE (1 al 30)
-        currentTxs.sort((a,b) => a.date.localeCompare(b.date) || a.id - b.id);
+        // ORDEN CRONOLÓGICO ASCENDENTE PARA CÁLCULO DE SALDOS
+        currentTxs.sort((a,b) => {
+            if(a.date !== b.date) return a.date.localeCompare(b.date);
+            // Primero Ingresos para que sumen saldo antes que el gasto lo reste
+            if(a.type !== b.type) return a.type==='inc' ? -1 : 1;
+            return a.id - b.id;
+        });
 
         calcKPI();
+        renderClassic(); // Aquí se calculan los subtotales
         renderStories();
-        renderClassic();
         renderAlloc();
         renderFeed();
+        renderChart();
     }
 
     function calcKPI() {
         const inc = currentTxs.filter(t=>t.type=='inc').reduce((a,b)=>a+b.amount,0);
         const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
         const bal = inc - exp;
+        
         const kpi = document.getElementById('kpiVal');
         kpi.innerText = `$${bal.toLocaleString()}`;
         kpi.style.color = bal >= 0 ? '#10B981' : '#EF4444';
+
+        // USD Calc
+        const tc = parseFloat(document.getElementById('usdRate').value) || 1;
+        document.getElementById('kpiUsd').innerText = Math.round(bal/tc).toLocaleString();
+        
+        document.getElementById('sum-inc').innerText = `$${inc.toLocaleString()}`;
+        document.getElementById('sum-exp').innerText = `$${exp.toLocaleString()}`;
     }
 
     // --- RENDERERS ---
+    function renderClassic() {
+        const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
+        lInc.innerHTML = ''; lExp.innerHTML = '';
+        
+        // Logica de Saldo Acumulado (Subtotal)
+        let runningBalance = 0;
+        
+        currentTxs.forEach(t => {
+            if(t.type === 'inc') runningBalance += t.amount;
+            else runningBalance -= t.amount;
+            
+            // Renderizado
+            const el = document.createElement('div');
+            el.className = `row-compact ${t.exec?'executed':''}`;
+            el.onclick = () => edit(t.id);
+            
+            // Buscar si tiene link
+            let linkTag = '';
+            if(t.linkId && t.type === 'exp') {
+                const p = currentTxs.find(x=>x.id==t.linkId);
+                if(p) linkTag = `<span class="tag-link"><i class="fas fa-link"></i> ${p.desc.substring(0,8)}</span>`;
+            }
+
+            // Subtotal solo en Egresos para ver cuanto va quedando
+            let subTag = '';
+            if(t.type === 'exp') {
+                subTag = `<div class="subtotal-pill ${runningBalance>=0?'st-ok':'st-bad'}">Quedan: $${Math.floor(runningBalance)}</div>`;
+            }
+
+            el.innerHTML = `
+                <div class="r-top">
+                    <div class="r-desc">${t.desc}</div>
+                    <div class="r-amt" style="color:${t.type=='inc'?'var(--inc)':'var(--txt)'}">
+                        $${Math.floor(t.amount).toLocaleString()}
+                    </div>
+                </div>
+                <div class="r-meta">
+                    <div>${linkTag}${t.cat} | ${t.date.split('-')[2]}</div>
+                    ${subTag}
+                </div>
+            `;
+            if(t.type === 'inc') lInc.appendChild(el); else lExp.appendChild(el);
+        });
+    }
+
     function renderStories() {
         const tray = document.getElementById('storiesTray');
         const incomes = currentTxs.filter(t => t.type === 'inc');
@@ -315,27 +388,6 @@
         tray.innerHTML = html;
     }
 
-    function renderClassic() {
-        const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
-        lInc.innerHTML = ''; lExp.innerHTML = '';
-        
-        currentTxs.forEach(t => {
-            const el = document.createElement('div');
-            el.className = 'row-compact';
-            el.onclick = () => edit(t.id);
-            el.innerHTML = `
-                <div>
-                    <div class="r-desc" style="${t.exec?'':'text-decoration:line-through;opacity:0.6'}">${t.desc}</div>
-                    <span class="r-meta">${t.cat} | D:${t.date.split('-')[2]}</span>
-                </div>
-                <div class="r-amt" style="color:${t.type=='inc'?'var(--inc)':'var(--txt)'}">
-                    $${Math.floor(t.amount).toLocaleString()}
-                </div>
-            `;
-            if(t.type === 'inc') lInc.appendChild(el); else lExp.appendChild(el);
-        });
-    }
-
     function renderAlloc() {
         const cont = document.getElementById('alloc-list');
         cont.innerHTML = '';
@@ -358,7 +410,7 @@
                     <span style="font-weight:700; font-size:12px;">${inc.desc}</span>
                     <span style="font-weight:800; color:var(--inc); font-size:12px;">$${Math.floor(inc.amount)}</span>
                 </div>
-                <div class="alloc-body">${items||'<div style="font-size:10px;text-align:center;padding:5px;color:#ccc;">Sin gastos</div>'}</div>
+                <div class="alloc-body">${items||'<div style="font-size:10px;text-align:center;padding:5px;color:#ccc;">Sin gastos asignados</div>'}</div>
                 <div class="alloc-foot">
                     <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700;">
                         <span>Gastado: $${Math.floor(spent)}</span>
@@ -374,17 +426,19 @@
         const list = document.getElementById('feed-list');
         list.innerHTML = '';
         let txs = filterId ? currentTxs.filter(t=>t.id==filterId || t.linkId==filterId) : currentTxs;
-        
-        txs.forEach(t => {
+        // Reordenar Feed de más reciente a más antiguo visualmente
+        let feedTxs = [...txs].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+        feedTxs.forEach(t => {
             const isInc = t.type=='inc';
             const div = document.createElement('div');
             div.className = 'feed-item';
             div.onclick = () => edit(t.id);
             div.innerHTML = `
                 <div class="f-icon-s" style="color:${isInc?'var(--inc)':'var(--txt)'}"><i class="fas ${isInc?'fa-arrow-down':'fa-shopping-bag'}"></i></div>
-                <div class="f-main">
+                <div class="f-main" style="flex:1;">
                     <div class="f-top">
-                        <span style="${t.exec?'':'text-decoration:line-through'}">${t.desc}</span>
+                        <span style="${t.exec?'':'text-decoration:line-through;opacity:0.6'}">${t.desc}</span>
                         <span style="color:${isInc?'var(--inc)':'var(--txt)'}">${isInc?'+':'-'} $${Math.floor(t.amount)}</span>
                     </div>
                     <div class="f-bot">
@@ -397,12 +451,43 @@
         });
     }
 
+    function renderChart() {
+        const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
+        const map = {}; 
+        currentTxs.filter(t=>t.type=='exp').forEach(t=>map[t.cat]=(map[t.cat]||0)+t.amount);
+        
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6'], borderWidth:1 }] },
+            options: { maintainAspectRatio:false, plugins:{ legend:{position:'bottom'} } }
+        });
+    }
+
     function setFilter(id) { filterId = id; renderStories(); renderAlloc(); renderFeed(); }
 
-    // --- FORMULARIO (CHIPS) ---
+    // --- NAVIGATION FIXED ---
+    function navMonth(n) { 
+        const i = document.getElementById('dateInput');
+        let [y, m] = i.value.split('-');
+        // Crear fecha segura usando el dia 1
+        const d = new Date(parseInt(y), parseInt(m)-1 + n, 1);
+        // Formatear a YYYY-MM
+        const newY = d.getFullYear();
+        const newM = (d.getMonth()+1).toString().padStart(2, '0');
+        i.value = `${newY}-${newM}`;
+        loadData(); 
+    }
+
+    function nav(view) {
+        document.querySelectorAll('.view-section').forEach(x=>x.classList.remove('visible'));
+        document.getElementById('view-'+view).classList.add('visible');
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+        document.getElementById('tab-'+view).classList.add('active');
+    }
+
+    // --- FORMULARIO ---
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
-    
     function resetForm() {
         editId=null; document.getElementById('txForm').reset();
         document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
@@ -488,19 +573,6 @@
     }
     
     function delTx() { if(confirm('Borrar?')){ data.txs=data.txs.filter(x=>x.id!=editId); saveData(); closeSheet(); } }
-
-    // --- NAVIGATION ---
-    function nav(view) {
-        document.querySelectorAll('.view-section').forEach(x=>x.classList.remove('visible'));
-        document.getElementById('view-'+view).classList.add('visible');
-        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-        document.getElementById('tab-'+view).classList.add('active');
-        
-        const stories = document.getElementById('storiesContainer');
-        if(view=='classic') stories.style.display='none'; else stories.style.display='block';
-    }
-
-    function navMonth(n) { const i=document.getElementById('dateInput'); let [y,m]=i.value.split('-'); const d=new Date(y, m-1+n, 1); i.value=d.toISOString().slice(0,7); loadData(); }
     
     function loader(s) { document.getElementById('loader').style.display=s?'flex':'none'; }
     function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download='Backup.json'; a.click(); }
