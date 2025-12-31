@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V45 Clean</title>
+    <title>J&M V45.1 Fixed</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -305,14 +305,23 @@
         });
     }
 
+    // --- DATA LOAD (FIX DE FECHA + ORDEN) ---
     function loadData() {
-        const y = currentDate.getFullYear(), m = currentDate.getMonth();
-        currentTxs = (data.txs || []).filter(t => !t.deletedAt && new Date(t.date).getFullYear() === y && new Date(t.date).getMonth() === m);
-        // ORDEN: Dia 1 arriba (ASCENDENTE)
+        const y = currentDate.getFullYear(), m = currentDate.getMonth(); // 0-11
+        
+        currentTxs = (data.txs || []).filter(t => {
+            if(t.deletedAt) return false;
+            // Parseamos manualmente para evitar Timezone Shift
+            const [tY, tM, tD] = t.date.split('-').map(Number);
+            return tY === y && tM === (m + 1); // tM viene en base 1 (01, 02...)
+        });
+
+        // ORDEN: Dia 1 arriba (ASCENDENTE) -> ID
         currentTxs.sort((a,b) => {
             if (a.date !== b.date) return a.date.localeCompare(b.date);
             return a.id - b.id;
         });
+        
         calcKPI(); renderClassic(); renderAllocWithAccordions(); renderCharts();
     }
 
