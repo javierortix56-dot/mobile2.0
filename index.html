@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V41.0 Stable</title>
+    <title>J&M V42 Principal</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -34,65 +34,63 @@
             height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
         }
         .brand { font-weight: 900; font-size: 16px; display:flex; align-items:center; gap:6px; }
-        .sync-dot { width:8px; height:8px; border-radius:50%; background:#CBD5E1; }
-
-        /* Controles Fecha */
-        .date-ctrl {
-            display: flex; align-items: center; background: #F1F5F9; border-radius: 6px; padding: 2px;
-        }
-        .btn-arrow {
-            width: 32px; height: 28px; border:none; background:transparent; font-size:14px; color:var(--txt); cursor:pointer;
-            display:flex; align-items:center; justify-content:center;
-        }
-        .date-display {
-            font-size: 11px; font-weight: 800; text-transform: uppercase; min-width: 80px; text-align: center; position: relative;
-        }
+        .sync-dot { width:8px; height:8px; border-radius:50%; background:#CBD5E1; transition:0.3s; }
+        
+        .date-ctrl { display: flex; align-items: center; background: #F1F5F9; border-radius: 6px; padding: 2px; }
+        .btn-arrow { width: 32px; height: 28px; border:none; background:transparent; font-size:14px; color:var(--txt); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+        .date-display { font-size: 11px; font-weight: 800; text-transform: uppercase; min-width: 80px; text-align: center; position: relative; }
         #dateInput { position: absolute; inset: 0; opacity: 0; width: 100%; height:100%; cursor:pointer; }
 
-        /* KPI Header (USD/TC) */
         .kpi-row {
             display: flex; justify-content: space-between; align-items: center; padding: 5px 15px 8px 15px; 
             font-size: 11px; border-bottom: 1px solid #F1F5F9; background: #F8FAFC;
         }
         .inp-tc { width: 50px; border: 1px solid #CBD5E1; border-radius: 4px; text-align: right; font-weight: 700; padding: 2px; font-size: 10px; }
 
-        /* TABS */
+        /* TABS (Solo 2 ahora) */
         .tabs-row { display: flex; padding: 0 15px; gap: 5px; margin-top: 5px; background: white; }
-        .tab {
-            flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--txt-sec);
-            border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s;
-        }
+        .tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--txt-sec); border-bottom: 2px solid transparent; cursor: pointer; transition: 0.2s; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
         /* VISTAS */
         .view-section { display: none; padding: 10px 15px; }
         .view-section.visible { display: block; }
 
-        /* --- VISTA 1: CLASICA T (Restaurada) --- */
-        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+        /* --- VISTA PRINCIPAL (T + CHART) --- */
+        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; margin-bottom: 20px; }
         .t-col { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
         .col-head { padding: 5px; text-align: center; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
         .bg-inc { background: var(--inc); } .bg-exp { background: var(--exp); }
         
         .row-compact { padding: 8px 6px; border-bottom: 1px solid #F1F5F9; font-size: 11px; position: relative; }
-        
-        /* Estado Ejecutado */
         .row-compact.executed .r-desc { text-decoration: line-through; opacity: 0.5; }
         .row-compact.executed .r-amt { opacity: 0.5; }
-
-        .r-top { display: flex; justify-content: space-between; align-items: center; }
-        .r-desc { font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
-        .r-amt { font-weight: 800; text-align: right; }
         
+        .r-top { display: flex; justify-content: space-between; align-items: center; }
+        .r-desc { font-weight: 700; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85px; }
+        .r-amt { font-weight: 800; text-align: right; }
         .r-meta { font-size: 9px; color: #94A3B8; margin-top: 2px; display:flex; justify-content:space-between; }
         
-        /* Etiquetas y Subtotales */
         .tag-link { background: #EFF6FF; color: var(--accent); padding: 1px 4px; border-radius: 3px; font-size: 9px; margin-right: 4px; }
         .subtotal-pill { display: inline-block; padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: 700; margin-top: 2px; float: right; }
-        .st-ok { background: #DCFCE7; color: #166534; }
-        .st-bad { background: #FEE2E2; color: #991B1B; }
+        .st-ok { background: #DCFCE7; color: #166534; } .st-bad { background: #FEE2E2; color: #991B1B; }
 
-        /* --- VISTA 2: FLUJO --- */
+        /* CHART & LEGEND */
+        .chart-container { margin-top: 10px; padding: 15px; background: #F8FAFC; border-radius: 12px; border: 1px solid var(--border); }
+        .chart-box { height: 220px; position: relative; }
+        .legend-list { margin-top: 15px; display: flex; flex-direction: column; gap: 6px; }
+        .legend-item { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding-bottom: 4px; border-bottom: 1px dashed #E2E8F0; }
+        .l-cat { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+        .l-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .l-val { font-weight: 800; color: var(--txt); }
+
+        /* ADMIN ZONE */
+        .admin-zone { margin-top: 30px; padding: 15px; background: #F1F5F9; border-radius: 8px; border: 1px dashed #CBD5E1; }
+        .admin-title { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--txt-sec); margin-bottom: 10px; }
+        .btn-admin { width: 100%; padding: 10px; background: white; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--txt); margin-bottom: 8px; }
+        .btn-danger { color: #EF4444; border-color: #FECACA; }
+
+        /* --- VISTA FLUJO --- */
         .stories-tray { display: flex; gap: 10px; padding: 5px 0 15px 0; overflow-x: auto; scrollbar-width: none; }
         .story-item { display: flex; flex-direction: column; align-items: center; min-width: 50px; opacity: 0.5; transition:0.2s; }
         .story-item.active { opacity: 1; }
@@ -108,12 +106,7 @@
         .bar-bg { height: 4px; background: #E2E8F0; border-radius: 2px; overflow: hidden; margin-top: 4px; }
         .bar-fill { height: 100%; background: var(--accent); }
 
-        /* --- VISTA 3: RESUMEN (Feed + Charts) --- */
-        .feed-item { padding: 10px 0; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; gap: 10px; }
-        .f-icon-s { width: 32px; height: 32px; border-radius: 8px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-        .chart-box { padding: 15px; border: 1px solid var(--border); border-radius: 12px; margin-top: 20px; background: #F8FAFC; height: 300px; }
-
-        /* --- BOTON FLOTANTE & FORM --- */
+        /* --- FORMULARIOS --- */
         .fab { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; border:none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 20px; z-index: 40; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         .sheet { position: fixed; inset: 0; background: white; z-index: 200; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; }
@@ -158,13 +151,13 @@
     </div>
 
     <div class="tabs-row">
-        <div class="tab active" id="tab-classic" onclick="nav('classic')">Clásica T</div>
+        <div class="tab active" id="tab-main" onclick="nav('main')">Principal</div>
         <div class="tab" id="tab-alloc" onclick="nav('alloc')">Flujo</div>
-        <div class="tab" id="tab-feed" onclick="nav('feed')">Resumen</div>
     </div>
 </div>
 
-<div id="view-classic" class="view-section visible">
+<div id="view-main" class="view-section visible">
+    
     <div class="t-grid">
         <div class="t-col">
             <div class="col-head bg-inc">Ingresos <span id="sum-inc" style="opacity:0.8">$0</span></div>
@@ -175,27 +168,30 @@
             <div id="list-exp"></div>
         </div>
     </div>
+
+    <div style="font-size:11px; font-weight:800; color:var(--txt-sec); margin-bottom:5px;">DISTRIBUCIÓN DEL GASTO</div>
+    <div class="chart-container">
+        <div class="chart-box">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div id="chartLegend" class="legend-list"></div>
+    </div>
+
+    <div class="admin-zone">
+        <div class="admin-title">Herramientas (Cuidado)</div>
+        <button class="btn-admin" onclick="cloneMonth()">Clonar del Mes Anterior</button>
+        <button class="btn-admin btn-danger" onclick="deleteCurrentMonth()">Eliminar Datos Mes Actual</button>
+        <div style="margin-top:10px; display:flex; gap:5px;">
+            <button class="btn-admin" onclick="backup()">Backup</button>
+            <button class="btn-admin" onclick="document.getElementById('fileIn').click()">Restaurar</button>
+            <input type="file" hidden id="fileIn" onchange="restoreSmart(this)">
+        </div>
+    </div>
 </div>
 
 <div id="view-alloc" class="view-section">
     <div class="stories-tray" id="storiesTray"></div>
     <div id="alloc-list"></div>
-</div>
-
-<div id="view-feed" class="view-section">
-    <div style="font-size:12px; font-weight:800; margin-bottom:10px;">HISTORIAL</div>
-    <div id="feed-list"></div>
-    
-    <div style="font-size:12px; font-weight:800; margin-top:30px;">DISTRIBUCIÓN</div>
-    <div class="chart-box">
-        <canvas id="myChart"></canvas>
-    </div>
-
-    <div style="margin-top:20px; text-align:center;">
-        <button onclick="backup()" style="font-size:10px; padding:5px 10px; background:#F1F5F9; border:none; border-radius:4px;">Descargar Backup</button>
-        <button onclick="document.getElementById('fileIn').click()" style="font-size:10px; padding:5px 10px; background:#F1F5F9; border:none; border-radius:4px;">Restaurar</button>
-        <input type="file" hidden id="fileIn" onchange="restoreSmart(this)">
-    </div>
 </div>
 
 <button class="fab" onclick="openSheet()"><i class="fas fa-plus"></i></button>
@@ -245,7 +241,10 @@
 
 <script>
     // --- PEGA TU URL DE SCRIPT AQUI ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwDELBCfaHd3zxKO1gKmwDO24RKKLF8WD_Zay9D0ahfeomVCxpKZ4BNM6q3C2w8AykE/exec";
+    
+    // UTILS
+    function uid() { return String(Date.now()) + "-" + Math.random().toString(16).slice(2); }
 
     let data = { txs: [], cats: { exp:['Super','Casa','Salidas'], inc:['Sueldo','Ventas'] }, concepts: {} };
     let currentTxs = [], editId = null, filterId = null, chartInstance=null;
@@ -259,45 +258,74 @@
         forceSync();
     };
 
-    // --- SYNC ENGINE ---
+    // --- SYNC ---
+    async function fetchJSON(url, opts) {
+        const res = await fetch(url, opts);
+        if(!res.ok) throw new Error(res.status);
+        return await res.json();
+    }
+    
+    function mergeData(local, incoming) {
+        const mergedTxs = [...local.txs];
+        const localMap = new Map(local.txs.map(t=>[String(t.id), t]));
+        if(incoming.txs) {
+            incoming.txs.forEach(inTx => {
+                const existing = localMap.get(String(inTx.id));
+                if(!existing) { mergedTxs.push(inTx); localMap.set(String(inTx.id), inTx); } 
+                else if((inTx.updatedAt||0) >= (existing.updatedAt||0)) {
+                    const idx = mergedTxs.findIndex(x=>String(x.id)===String(inTx.id));
+                    if(idx!==-1) mergedTxs[idx]=inTx;
+                }
+            });
+        }
+        const mergeArr = (a, b) => [...new Set([...(a||[]), ...(b||[])])];
+        const cats = { exp: mergeArr(local.cats.exp, incoming.cats?.exp), inc: mergeArr(local.cats.inc, incoming.cats?.inc) };
+        const concepts = { ...local.concepts };
+        if(incoming.concepts) for(let k in incoming.concepts) concepts[k] = mergeArr(concepts[k], incoming.concepts[k]);
+        return { rev: Math.max(local.rev||0, incoming.rev||0), txs: mergedTxs, cats, concepts };
+    }
+
     async function forceSync() {
         loader(true);
         try {
-            let res = await fetch(API_URL);
-            let cloud = await res.json();
-            if(cloud.txs) { data = cloud; loadData(); document.getElementById('syncDot').style.background='#10B981'; }
+            const cloud = await fetchJSON(API_URL);
+            if(cloud) data = mergeData(data, cloud);
+            loadData();
+            const synced = await fetchJSON(API_URL, { method:'POST', body:JSON.stringify(data) });
+            if(synced) data = mergeData(data, synced);
+            loadData(); document.getElementById('syncDot').style.background='#10B981';
         } catch(e) { document.getElementById('syncDot').style.background='#EF4444'; }
         loader(false);
     }
     async function saveData() {
         loader(true); document.getElementById('syncDot').style.background='#F59E0B';
         localStorage.setItem('usdRate', document.getElementById('usdRate').value);
-        try { await fetch(API_URL, {method:'POST', body:JSON.stringify(data)}); loadData(); document.getElementById('syncDot').style.background='#10B981'; } catch(e){}
+        try { 
+            const synced = await fetchJSON(API_URL, { method:'POST', body:JSON.stringify(data) });
+            if(synced) data = mergeData(data, synced);
+            loadData(); document.getElementById('syncDot').style.background='#10B981'; 
+        } catch(e){ document.getElementById('syncDot').style.background='#EF4444'; }
         loader(false);
     }
 
-    // --- CORE LOGIC ---
+    // --- CORE ---
     function loadData() {
         const ym = document.getElementById('dateInput').value;
         const [y, m] = ym.split('-');
         const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
         document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
         
-        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
-        
-        // ORDEN CRONOLÓGICO ASCENDENTE PARA CÁLCULO DE SALDOS
+        currentTxs = (data.txs || []).filter(t => !t.deletedAt && t.date.startsWith(ym));
         currentTxs.sort((a,b) => {
             if(a.date !== b.date) return a.date.localeCompare(b.date);
-            // Primero Ingresos para que sumen saldo antes que el gasto lo reste
             if(a.type !== b.type) return a.type==='inc' ? -1 : 1;
             return a.id - b.id;
         });
 
         calcKPI();
-        renderClassic(); // Aquí se calculan los subtotales
+        renderClassic();
         renderStories();
         renderAlloc();
-        renderFeed();
         renderChart();
     }
 
@@ -305,61 +333,38 @@
         const inc = currentTxs.filter(t=>t.type=='inc').reduce((a,b)=>a+b.amount,0);
         const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
         const bal = inc - exp;
-        
-        const kpi = document.getElementById('kpiVal');
-        kpi.innerText = `$${bal.toLocaleString()}`;
-        kpi.style.color = bal >= 0 ? '#10B981' : '#EF4444';
-
-        // USD Calc
+        document.getElementById('kpiVal').innerText = `$${bal.toLocaleString()}`;
+        document.getElementById('kpiVal').style.color = bal >= 0 ? '#10B981' : '#EF4444';
         const tc = parseFloat(document.getElementById('usdRate').value) || 1;
         document.getElementById('kpiUsd').innerText = Math.round(bal/tc).toLocaleString();
-        
         document.getElementById('sum-inc').innerText = `$${inc.toLocaleString()}`;
         document.getElementById('sum-exp').innerText = `$${exp.toLocaleString()}`;
     }
 
-    // --- RENDERERS ---
+    // --- RENDER ---
     function renderClassic() {
         const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
         lInc.innerHTML = ''; lExp.innerHTML = '';
-        
-        // Logica de Saldo Acumulado (Subtotal)
         let runningBalance = 0;
-        
         currentTxs.forEach(t => {
-            if(t.type === 'inc') runningBalance += t.amount;
-            else runningBalance -= t.amount;
-            
-            // Renderizado
+            if(t.type === 'inc') runningBalance += t.amount; else runningBalance -= t.amount;
             const el = document.createElement('div');
             el.className = `row-compact ${t.exec?'executed':''}`;
             el.onclick = () => edit(t.id);
-            
-            // Buscar si tiene link
             let linkTag = '';
             if(t.linkId && t.type === 'exp') {
-                const p = currentTxs.find(x=>x.id==t.linkId);
+                const p = currentTxs.find(x=>String(x.id)===String(t.linkId));
                 if(p) linkTag = `<span class="tag-link"><i class="fas fa-link"></i> ${p.desc.substring(0,8)}</span>`;
             }
-
-            // Subtotal solo en Egresos para ver cuanto va quedando
             let subTag = '';
-            if(t.type === 'exp') {
-                subTag = `<div class="subtotal-pill ${runningBalance>=0?'st-ok':'st-bad'}">Quedan: $${Math.floor(runningBalance)}</div>`;
-            }
-
+            if(t.type === 'exp') subTag = `<div class="subtotal-pill ${runningBalance>=0?'st-ok':'st-bad'}">Quedan: $${Math.floor(runningBalance)}</div>`;
+            
             el.innerHTML = `
                 <div class="r-top">
                     <div class="r-desc">${t.desc}</div>
-                    <div class="r-amt" style="color:${t.type=='inc'?'var(--inc)':'var(--txt)'}">
-                        $${Math.floor(t.amount).toLocaleString()}
-                    </div>
+                    <div class="r-amt" style="color:${t.type=='inc'?'var(--inc)':'var(--txt)'}">$${Math.floor(t.amount).toLocaleString()}</div>
                 </div>
-                <div class="r-meta">
-                    <div>${linkTag}${t.cat} | ${t.date.split('-')[2]}</div>
-                    ${subTag}
-                </div>
-            `;
+                <div class="r-meta"><div>${linkTag}${t.cat} | ${t.date.split('-')[2]}</div>${subTag}</div>`;
             if(t.type === 'inc') lInc.appendChild(el); else lExp.appendChild(el);
         });
     }
@@ -368,116 +373,74 @@
         const tray = document.getElementById('storiesTray');
         const incomes = currentTxs.filter(t => t.type === 'inc');
         const exps = currentTxs.filter(t => t.type === 'exp');
-        
         let html = `<div class="story-item ${filterId===null?'active':''}" onclick="setFilter(null)"><div class="ring" style="background:conic-gradient(#0F172A 100%, transparent 0)"><div class="avatar" style="background:#0F172A; color:white;">All</div></div><span class="s-name">Todo</span></div>`;
-        
         incomes.forEach(inc => {
-            const spent = exps.filter(e => e.linkId == inc.id).reduce((a,b)=>a+b.amount,0);
+            const spent = exps.filter(e => String(e.linkId) === String(inc.id)).reduce((a,b)=>a+b.amount,0);
             const remain = inc.amount - spent;
             const pct = inc.amount>0 ? (remain/inc.amount)*100 : 0;
             const color = remain<0 ? '#EF4444' : (pct>20 ? '#10B981' : '#F59E0B');
-            
-            html += `
-            <div class="story-item ${filterId==inc.id?'active':''}" onclick="setFilter(${inc.id})">
-                <div class="ring" style="background:conic-gradient(${color} ${Math.max(0,pct)}%, #E2E8F0 0)">
-                    <div class="avatar">$</div>
-                </div>
-                <span class="s-name">${inc.desc}</span>
-            </div>`;
+            html += `<div class="story-item ${filterId==inc.id?'active':''}" onclick="setFilter('${inc.id}')"><div class="ring" style="background:conic-gradient(${color} ${Math.max(0,pct)}%, #E2E8F0 0)"><div class="avatar">$</div></div><span class="s-name">${inc.desc}</span></div>`;
         });
         tray.innerHTML = html;
     }
 
     function renderAlloc() {
-        const cont = document.getElementById('alloc-list');
-        cont.innerHTML = '';
-        let txs = filterId ? currentTxs.filter(t=>t.id==filterId || t.linkId==filterId) : currentTxs;
-        const incs = txs.filter(t=>t.type=='inc');
-        const exps = txs.filter(t=>t.type=='exp');
-
+        const cont = document.getElementById('alloc-list'); cont.innerHTML = '';
+        let txs = filterId ? currentTxs.filter(t=>String(t.id)===String(filterId) || String(t.linkId)===String(filterId)) : currentTxs;
+        const incs = txs.filter(t=>t.type=='inc'); const exps = txs.filter(t=>t.type=='exp');
         incs.forEach(inc => {
-            const sub = exps.filter(e => e.linkId == inc.id);
+            const sub = exps.filter(e => String(e.linkId) === String(inc.id));
             const spent = sub.reduce((a,b)=>a+b.amount,0);
             const remain = inc.amount - spent;
             const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
-            
             let items = '';
-            sub.forEach(s => items += `<div class="alloc-item" onclick="edit(${s.id})"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`);
-
-            cont.innerHTML += `
-            <div class="alloc-card">
-                <div class="alloc-head" onclick="edit(${inc.id})">
-                    <span style="font-weight:700; font-size:12px;">${inc.desc}</span>
-                    <span style="font-weight:800; color:var(--inc); font-size:12px;">$${Math.floor(inc.amount)}</span>
-                </div>
-                <div class="alloc-body">${items||'<div style="font-size:10px;text-align:center;padding:5px;color:#ccc;">Sin gastos asignados</div>'}</div>
-                <div class="alloc-foot">
-                    <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700;">
-                        <span>Gastado: $${Math.floor(spent)}</span>
-                        <span style="color:${remain<0?'red':'green'}">Queda: $${Math.floor(remain)}</span>
-                    </div>
-                    <div class="bar-bg"><div class="bar-fill" style="width:${Math.min(pct,100)}%; background:${remain<0?'red':'#2563EB'}"></div></div>
-                </div>
-            </div>`;
-        });
-    }
-
-    function renderFeed() {
-        const list = document.getElementById('feed-list');
-        list.innerHTML = '';
-        let txs = filterId ? currentTxs.filter(t=>t.id==filterId || t.linkId==filterId) : currentTxs;
-        // Reordenar Feed de más reciente a más antiguo visualmente
-        let feedTxs = [...txs].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
-
-        feedTxs.forEach(t => {
-            const isInc = t.type=='inc';
-            const div = document.createElement('div');
-            div.className = 'feed-item';
-            div.onclick = () => edit(t.id);
-            div.innerHTML = `
-                <div class="f-icon-s" style="color:${isInc?'var(--inc)':'var(--txt)'}"><i class="fas ${isInc?'fa-arrow-down':'fa-shopping-bag'}"></i></div>
-                <div class="f-main" style="flex:1;">
-                    <div class="f-top">
-                        <span style="${t.exec?'':'text-decoration:line-through;opacity:0.6'}">${t.desc}</span>
-                        <span style="color:${isInc?'var(--inc)':'var(--txt)'}">${isInc?'+':'-'} $${Math.floor(t.amount)}</span>
-                    </div>
-                    <div class="f-bot">
-                        <span>${t.cat} | ${t.date.split('-')[2]}</span>
-                        ${t.linkId && !isInc ? '<span style="color:var(--accent)"><i class="fas fa-link"></i></span>' : ''}
-                    </div>
-                </div>
-            `;
-            list.appendChild(div);
+            sub.forEach(s => items += `<div class="alloc-item" onclick="edit('${s.id}')"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`);
+            cont.innerHTML += `<div class="alloc-card"><div class="alloc-head" onclick="edit('${inc.id}')"><span style="font-weight:700; font-size:12px;">${inc.desc}</span><span style="font-weight:800; color:var(--inc); font-size:12px;">$${Math.floor(inc.amount)}</span></div><div class="alloc-body">${items||'<div style="font-size:10px;text-align:center;padding:5px;color:#ccc;">Sin gastos asignados</div>'}</div><div class="alloc-foot"><div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700;"><span>Gastado: $${Math.floor(spent)}</span><span style="color:${remain<0?'red':'green'}">Queda: $${Math.floor(remain)}</span></div><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(pct,100)}%; background:${remain<0?'red':'#2563EB'}"></div></div></div></div>`;
         });
     }
 
     function renderChart() {
         const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
-        const map = {}; 
-        currentTxs.filter(t=>t.type=='exp').forEach(t=>map[t.cat]=(map[t.cat]||0)+t.amount);
+        const legend = document.getElementById('chartLegend'); legend.innerHTML = '';
+        const map = {}; let totalExp = 0;
+        currentTxs.filter(t=>t.type=='exp').forEach(t=>{ map[t.cat]=(map[t.cat]||0)+t.amount; totalExp+=t.amount; });
         
+        const colors = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#6366F1'];
+        const labels = Object.keys(map); const dataPts = Object.values(map);
+        
+        // Render Custom Legend with % and Amount
+        labels.forEach((lbl, i) => {
+            const val = dataPts[i];
+            const pct = totalExp > 0 ? Math.round((val/totalExp)*100) : 0;
+            const color = colors[i % colors.length];
+            legend.innerHTML += `
+            <div class="legend-item">
+                <div class="l-cat"><div class="l-dot" style="background:${color}"></div>${lbl}</div>
+                <div class="l-val">$${Math.floor(val).toLocaleString()} <span style="color:#94A3B8; margin-left:4px;">(${pct}%)</span></div>
+            </div>`;
+        });
+
         chartInstance = new Chart(ctx, {
             type: 'doughnut',
-            data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6'], borderWidth:1 }] },
-            options: { maintainAspectRatio:false, plugins:{ legend:{position:'bottom'} } }
+            data: { labels: labels, datasets: [{ data: dataPts, backgroundColor: colors, borderWidth:1 }] },
+            options: { maintainAspectRatio:false, plugins:{ legend:{display:false} } } // Hide default legend
         });
     }
 
-    function setFilter(id) { filterId = id; renderStories(); renderAlloc(); renderFeed(); }
+    function setFilter(id) { filterId = id; renderStories(); renderAlloc(); }
 
-    // --- NAVIGATION FIXED ---
+    // --- NAV FIXED ---
     function navMonth(n) { 
         const i = document.getElementById('dateInput');
         let [y, m] = i.value.split('-');
-        // Crear fecha segura usando el dia 1
-        const d = new Date(parseInt(y), parseInt(m)-1 + n, 1);
-        // Formatear a YYYY-MM
-        const newY = d.getFullYear();
-        const newM = (d.getMonth()+1).toString().padStart(2, '0');
-        i.value = `${newY}-${newM}`;
+        // Crear fecha segura sumando/restando meses
+        const d = new Date(parseInt(y), parseInt(m) - 1 + n, 1);
+        const nextY = d.getFullYear();
+        const nextM = (d.getMonth() + 1).toString().padStart(2, '0');
+        i.value = `${nextY}-${nextM}`;
         loadData(); 
     }
-
+    
     function nav(view) {
         document.querySelectorAll('.view-section').forEach(x=>x.classList.remove('visible'));
         document.getElementById('view-'+view).classList.add('visible');
@@ -485,98 +448,64 @@
         document.getElementById('tab-'+view).classList.add('active');
     }
 
-    // --- FORMULARIO ---
+    // --- ADMIN ACTIONS ---
+    function cloneMonth() {
+        const ym = document.getElementById('dateInput').value;
+        const [y, m] = ym.split('-');
+        // Calcular mes anterior
+        const d = new Date(parseInt(y), parseInt(m)-2, 1); // Mes actual - 1
+        const prevY = d.getFullYear();
+        const prevM = (d.getMonth() + 1).toString().padStart(2, '0');
+        const prevYM = `${prevY}-${prevM}`;
+
+        if(!confirm(`¿Clonar todos los movimientos de ${prevYM} a este mes?`)) return;
+
+        // Buscar txs del mes anterior activo
+        const sourceTxs = data.txs.filter(t => !t.deletedAt && t.date.startsWith(prevYM));
+        
+        if(sourceTxs.length === 0) return alert("No hay datos en el mes anterior.");
+
+        sourceTxs.forEach(t => {
+            const newTx = { ...t };
+            newTx.id = uid(); // Nuevo ID
+            newTx.date = `${y}-${m}-${t.date.split('-')[2]}`; // Misma dia, mes actual
+            newTx.exec = false; // Resetear ejecutado
+            newTx.updatedAt = Date.now();
+            data.txs.push(newTx);
+        });
+        saveData();
+    }
+
+    function deleteCurrentMonth() {
+        if(!confirm("¿ESTÁS SEGURO? Se borrará todo lo de este mes.")) return;
+        const ym = document.getElementById('dateInput').value;
+        data.txs.forEach(t => {
+            if(t.date.startsWith(ym) && !t.deletedAt) {
+                t.deletedAt = Date.now();
+                t.updatedAt = Date.now();
+            }
+        });
+        saveData();
+    }
+
+    // --- FORM ---
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
-    function resetForm() {
-        editId=null; document.getElementById('txForm').reset();
-        document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('btnDel').style.display='none';
-        document.getElementById('btnSave').innerText='GUARDAR';
-        setType('exp'); tempCat=''; tempLink=''; renderLinkChips();
-    }
+    function resetForm() { editId=null; document.getElementById('txForm').reset(); document.getElementById('fDate').value = new Date().toISOString().split('T')[0]; document.getElementById('btnDel').style.display='none'; document.getElementById('btnSave').innerText='GUARDAR'; setType('exp'); tempCat=''; tempLink=''; renderLinkChips(); }
 
-    function setType(t) {
-        document.getElementById('fType').value = t;
-        document.getElementById('chip-exp').className=`chip ${t=='exp'?'active':''}`;
-        document.getElementById('chip-inc').className=`chip ${t=='inc'?'active':''}`;
-        document.getElementById('linkSection').style.display = t=='exp'?'block':'none';
-        renderCatChips(t);
-    }
-
-    function renderCatChips(type) {
-        const div = document.getElementById('catChips'); div.innerHTML = '';
-        const cats = data.cats[type] || [];
-        const add = document.createElement('div'); add.className='chip'; add.innerText='+'; 
-        add.onclick=()=>{ const n=prompt('Nueva Cat:'); if(n){data.cats[type].push(n);data.concepts[n]=[];saveData();renderCatChips(type);pickCat(n);} };
-        div.appendChild(add);
-        cats.forEach(c => {
-            const el = document.createElement('div'); el.className=`chip ${tempCat==c?'active':''}`; el.innerText=c;
-            el.onclick=()=>{pickCat(c)}; div.appendChild(el);
-        });
-        if(tempCat && cats.includes(tempCat)) renderConChips(tempCat); else document.getElementById('conChips').innerHTML='';
-    }
+    function setType(t) { document.getElementById('fType').value = t; document.getElementById('chip-exp').className=`chip ${t=='exp'?'active':''}`; document.getElementById('chip-inc').className=`chip ${t=='inc'?'active':''}`; document.getElementById('linkSection').style.display = t=='exp'?'block':'none'; renderCatChips(t); }
+    function renderCatChips(type) { const div = document.getElementById('catChips'); div.innerHTML = ''; const cats = data.cats[type] || []; const add = document.createElement('div'); add.className='chip'; add.innerText='+'; add.onclick=()=>{ const n=prompt('Nueva Cat:'); if(n){data.cats[type].push(n);data.concepts[n]=[];saveData();renderCatChips(type);pickCat(n);} }; div.appendChild(add); cats.forEach(c => { const el = document.createElement('div'); el.className=`chip ${tempCat==c?'active':''}`; el.innerText=c; el.onclick=()=>{pickCat(c)}; div.appendChild(el); }); if(tempCat && cats.includes(tempCat)) renderConChips(tempCat); else document.getElementById('conChips').innerHTML=''; }
     function pickCat(c) { tempCat=c; document.getElementById('fCat').value=c; renderCatChips(document.getElementById('fType').value); renderConChips(c); }
+    function renderConChips(cat) { const div = document.getElementById('conChips'); div.innerHTML=''; const cons = data.concepts[cat] || []; const add = document.createElement('div'); add.className='chip'; add.innerText='+ Manual'; add.onclick=()=>{ document.getElementById('fConcept').value='new'; document.getElementById('fCustomDesc').style.display='block'; }; div.appendChild(add); cons.forEach(c => { const el = document.createElement('div'); el.className='chip'; el.innerText=c; if(document.getElementById('fConcept').value==c) el.classList.add('active'); el.onclick=()=>{ document.getElementById('fConcept').value=c; document.getElementById('fCustomDesc').style.display='none'; Array.from(div.children).forEach(x=>x.classList.remove('active')); el.classList.add('active'); }; div.appendChild(el); }); }
+    function renderLinkChips() { const div = document.getElementById('linkChips'); div.innerHTML=''; const def = document.createElement('div'); def.className=`chip link-chip ${!tempLink?'active':''}`; def.innerText='General'; def.onclick=()=>{tempLink=''; document.getElementById('fLink').value=''; renderLinkChips();}; div.appendChild(def); currentTxs.filter(t=>t.type=='inc').forEach(i => { const el = document.createElement('div'); el.className=`chip link-chip ${String(tempLink)===String(i.id)?'active':''}`; el.innerText=`${i.desc} ($${Math.floor(i.amount)})`; el.onclick=()=>{tempLink=i.id; document.getElementById('fLink').value=i.id; renderLinkChips();}; div.appendChild(el); }); }
 
-    function renderConChips(cat) {
-        const div = document.getElementById('conChips'); div.innerHTML='';
-        const cons = data.concepts[cat] || [];
-        const add = document.createElement('div'); add.className='chip'; add.innerText='+ Manual';
-        add.onclick=()=>{ document.getElementById('fConcept').value='new'; document.getElementById('fCustomDesc').style.display='block'; };
-        div.appendChild(add);
-        cons.forEach(c => {
-            const el = document.createElement('div'); el.className='chip'; el.innerText=c;
-            if(document.getElementById('fConcept').value==c) el.classList.add('active');
-            el.onclick=()=>{ document.getElementById('fConcept').value=c; document.getElementById('fCustomDesc').style.display='none'; Array.from(div.children).forEach(x=>x.classList.remove('active')); el.classList.add('active'); };
-            div.appendChild(el);
-        });
-    }
-
-    function renderLinkChips() {
-        const div = document.getElementById('linkChips'); div.innerHTML='';
-        const def = document.createElement('div'); def.className=`chip link-chip ${!tempLink?'active':''}`; def.innerText='General';
-        def.onclick=()=>{tempLink=''; document.getElementById('fLink').value=''; renderLinkChips();}; div.appendChild(def);
-        
-        currentTxs.filter(t=>t.type=='inc').forEach(i => {
-            const el = document.createElement('div'); el.className=`chip link-chip ${tempLink==i.id?'active':''}`; el.innerText=`${i.desc} ($${Math.floor(i.amount)})`;
-            el.onclick=()=>{tempLink=i.id; document.getElementById('fLink').value=i.id; renderLinkChips();}; div.appendChild(el);
-        });
-    }
-
-    document.getElementById('txForm').onsubmit = (e) => {
-        e.preventDefault();
-        let cat=document.getElementById('fCat').value, desc=document.getElementById('fConcept').value;
-        if(desc=='new' || !desc) { desc=document.getElementById('fCustomDesc').value; if(desc && !data.concepts[cat].includes(desc)) data.concepts[cat].push(desc); }
-        
-        const tx = {
-            id: editId || Date.now(),
-            date: document.getElementById('fDate').value,
-            amount: parseFloat(document.getElementById('fAmount').value),
-            type: document.getElementById('fType').value,
-            cat: cat, desc: desc,
-            exec: document.getElementById('fExec').checked,
-            linkId: document.getElementById('fType').value=='exp' ? document.getElementById('fLink').value : null
-        };
-
-        if(editId) { const i=data.txs.findIndex(x=>x.id==editId); data.txs[i]=tx; } else data.txs.push(tx);
-        saveData(); closeSheet();
-    }
-
-    function edit(id) {
-        const t = data.txs.find(x=>x.id==id); editId=id;
-        document.getElementById('fAmount').value=t.amount; document.getElementById('fDate').value=t.date;
-        document.getElementById('fExec').checked=t.exec; document.getElementById('btnDel').style.display='block';
-        setType(t.type); pickCat(t.cat); 
-        document.getElementById('fConcept').value=t.desc; renderConChips(t.cat);
-        tempLink=t.linkId||''; document.getElementById('fLink').value=tempLink; renderLinkChips();
-        openSheet();
-    }
-    
-    function delTx() { if(confirm('Borrar?')){ data.txs=data.txs.filter(x=>x.id!=editId); saveData(); closeSheet(); } }
+    document.getElementById('txForm').onsubmit = (e) => { e.preventDefault(); let cat=document.getElementById('fCat').value, desc=document.getElementById('fConcept').value; if(desc=='new' || !desc) { desc=document.getElementById('fCustomDesc').value; if(desc && !data.concepts[cat].includes(desc)) data.concepts[cat].push(desc); } const tx = { id: editId || uid(), date: document.getElementById('fDate').value, amount: parseFloat(document.getElementById('fAmount').value), type: document.getElementById('fType').value, cat: cat, desc: desc, exec: document.getElementById('fExec').checked, linkId: document.getElementById('fType').value=='exp' ? document.getElementById('fLink').value : null, updatedAt: Date.now() }; const idx = data.txs.findIndex(x=>String(x.id)===String(tx.id)); if(idx!==-1) data.txs[idx]=tx; else data.txs.push(tx); saveData(); closeSheet(); }
+    function edit(id) { const t = data.txs.find(x=>String(x.id)===String(id)); editId=id; document.getElementById('fAmount').value=t.amount; document.getElementById('fDate').value=t.date; document.getElementById('fExec').checked=t.exec; document.getElementById('btnDel').style.display='block'; setType(t.type); pickCat(t.cat); document.getElementById('fConcept').value=t.desc; renderConChips(t.cat); tempLink=t.linkId||''; document.getElementById('fLink').value=tempLink; renderLinkChips(); openSheet(); }
+    function delTx() { if(confirm('Borrar?')){ const t = data.txs.find(x=>String(x.id)===String(editId)); if(t) { t.deletedAt=Date.now(); t.updatedAt=Date.now(); } saveData(); closeSheet(); } }
     
     function loader(s) { document.getElementById('loader').style.display=s?'flex':'none'; }
     function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download='Backup.json'; a.click(); }
-    function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{data=JSON.parse(e.target.result); saveData();}; r.readAsText(i.files[0]); }
+    function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{data=mergeData(data, JSON.parse(e.target.result)); saveData();}; r.readAsText(i.files[0]); }
 </script>
 </body>
 </html>
