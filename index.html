@@ -1,599 +1,695 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#ffffff">
-    <title>J&M Hybrid V39</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        :root {
-            --bg: #FFFFFF; --bg-sec: #F8FAFC;
-            --txt: #0F172A; --txt-sec: #64748B;
-            --primary: #0F172A; /* Negro/Azul oscuro elegante */
-            --accent: #2563EB; /* Azul vivo para acciones */
-            --inc: #10B981; --exp: #EF4444;
-            --border: #E2E8F0;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--txt); padding-bottom: 90px; padding-top: 60px; }
-
-        /* --- HEADER FUNCIONAL + ESTÉTICO --- */
-        .top-nav {
-            position: fixed; top: 0; left: 0; right: 0; height: 60px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border); z-index: 50;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
-        }
-        .brand { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; display:flex; align-items:center; gap:5px; }
-        .sync-dot { width:8px; height:8px; border-radius:50%; background:#CBD5E1; transition:0.3s; }
-        
-        .date-pill {
-            background: #F1F5F9; border-radius: 20px; padding: 4px; 
-            display: flex; align-items: center; gap: 5px; border: 1px solid var(--border);
-        }
-        .btn-nav { width: 30px; height: 30px; border-radius: 50%; border:none; background:white; color:var(--txt); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-        .date-txt { font-size: 12px; font-weight: 800; text-transform: uppercase; min-width: 80px; text-align: center; position: relative; }
-        #dateInput { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
-
-        /* --- STORIES (INGRESOS) --- */
-        .stories-tray {
-            display: flex; gap: 15px; padding: 15px 15px 5px 15px; overflow-x: auto; scrollbar-width: none;
-            background: var(--bg);
-        }
-        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 64px; cursor: pointer; opacity: 0.6; transition: 0.2s; }
-        .story-item.active { opacity: 1; transform: scale(1.05); }
-        
-        .ring-container {
-            width: 58px; height: 58px; padding: 3px; border-radius: 50%;
-            background: conic-gradient(var(--border) 100%, transparent 0);
-            display: flex; align-items: center; justify-content: center; position: relative;
-        }
-        .avatar {
-            width: 100%; height: 100%; background: #F8FAFC; border-radius: 50%; border: 3px solid var(--bg);
-            display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--txt);
-        }
-        .story-badge {
-            position: absolute; bottom: -2px; background: var(--primary); color: white;
-            font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; border: 2px solid white;
-        }
-        .story-name { font-size: 11px; margin-top: 6px; font-weight: 600; text-align: center; max-width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* --- KPI BAR --- */
-        .kpi-bar { margin: 10px 15px; padding: 15px; background: var(--primary); border-radius: 16px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15); }
-        .kpi-label { font-size: 11px; opacity: 0.8; font-weight: 600; text-transform: uppercase; }
-        .kpi-val { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-
-        /* --- FEED LIST --- */
-        .feed-header { padding: 10px 20px 5px 20px; font-size: 13px; font-weight: 800; color: var(--txt-sec); text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; }
-        .feed-list { padding: 0 15px; list-style: none; margin: 0; }
-        .feed-item {
-            padding: 15px 0; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; gap: 15px;
-        }
-        .f-icon {
-            width: 44px; height: 44px; border-radius: 14px; background: #F1F5F9; 
-            display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
-        }
-        .f-content { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-        .f-row { display: flex; justify-content: space-between; align-items: center; }
-        .f-desc { font-weight: 700; font-size: 15px; color: var(--txt); }
-        .f-amt { font-weight: 800; font-size: 15px; }
-        .f-meta { font-size: 12px; color: var(--txt-sec); display: flex; gap: 6px; align-items: center; }
-        
-        .pill { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: #F1F5F9; color: var(--txt-sec); }
-        .pill.link { background: #EFF6FF; color: var(--accent); }
-
-        /* --- BOTTOM NAV --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-            background: white; border-top: 1px solid var(--border);
-            display: flex; align-items: flex-start; justify-content: space-around; padding-top: 15px; z-index: 100;
-        }
-        .nav-item { color: #94A3B8; font-size: 24px; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: var(--primary); transform: scale(1.1); }
-        
-        .fab-btn {
-            width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 20px;
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
-            transform: translateY(-25px); box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3); cursor: pointer;
-            border: 4px solid white;
-        }
-
-        /* --- SHEET MODAL (CHIPS STYLE) --- */
-        .sheet { position: fixed; inset: 0; background: white; z-index: 200; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; }
-        .sheet.open { transform: translateY(0); }
-        .sheet-head { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .sheet-body { flex: 1; padding: 0 20px 20px 20px; overflow-y: auto; }
-        
-        .lbl { font-size: 11px; font-weight: 800; color: var(--txt-sec); text-transform: uppercase; margin-bottom: 8px; margin-top: 20px; display: block; }
-        
-        /* CHIPS SCROLL */
-        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; flex-wrap: wrap; }
-        .chip {
-            padding: 10px 18px; border-radius: 30px; background: #F8FAFC; color: var(--txt-sec);
-            font-size: 14px; font-weight: 600; border: 1px solid var(--border); white-space: nowrap; cursor: pointer; transition: 0.2s;
-        }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(15,23,42,0.2); }
-        .chip.link-chip.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
-
-        .big-input { width: 100%; border: none; font-size: 36px; font-weight: 900; color: var(--txt); background: transparent; padding: 10px 0; text-align: center; border-bottom: 1px solid var(--border); border-radius: 0; }
-        .big-input::placeholder { color: #CBD5E1; }
-        
-        .btn-save { width: 100%; height: 56px; background: var(--accent); color: white; border: none; border-radius: 16px; font-weight: 800; font-size: 16px; margin-top: 30px; box-shadow: 0 5px 15px rgba(37,99,235,0.3); }
-
-        .loader { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:300; display:none; align-items:center; justify-content:center; }
-        .view-section { display: none; padding-bottom: 20px; }
-        .view-section.visible { display: block; }
-    </style>
-</head>
-<body>
-
-<div id="loader" class="loader"><i class="fas fa-circle-notch fa-spin fa-2x" style="color:var(--primary)"></i></div>
-
-<nav class="top-nav">
-    <div class="brand">J&M <div id="syncDot" class="sync-dot"></div></div>
-    <div class="date-pill">
-        <button class="btn-nav" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="date-txt"><span id="monthTxt">...</span><input type="month" id="dateInput" onchange="loadData()"></div>
-        <button class="btn-nav" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
-    </div>
-    <div onclick="forceSync()" style="font-size:18px; color:var(--txt-sec); cursor:pointer;"><i class="fas fa-sync-alt"></i></div>
-</nav>
-
-<div id="view-home" class="view-section visible">
-    
-    <div class="stories-tray" id="storiesTray"></div>
-
-    <div class="kpi-bar" id="kpiBar">
-        <div>
-            <div class="kpi-label">Disponible</div>
-            <div class="kpi-val" id="kpiVal">$0</div>
-        </div>
-        <div style="text-align:right;">
-            <div class="kpi-label">Gastado</div>
-            <div style="font-weight:700;" id="kpiSpent">$0</div>
-        </div>
-    </div>
-
-    <div class="feed-header">
-        <span id="feedTitle">Todos los movimientos</span>
-        <span style="font-size:11px; background:#F1F5F9; padding:2px 6px; border-radius:4px; cursor:pointer;" onclick="deleteCurrentMonth()">BORRAR MES</span>
-    </div>
-    <ul class="feed-list" id="feedList"></ul>
-</div>
-
-<div id="view-stats" class="view-section" style="padding:20px;">
-    <h3 style="margin:0 0 20px 0;">Distribución</h3>
-    <div style="height:300px; background:white; border-radius:16px; border:1px solid var(--border); padding:10px;">
-        <canvas id="myChart"></canvas>
-    </div>
-    <div style="margin-top:30px;">
-        <button onclick="backup()" class="chip" style="width:100%; text-align:center; justify-content:center; margin-bottom:10px;">Descargar Backup</button>
-        <button onclick="document.getElementById('fileIn').click()" class="chip" style="width:100%; text-align:center; justify-content:center;">Restaurar Backup</button>
-        <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
-    </div>
-</div>
-
-<div class="bottom-nav">
-    <div class="nav-item active" id="nav-home" onclick="nav('home')"><i class="fas fa-home"></i></div>
-    <div class="fab-btn" onclick="openSheet()"><i class="fas fa-plus"></i></div>
-    <div class="nav-item" id="nav-stats" onclick="nav('stats')"><i class="fas fa-chart-pie"></i></div>
-</div>
-
-<div class="sheet" id="sheet">
-    <div class="sheet-head">
-        <span style="font-weight:800; font-size:18px;">Nuevo</span>
-        <span onclick="closeSheet()" style="font-size:24px; color:var(--txt-sec); cursor:pointer;"><i class="fas fa-times"></i></span>
-    </div>
-    <div class="sheet-body">
-        <form id="txForm">
-            <div style="text-align:center; margin-bottom:20px;">
-                <input type="number" id="fAmount" class="big-input" placeholder="$0" step="0.01" required>
-            </div>
-
-            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-                <div class="chip active" id="type-exp" onclick="setType('exp')">Gasto</div>
-                <div class="chip" id="type-inc" onclick="setType('inc')">Ingreso</div>
-            </div>
-            <input type="hidden" id="fType" value="exp">
-
-            <label class="lbl">Categoría</label>
-            <div class="chip-scroll" id="catChips"></div>
-            <input type="hidden" id="fCat">
-
-            <label class="lbl">Concepto</label>
-            <div class="chip-scroll" id="conceptChips"></div>
-            <input type="hidden" id="fConcept">
-            <input type="text" id="fCustomDesc" placeholder="Escribe el nombre..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-top:10px; display:none; background:#F8FAFC;">
-
-            <div id="linkGroup">
-                <label class="lbl" style="color:var(--accent);">¿Con qué pagas?</label>
-                <div class="chip-scroll" id="linkChips"></div>
-                <input type="hidden" id="fLink">
-            </div>
-
-            <div style="display:flex; gap:15px; margin-top:20px;">
-                <input type="date" id="fDate" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:#F8FAFC; font-family:'Inter';" required>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <input type="checkbox" id="fExec" checked style="width:20px; height:20px;">
-                    <label style="font-size:13px; font-weight:600;">Ejecutado</label>
-                </div>
-            </div>
-
-            <button type="submit" id="btnSave" class="btn-save">GUARDAR</button>
-            <button type="button" id="btnDel" onclick="delTx()" style="width:100%; padding:15px; color:#EF4444; background:none; border:none; font-weight:700; display:none; margin-top:10px;">Eliminar Transacción</button>
-        </form>
-    </div>
-</div>
-
 <script>
-    // --- CONFIGURACIÓN ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
-    
-    // --- ESTADO ---
-    let data = { txs: [], cats: { exp:['Super','Casa','Salidas','Servicios'], inc:['Sueldo','Ventas'] }, concepts: { 'Super':['Coto'], 'Casa':['Alquiler'] } };
-    let editId = null, currentTxs = [], chartInstance = null;
-    let filterId = null; // Para filtrar por Story
+/* =========================
+   J&M Hybrid V40 (refactor seguro + offline + merge)
+   - Sin XSS (no innerHTML con user data)
+   - Offline-first (localStorage)
+   - Sync con merge por tx.updatedAt
+   - fetch timeout + retry
+========================= */
 
-    // --- TEMPORALES FORMULARIO ---
-    let tempCat='', tempLink='';
+const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
+const LS_KEY = "jmhybrid:v40:data";
 
-    window.onload = () => {
-        const d = new Date();
-        document.getElementById('dateInput').value = d.toISOString().slice(0, 7);
-        document.getElementById('fDate').value = d.toISOString().split('T')[0];
-        forceSync();
-    };
+const $ = (id) => document.getElementById(id);
 
-    // --- SYNC ENGINE (CORE V37) ---
-    async function forceSync() {
-        loader(true);
-        try {
-            const res = await fetch(API_URL);
-            const cloud = await res.json();
-            if(cloud.txs) { 
-                data = cloud; 
-                loadData(); 
-                document.getElementById('syncDot').style.background = '#10B981'; // Green
-            }
-        } catch(e) { 
-            document.getElementById('syncDot').style.background = '#EF4444'; // Red
-        }
-        loader(false);
+const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+
+const formatMoney = (n) => {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return "$0";
+  return "$" + Math.trunc(v).toLocaleString();
+};
+
+const nowISODate = () => new Date().toISOString().split("T")[0];
+const nowYM = () => new Date().toISOString().slice(0, 7);
+
+const uid = () => {
+  if (crypto && crypto.randomUUID) return crypto.randomUUID();
+  return String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+};
+
+function loader(on) { $("loader").style.display = on ? "flex" : "none"; }
+function setSyncDot(color) { $("syncDot").style.background = color; } // gray/orange/green/red
+
+function safeNumber(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function fetchWithTimeout(url, opts = {}, ms = 9000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctrl.signal })
+    .finally(() => clearTimeout(t));
+}
+
+async function fetchJSON(url, opts, { retries = 2, timeout = 9000 } = {}) {
+  let lastErr;
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const res = await fetchWithTimeout(url, opts, timeout);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      lastErr = e;
+      await new Promise(r => setTimeout(r, 300 * (i + 1)));
+    }
+  }
+  throw lastErr;
+}
+
+/* ===== Estado ===== */
+let data = {
+  txs: [],
+  cats: { exp: ["Super","Casa","Salidas","Servicios"], inc: ["Sueldo","Ventas"] },
+  concepts: { "Super": ["Coto"], "Casa": ["Alquiler"] }
+};
+
+let editId = null;
+let currentTxs = [];
+let chartInstance = null;
+let filterId = null; // story filter
+let tempCat = "";
+let tempLink = "";
+
+/* ===== Persistencia local ===== */
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && Array.isArray(parsed.txs)) data = hardenData(parsed);
+  } catch {}
+}
+
+function saveLocal() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch {}
+}
+
+function hardenData(d) {
+  // normaliza estructura mínima
+  const out = {
+    txs: Array.isArray(d.txs) ? d.txs : [],
+    cats: d.cats && typeof d.cats === "object" ? d.cats : { exp: [], inc: [] },
+    concepts: d.concepts && typeof d.concepts === "object" ? d.concepts : {}
+  };
+  out.cats.exp = Array.isArray(out.cats.exp) ? out.cats.exp : [];
+  out.cats.inc = Array.isArray(out.cats.inc) ? out.cats.inc : [];
+  return out;
+}
+
+/* ===== Merge por tx.updatedAt ===== */
+function mergeCloud(local, cloud) {
+  const L = hardenData(local);
+  const C = hardenData(cloud);
+
+  const byId = new Map();
+
+  for (const t of L.txs) byId.set(String(t.id), t);
+  for (const t of C.txs) {
+    const k = String(t.id);
+    const prev = byId.get(k);
+    if (!prev) byId.set(k, t);
+    else {
+      const a = Number(prev.updatedAt || 0);
+      const b = Number(t.updatedAt || 0);
+      byId.set(k, (b >= a) ? t : prev);
+    }
+  }
+
+  // cats y concepts: unión simple
+  const cats = { exp: [], inc: [] };
+  const addUniq = (arr, v) => { if (v && !arr.includes(v)) arr.push(v); };
+
+  for (const v of (L.cats.exp || [])) addUniq(cats.exp, v);
+  for (const v of (C.cats.exp || [])) addUniq(cats.exp, v);
+  for (const v of (L.cats.inc || [])) addUniq(cats.inc, v);
+  for (const v of (C.cats.inc || [])) addUniq(cats.inc, v);
+
+  const concepts = { ...(L.concepts || {}) };
+  for (const [k, arr] of Object.entries(C.concepts || {})) {
+    if (!Array.isArray(arr)) continue;
+    if (!Array.isArray(concepts[k])) concepts[k] = [];
+    for (const v of arr) if (v && !concepts[k].includes(v)) concepts[k].push(v);
+  }
+
+  return { txs: Array.from(byId.values()), cats, concepts };
+}
+
+/* ===== Sync ===== */
+async function forceSync() {
+  loader(true);
+  setSyncDot("#F59E0B"); // naranja (syncing)
+  try {
+    const cloud = await fetchJSON(API_URL, {}, { retries: 2, timeout: 9000 });
+    if (cloud && cloud.txs) {
+      const merged = mergeCloud(data, cloud);
+      data = merged;
+      saveLocal();
+      await pushToCloud(); // opcional: sube merge para converger
+    }
+    loadData();
+    setSyncDot("#10B981"); // green
+  } catch (e) {
+    // si no hay red, al menos seguimos en local
+    setSyncDot("#EF4444"); // red
+    loadData();
+  } finally {
+    loader(false);
+  }
+}
+
+async function pushToCloud() {
+  // subida con retry; no bloquea UI demasiado
+  try {
+    await fetchJSON(API_URL, { method: "POST", body: JSON.stringify(data) }, { retries: 1, timeout: 9000 });
+  } catch (e) {
+    // queda en local; dot rojo si querés: aquí lo dejamos “warning”
+    setSyncDot("#F59E0B");
+  }
+}
+
+async function saveData() {
+  // guarda local inmediato (optimista) y empuja a cloud
+  saveLocal();
+  loadData();
+  setSyncDot("#F59E0B");
+  loader(true);
+  await pushToCloud();
+  loader(false);
+  if ($("syncDot").style.background !== "rgb(239, 68, 68)") setSyncDot("#10B981");
+}
+
+/* ===== Inicialización ===== */
+window.addEventListener("load", () => {
+  loadLocal();
+
+  $("dateInput").value = nowYM();
+  $("fDate").value = nowISODate();
+
+  // si tenés onclick inline, no estorba; esto agrega robustez si los quitás después
+  $("txForm").addEventListener("submit", onSubmitTx);
+
+  // primer render con local, luego sync
+  loadData();
+  forceSync();
+});
+
+/* ===== Carga mensual ===== */
+function loadData() {
+  const ym = $("dateInput").value;
+  const [y, m] = ym.split("-");
+  $("monthTxt").innerText = `${months[parseInt(m, 10) - 1]} ${y}`;
+
+  currentTxs = (data.txs || []).filter(t => String(t.date || "").startsWith(ym));
+  renderStories();
+  renderFeed(filterId);
+  renderChart();
+}
+
+/* ===== Render: Stories ===== */
+function renderStories() {
+  const tray = $("storiesTray");
+  tray.textContent = "";
+
+  const incomes = currentTxs.filter(t => t.type === "inc").sort((a,b) => (b.amount||0) - (a.amount||0));
+  const expenses = currentTxs.filter(t => t.type === "exp");
+
+  tray.appendChild(storyNode({
+    active: filterId === null,
+    icon: "fa-wallet",
+    title: "Todo",
+    badge: "",
+    ringPct: 100,
+    ringColor: "var(--primary)",
+    onClick: () => setFilter(null)
+  }));
+
+  for (const inc of incomes) {
+    const spent = expenses
+      .filter(e => String(e.linkId || "") === String(inc.id))
+      .reduce((a,b) => a + (Number(b.amount)||0), 0);
+
+    const remain = (Number(inc.amount)||0) - spent;
+    const pct = (Number(inc.amount)||0) > 0 ? (remain / inc.amount) * 100 : 0;
+    const ringPct = Math.max(0, Math.min(100, pct));
+
+    const color = remain < 0 ? "#EF4444" : (ringPct > 20 ? "#10B981" : "#F59E0B");
+    const badge = Number.isFinite(remain) ? `${Math.floor(remain/1000)}k` : "";
+
+    tray.appendChild(storyNode({
+      active: String(filterId) === String(inc.id),
+      icon: "fa-dollar-sign",
+      title: String(inc.desc || "Ingreso"),
+      badge,
+      ringPct,
+      ringColor: color,
+      onClick: () => setFilter(inc.id)
+    }));
+  }
+}
+
+function storyNode({ active, icon, title, badge, ringPct, ringColor, onClick }) {
+  const item = document.createElement("div");
+  item.className = "story-item" + (active ? " active" : "");
+  item.addEventListener("click", onClick);
+
+  const ring = document.createElement("div");
+  ring.className = "ring-container";
+  ring.style.background = `conic-gradient(${ringColor} ${ringPct}%, #E2E8F0 0)`;
+
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  const i = document.createElement("i");
+  i.className = `fas ${icon}`;
+  avatar.appendChild(i);
+
+  ring.appendChild(avatar);
+
+  if (badge) {
+    const b = document.createElement("div");
+    b.className = "story-badge";
+    b.textContent = badge;
+    ring.appendChild(b);
+  }
+
+  const name = document.createElement("span");
+  name.className = "story-name";
+  name.textContent = title;
+
+  item.appendChild(ring);
+  item.appendChild(name);
+  return item;
+}
+
+function setFilter(id) {
+  filterId = id;
+  renderStories();
+  renderFeed(id);
+}
+
+/* ===== Render: Feed + KPI ===== */
+function renderFeed(fId) {
+  const list = $("feedList");
+  list.textContent = "";
+
+  let txs = [...currentTxs];
+  let title = "Todos los movimientos";
+
+  if (fId) {
+    const inc = txs.find(t => String(t.id) === String(fId));
+    if (inc) title = `Gastos de: ${String(inc.desc || "")}`;
+    txs = txs.filter(t => String(t.id) === String(fId) || String(t.linkId || "") === String(fId));
+  }
+
+  txs.sort((a,b) => String(b.date||"").localeCompare(String(a.date||"")) || String(b.id).localeCompare(String(a.id)));
+
+  const sumInc = currentTxs.filter(t=>t.type==="inc").reduce((a,b)=>a+(Number(b.amount)||0),0);
+  const sumExp = currentTxs.filter(t=>t.type==="exp").reduce((a,b)=>a+(Number(b.amount)||0),0);
+
+  $("kpiVal").innerText = formatMoney(sumInc - sumExp);
+  $("kpiSpent").innerText = formatMoney(sumExp);
+  $("feedTitle").innerText = title;
+
+  if (txs.length === 0) {
+    const empty = document.createElement("div");
+    empty.style.cssText = "text-align:center; padding:30px; color:#94A3B8;";
+    empty.textContent = "Sin movimientos aquí";
+    list.appendChild(empty);
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+
+  for (const t of txs) {
+    const li = document.createElement("li");
+    li.className = "feed-item";
+    li.addEventListener("click", () => edit(t.id));
+
+    const isInc = t.type === "inc";
+
+    const icon =
+      isInc ? "fa-arrow-down" :
+      (t.cat === "Super" ? "fa-shopping-cart" :
+      (t.cat === "Casa" ? "fa-home" : "fa-receipt"));
+
+    const bg = isInc ? "#ECFDF5" : "#F1F5F9";
+
+    // linkName
+    let linkName = "";
+    if (!isInc && t.linkId) {
+      const p = currentTxs.find(x => String(x.id) === String(t.linkId));
+      if (p) linkName = String(p.desc || "");
     }
 
-    async function saveData() {
-        loader(true);
-        document.getElementById('syncDot').style.background = '#F59E0B'; // Orange saving
-        try { await fetch(API_URL, {method:'POST', body:JSON.stringify(data)}); loadData(); document.getElementById('syncDot').style.background='#10B981'; } 
-        catch(e) { document.getElementById('syncDot').style.background='#EF4444'; }
-        loader(false);
+    const fIcon = document.createElement("div");
+    fIcon.className = "f-icon";
+    fIcon.style.background = bg;
+    fIcon.style.color = isInc ? "var(--inc)" : "var(--txt-sec)";
+    const ii = document.createElement("i");
+    ii.className = `fas ${icon}`;
+    fIcon.appendChild(ii);
+
+    const content = document.createElement("div");
+    content.className = "f-content";
+
+    const row = document.createElement("div");
+    row.className = "f-row";
+
+    const desc = document.createElement("span");
+    desc.className = "f-desc";
+    desc.textContent = String(t.desc || "");
+    if (!t.exec) {
+      desc.style.textDecoration = "line-through";
+      desc.style.opacity = "0.5";
     }
 
-    function loadData() {
-        const ym = document.getElementById('dateInput').value;
-        const [y, m] = ym.split('-');
-        const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
-        document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
-        
-        currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
-        renderStories();
-        renderFeed(filterId);
-        renderChart();
+    const amt = document.createElement("span");
+    amt.className = "f-amt";
+    amt.style.color = isInc ? "var(--inc)" : "var(--txt)";
+    const sign = isInc ? "+" : "-";
+    amt.textContent = `${sign} ${formatMoney(t.amount)}`;
+
+    row.appendChild(desc);
+    row.appendChild(amt);
+
+    const meta = document.createElement("div");
+    meta.className = "f-meta";
+
+    const pillCat = document.createElement("span");
+    pillCat.className = "pill";
+    pillCat.textContent = String(t.cat || "");
+
+    const day = document.createElement("span");
+    day.textContent = String(t.date || "").split("-")[2] || "";
+
+    meta.appendChild(pillCat);
+    meta.appendChild(day);
+
+    if (linkName) {
+      const pillLink = document.createElement("span");
+      pillLink.className = "pill link";
+      const linkI = document.createElement("i");
+      linkI.className = "fas fa-link";
+      pillLink.appendChild(linkI);
+      pillLink.appendChild(document.createTextNode(" " + linkName));
+      meta.appendChild(pillLink);
     }
 
-    // --- RENDERIZADO: STORIES (INNOVACIÓN V38 FUNCIONAL) ---
-    function renderStories() {
-        const tray = document.getElementById('storiesTray');
-        const incomes = currentTxs.filter(t => t.type === 'inc').sort((a,b)=>b.amount-a.amount);
-        const expenses = currentTxs.filter(t => t.type === 'exp');
-        
-        let html = '';
-        
-        // Botón "Todo"
-        html += `
-        <div class="story-item ${filterId===null?'active':''}" onclick="setFilter(null)">
-            <div class="ring-container" style="background:conic-gradient(var(--primary) 100%, transparent 0);">
-                <div class="avatar" style="background:var(--primary); color:white;"><i class="fas fa-wallet"></i></div>
-            </div>
-            <span class="story-name">Todo</span>
-        </div>`;
+    content.appendChild(row);
+    content.appendChild(meta);
 
-        incomes.forEach(inc => {
-            // Calcular cuánto queda de este ingreso
-            const spent = expenses.filter(e => e.linkId == inc.id).reduce((a,b)=>a+b.amount, 0);
-            const remain = inc.amount - spent;
-            const pct = inc.amount > 0 ? (remain / inc.amount) * 100 : 0;
-            const color = remain < 0 ? '#EF4444' : (pct > 20 ? '#10B981' : '#F59E0B');
-            
-            html += `
-            <div class="story-item ${filterId==inc.id?'active':''}" onclick="setFilter(${inc.id})">
-                <div class="ring-container" style="background:conic-gradient(${color} ${Math.max(0, pct)}%, #E2E8F0 0);">
-                    <div class="avatar"><i class="fas fa-dollar-sign"></i></div>
-                    <div class="story-badge">${Math.floor(remain/1000)}k</div>
-                </div>
-                <span class="story-name">${inc.desc}</span>
-            </div>`;
-        });
-        
-        tray.innerHTML = html;
+    li.appendChild(fIcon);
+    li.appendChild(content);
+
+    frag.appendChild(li);
+  }
+
+  list.appendChild(frag);
+}
+
+/* ===== Form ===== */
+function openSheet() { if (!editId) resetForm(); $("sheet").classList.add("open"); }
+function closeSheet() { $("sheet").classList.remove("open"); }
+
+function resetForm() {
+  editId = null;
+  $("txForm").reset();
+  $("fDate").value = nowISODate();
+  $("btnDel").style.display = "none";
+  $("btnSave").innerText = "GUARDAR";
+  setType("exp");
+  tempCat = "";
+  tempLink = "";
+  renderLinkChips();
+}
+
+function setType(t) {
+  $("fType").value = t;
+  $("type-exp").className = `chip ${t==="exp" ? "active" : ""}`;
+  $("type-inc").className = `chip ${t==="inc" ? "active" : ""}`;
+  $("linkGroup").style.display = (t === "exp") ? "block" : "none";
+  renderCatChips(t);
+}
+
+function renderCatChips(type) {
+  const div = $("catChips");
+  div.textContent = "";
+
+  if (!data.cats[type]) data.cats[type] = [];
+
+  const addBtn = document.createElement("div");
+  addBtn.className = "chip";
+  addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+  addBtn.addEventListener("click", () => {
+    const n = prompt("Nueva Categoria:");
+    if (!n) return;
+    if (!data.cats[type].includes(n)) data.cats[type].push(n);
+    if (!data.concepts[n]) data.concepts[n] = [];
+    saveData();
+    pickCat(n);
+  });
+  div.appendChild(addBtn);
+
+  for (const c of data.cats[type]) {
+    const el = document.createElement("div");
+    el.className = `chip ${tempCat === c ? "active" : ""}`;
+    el.textContent = c;
+    el.addEventListener("click", () => pickCat(c));
+    div.appendChild(el);
+  }
+
+  if (tempCat && data.cats[type].includes(tempCat)) renderConceptChips(tempCat);
+  else $("conceptChips").textContent = "";
+}
+
+function pickCat(c) {
+  tempCat = c;
+  $("fCat").value = c;
+  renderCatChips($("fType").value);
+  renderConceptChips(c);
+}
+
+function renderConceptChips(cat) {
+  const div = $("conceptChips");
+  div.textContent = "";
+
+  if (!data.concepts[cat]) data.concepts[cat] = [];
+
+  const customBtn = document.createElement("div");
+  customBtn.className = "chip";
+  customBtn.textContent = "+ Nuevo";
+  customBtn.addEventListener("click", () => {
+    $("fConcept").value = "new_c";
+    $("fCustomDesc").style.display = "block";
+    $("fCustomDesc").value = "";
+    $("fCustomDesc").focus();
+    renderConceptChips(cat);
+  });
+  div.appendChild(customBtn);
+
+  for (const c of data.concepts[cat]) {
+    const el = document.createElement("div");
+    el.className = "chip" + ($("fConcept").value === c ? " active" : "");
+    el.textContent = c;
+    el.addEventListener("click", () => {
+      $("fConcept").value = c;
+      $("fCustomDesc").style.display = "none";
+      renderConceptChips(cat);
+    });
+    div.appendChild(el);
+  }
+}
+
+function renderLinkChips() {
+  const div = $("linkChips");
+  div.textContent = "";
+
+  const def = document.createElement("div");
+  def.className = `chip link-chip ${!tempLink ? "active" : ""}`;
+  def.textContent = "Fondo General";
+  def.addEventListener("click", () => {
+    tempLink = "";
+    $("fLink").value = "";
+    renderLinkChips();
+  });
+  div.appendChild(def);
+
+  const incs = currentTxs.filter(t => t.type === "inc");
+  for (const i of incs) {
+    const el = document.createElement("div");
+    el.className = `chip link-chip ${String(tempLink) === String(i.id) ? "active" : ""}`;
+    el.textContent = `${String(i.desc || "Ingreso")} (${formatMoney(i.amount)})`;
+    el.addEventListener("click", () => {
+      tempLink = i.id;
+      $("fLink").value = String(i.id);
+      renderLinkChips();
+    });
+    div.appendChild(el);
+  }
+}
+
+function onSubmitTx(e) {
+  e.preventDefault();
+
+  const type = $("fType").value;
+  const amount = safeNumber($("fAmount").value);
+  const date = $("fDate").value;
+
+  if (!date) return alert("Fecha inválida");
+  if (!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido");
+
+  const cat = $("fCat").value;
+  if (!cat) return alert("Selecciona categoría");
+
+  let desc = $("fConcept").value;
+  if (desc === "new_c" || !desc) {
+    desc = ($("fCustomDesc").value || "").trim();
+    if (!desc) return alert("Escribe el concepto");
+    if (!data.concepts[cat]) data.concepts[cat] = [];
+    if (!data.concepts[cat].includes(desc)) data.concepts[cat].push(desc);
+  }
+
+  const tx = {
+    id: editId || uid(),
+    date,
+    amount,
+    type,
+    cat,
+    desc,
+    exec: $("fExec").checked,
+    linkId: (type === "exp") ? ($("fLink").value || "") : null,
+    updatedAt: Date.now()
+  };
+
+  if (editId) {
+    const idx = data.txs.findIndex(x => String(x.id) === String(editId));
+    if (idx >= 0) data.txs[idx] = tx;
+    else data.txs.push(tx);
+  } else {
+    data.txs.push(tx);
+  }
+
+  saveData();
+  closeSheet();
+}
+
+function edit(id) {
+  const t = data.txs.find(x => String(x.id) === String(id));
+  if (!t) return;
+
+  editId = t.id;
+  $("fAmount").value = t.amount;
+  $("fDate").value = t.date;
+  $("fExec").checked = !!t.exec;
+
+  $("btnDel").style.display = "block";
+  $("btnSave").innerText = "ACTUALIZAR";
+
+  setType(t.type);
+  pickCat(t.cat);
+
+  $("fConcept").value = t.desc;
+  renderConceptChips(t.cat);
+
+  tempLink = t.linkId || "";
+  $("fLink").value = tempLink;
+  renderLinkChips();
+
+  openSheet();
+}
+
+function delTx() {
+  if (!editId) return;
+  if (confirm("¿Eliminar?")) {
+    data.txs = data.txs.filter(x => String(x.id) !== String(editId));
+    saveData();
+    closeSheet();
+  }
+}
+
+/* ===== Utils UI existentes ===== */
+function navMonth(n) {
+  const i = $("dateInput");
+  let [y,m] = i.value.split("-");
+  const d = new Date(Number(y), Number(m) - 1 + n, 1);
+  i.value = d.toISOString().slice(0,7);
+  loadData();
+}
+
+function deleteCurrentMonth() {
+  if (!confirm("¿BORRAR TODO EL MES ACTUAL?")) return;
+  const ym = $("dateInput").value;
+  data.txs = data.txs.filter(t => !String(t.date || "").startsWith(ym));
+  saveData();
+}
+
+function nav(view) {
+  document.querySelectorAll(".view-section").forEach(x => x.classList.remove("visible"));
+  $("view-" + view).classList.add("visible");
+  document.querySelectorAll(".nav-item").forEach(x => x.classList.remove("active"));
+  $("nav-" + view).classList.add("active");
+}
+
+function backup() {
+  const a = document.createElement("a");
+  a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+  a.download = "Backup.json";
+  a.click();
+}
+
+function restoreSmart(i) {
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      data = mergeCloud(data, parsed);
+      saveData();
+    } catch {
+      alert("Backup inválido");
     }
+  };
+  r.readAsText(i.files[0]);
+}
 
-    function setFilter(id) {
-        filterId = id;
-        renderStories(); // Actualiza clases active
-        renderFeed(id);
-    }
+/* ===== Chart ===== */
+function renderChart() {
+  const ctx = $("myChart");
+  if (!ctx) return;
+  if (chartInstance) chartInstance.destroy();
 
-    // --- RENDERIZADO: FEED & KPI ---
-    function renderFeed(fId) {
-        const list = document.getElementById('feedList');
-        list.innerHTML = '';
-        
-        let txs = [...currentTxs];
-        let title = "Todos los movimientos";
-        let totalInc = 0, totalExp = 0;
+  const map = {};
+  for (const t of currentTxs) {
+    if (t.type !== "exp") continue;
+    const k = String(t.cat || "Otros");
+    map[k] = (map[k] || 0) + (Number(t.amount) || 0);
+  }
 
-        // Si hay filtro de Story
-        if(fId) {
-            const inc = txs.find(t => t.id == fId);
-            if(inc) title = `Gastos de: ${inc.desc}`;
-            txs = txs.filter(t => t.id == fId || t.linkId == fId);
-        }
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(map),
+      datasets: [{
+        data: Object.values(map),
+        backgroundColor: ["#2563EB","#10B981","#F59E0B","#EF4444","#8B5CF6","#0EA5E9","#22C55E"],
+        borderWidth: 0
+      }]
+    },
+    options: { maintainAspectRatio: false, plugins: { legend: { position: "right", labels: { boxWidth: 10 } } } }
+  });
+}
 
-        // Ordenar
-        txs.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
-
-        // Calcular Totales Generales (para el KPI Top)
-        const allInc = currentTxs.filter(t=>t.type=='inc');
-        const allExp = currentTxs.filter(t=>t.type=='exp');
-        const sumInc = allInc.reduce((a,b)=>a+b.amount,0);
-        const sumExp = allExp.reduce((a,b)=>a+b.amount,0);
-
-        document.getElementById('kpiVal').innerText = `$${(sumInc-sumExp).toLocaleString()}`;
-        document.getElementById('kpiSpent').innerText = `$${sumExp.toLocaleString()}`;
-        document.getElementById('feedTitle').innerText = title;
-
-        txs.forEach(t => {
-            const isInc = t.type === 'inc';
-            const li = document.createElement('li');
-            li.className = 'feed-item';
-            li.onclick = () => edit(t.id);
-            
-            const icon = isInc ? 'fa-arrow-down' : (t.cat=='Super'?'fa-shopping-cart': (t.cat=='Casa'?'fa-home':'fa-receipt'));
-            const color = isInc ? 'var(--inc)' : 'var(--txt)';
-            const bg = isInc ? '#ECFDF5' : '#F1F5F9';
-            
-            // Buscar nombre del Link si existe
-            let linkName = '';
-            if(t.linkId && !isInc) {
-                const p = currentTxs.find(x=>x.id==t.linkId);
-                if(p) linkName = p.desc;
-            }
-
-            li.innerHTML = `
-                <div class="f-icon" style="background:${bg}; color:${isInc?'var(--inc)':'var(--txt-sec)'}"><i class="fas ${icon}"></i></div>
-                <div class="f-content">
-                    <div class="f-row">
-                        <span class="f-desc" style="${t.exec?'':'text-decoration:line-through; opacity:0.5'}">${t.desc}</span>
-                        <span class="f-amt" style="color:${color}">${isInc?'+':'-'} $${Math.floor(t.amount).toLocaleString()}</span>
-                    </div>
-                    <div class="f-meta">
-                        <span class="pill">${t.cat}</span>
-                        <span>${t.date.split('-')[2]}</span>
-                        ${linkName ? `<span class="pill link"><i class="fas fa-link"></i> ${linkName}</span>` : ''}
-                    </div>
-                </div>
-            `;
-            list.appendChild(li);
-        });
-        
-        if(txs.length===0) list.innerHTML = '<div style="text-align:center; padding:30px; color:#94A3B8;">Sin movimientos aquí</div>';
-    }
-
-    // --- FORMULARIO CHIPS (LÓGICA MEJORADA) ---
-    function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); }
-    function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
-    
-    function resetForm() {
-        editId=null; document.getElementById('txForm').reset();
-        document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('btnDel').style.display='none';
-        document.getElementById('btnSave').innerText = 'GUARDAR';
-        setType('exp');
-        tempCat=''; tempLink=''; renderLinkChips();
-    }
-
-    function setType(t) {
-        document.getElementById('fType').value = t;
-        document.getElementById('type-exp').className = `chip ${t=='exp'?'active':''}`;
-        document.getElementById('type-inc').className = `chip ${t=='inc'?'active':''}`;
-        document.getElementById('linkGroup').style.display = t==='exp'?'block':'none';
-        renderCatChips(t);
-    }
-
-    function renderCatChips(type) {
-        const div = document.getElementById('catChips');
-        div.innerHTML = '';
-        const cats = data.cats[type] || [];
-        
-        // Add Button
-        const addBtn = document.createElement('div'); addBtn.className='chip'; addBtn.innerHTML='<i class="fas fa-plus"></i>';
-        addBtn.onclick = () => { const n=prompt('Nueva Categoria:'); if(n){data.cats[type].push(n); data.concepts[n]=[]; saveData(); renderCatChips(type); pickCat(n);} };
-        div.appendChild(addBtn);
-
-        cats.forEach(c => {
-            const el = document.createElement('div');
-            el.className = `chip ${tempCat===c?'active':''}`;
-            el.innerText = c;
-            el.onclick = () => pickCat(c);
-            div.appendChild(el);
-        });
-        if(tempCat && cats.includes(tempCat)) renderConceptChips(tempCat);
-        else document.getElementById('conceptChips').innerHTML='';
-    }
-
-    function pickCat(c) {
-        tempCat = c; document.getElementById('fCat').value = c;
-        renderCatChips(document.getElementById('fType').value); // Re-render to show active
-        renderConceptChips(c);
-    }
-
-    function renderConceptChips(cat) {
-        const div = document.getElementById('conceptChips');
-        div.innerHTML = '';
-        const concepts = data.concepts[cat] || [];
-        
-        const customBtn = document.createElement('div'); customBtn.className='chip'; customBtn.innerText='+ Nuevo';
-        customBtn.onclick = () => { 
-            document.getElementById('fConcept').value='new_c'; 
-            document.getElementById('fCustomDesc').style.display='block'; 
-            document.getElementById('fCustomDesc').focus();
-            renderConceptChips(cat); // clear active
-            customBtn.classList.add('active');
-        };
-        div.appendChild(customBtn);
-
-        concepts.forEach(c => {
-            const el = document.createElement('div');
-            el.className = 'chip';
-            if(document.getElementById('fConcept').value === c) el.classList.add('active');
-            el.innerText = c;
-            el.onclick = () => {
-                document.getElementById('fConcept').value = c;
-                document.getElementById('fCustomDesc').style.display='none';
-                Array.from(div.children).forEach(x=>x.classList.remove('active'));
-                el.classList.add('active');
-            };
-            div.appendChild(el);
-        });
-    }
-
-    function renderLinkChips() {
-        const div = document.getElementById('linkChips');
-        div.innerHTML = '';
-        
-        const def = document.createElement('div'); 
-        def.className=`chip link-chip ${!tempLink?'active':''}`; def.innerText="Fondo General";
-        def.onclick=()=>{ tempLink=''; document.getElementById('fLink').value=''; renderLinkChips(); };
-        div.appendChild(def);
-
-        const incs = currentTxs.filter(t=>t.type=='inc');
-        incs.forEach(i => {
-            const el = document.createElement('div');
-            el.className=`chip link-chip ${tempLink==i.id?'active':''}`; 
-            el.innerText = `${i.desc} ($${Math.floor(i.amount)})`;
-            el.onclick=()=>{ tempLink=i.id; document.getElementById('fLink').value=i.id; renderLinkChips(); };
-            div.appendChild(el);
-        });
-    }
-
-    // --- ACCIONES ---
-    document.getElementById('txForm').onsubmit = (e) => {
-        e.preventDefault();
-        let cat = document.getElementById('fCat').value;
-        let desc = document.getElementById('fConcept').value;
-        if(desc==='new_c' || !desc) {
-            desc = document.getElementById('fCustomDesc').value;
-            if(!cat) return alert("Selecciona categoría");
-            if(desc && !data.concepts[cat].includes(desc)) data.concepts[cat].push(desc);
-        }
-        
-        const tx = {
-            id: editId || Date.now(),
-            date: document.getElementById('fDate').value,
-            amount: parseFloat(document.getElementById('fAmount').value),
-            type: document.getElementById('fType').value,
-            cat: cat,
-            desc: desc,
-            exec: document.getElementById('fExec').checked,
-            linkId: document.getElementById('fType').value==='exp' ? document.getElementById('fLink').value : null
-        };
-
-        if(editId) {
-            const idx = data.txs.findIndex(x=>x.id==editId);
-            data.txs[idx] = tx;
-        } else {
-            data.txs.push(tx);
-        }
-        saveData(); closeSheet();
-    }
-
-    function edit(id) {
-        const t = data.txs.find(x=>x.id==id);
-        if(!t) return;
-        editId = id;
-        document.getElementById('fAmount').value = t.amount;
-        document.getElementById('fDate').value = t.date;
-        document.getElementById('fExec').checked = t.exec;
-        document.getElementById('btnDel').style.display='block';
-        document.getElementById('btnSave').innerText = 'ACTUALIZAR';
-        
-        setType(t.type);
-        pickCat(t.cat);
-        
-        document.getElementById('fConcept').value = t.desc;
-        renderConceptChips(t.cat); // Activa el chip correcto
-        
-        tempLink = t.linkId || '';
-        document.getElementById('fLink').value = tempLink;
-        renderLinkChips();
-        
-        openSheet();
-    }
-
-    function delTx() {
-        if(confirm("¿Eliminar?")) {
-            data.txs = data.txs.filter(x=>x.id!=editId);
-            saveData(); closeSheet();
-        }
-    }
-
-    // --- UTILS ---
-    function navMonth(n) { 
-        const i = document.getElementById('dateInput'); 
-        let [y,m]=i.value.split('-'); 
-        const d = new Date(y, m-1+n, 1); 
-        i.value = d.toISOString().slice(0,7); 
-        loadData(); 
-    }
-    
-    function deleteCurrentMonth() {
-        if(confirm("¿BORRAR TODO EL MES ACTUAL?")) {
-            const ym = document.getElementById('dateInput').value;
-            data.txs = data.txs.filter(t => !t.date.startsWith(ym));
-            saveData();
-        }
-    }
-
-    function nav(view) {
-        document.querySelectorAll('.view-section').forEach(x=>x.classList.remove('visible'));
-        document.getElementById('view-'+view).classList.add('visible');
-        document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-        document.getElementById('nav-'+view).classList.add('active');
-    }
-    
-    function loader(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
-    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`Backup.json`; a.click(); }
-    function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{ data=JSON.parse(e.target.result); saveData(); }; r.readAsText(i.files[0]); }
-
-    function renderChart() {
-        const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
-        const map = {}; currentTxs.filter(t=>t.type=='exp').forEach(t=>map[t.cat]=(map[t.cat]||0)+t.amount);
-        chartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ['#2563EB','#10B981','#F59E0B','#EF4444','#8B5CF6'], borderWidth:0 }] },
-            options: { maintainAspectRatio:false, plugins:{legend:{position:'right', labels:{boxWidth:10}}} }
-        });
-    }
+/* ===== Exponer funciones usadas por tus onclick inline ===== */
+window.forceSync = forceSync;
+window.saveData = saveData;
+window.loadData = loadData;
+window.openSheet = openSheet;
+window.closeSheet = closeSheet;
+window.setType = setType;
+window.navMonth = navMonth;
+window.nav = nav;
+window.deleteCurrentMonth = deleteCurrentMonth;
+window.delTx = delTx;
+window.backup = backup;
+window.restoreSmart = restoreSmart;
 </script>
-</body>
-</html>
