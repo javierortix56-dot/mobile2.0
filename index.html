@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M Mobile Cloud V37.0</title>
+    <title>J&M Social Fin V38.0</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%2310B981'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%23000000'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='320' fill='white'%3E$%3C/text%3E%3C/svg%3E">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -16,641 +16,519 @@
 
     <style>
         :root {
-            --bg-app: #F8FAFC; --surface: #FFFFFF;
-            --text-dark: #0F172A; --text-gray: #64748B;
-            --inc-color: #10B981; --inc-bg: #ECFDF5;
-            --exp-color: #EF4444; --exp-bg: #FEF2F2;
-            --primary: #2563EB; --border: #E2E8F0;
+            --bg: #FFFFFF; --bg-sec: #F8FAFC;
+            --txt: #0F172A; --txt-sec: #64748B;
+            --acc: #2563EB; --inc: #10B981; --exp: #EF4444;
+            --border: #E2E8F0;
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-app); margin: 0; color: var(--text-dark); padding-bottom: 100px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--txt); padding-bottom: 80px; padding-top: 60px; }
 
-        /* --- HEADER --- */
-        .top-bar { background: var(--surface); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
-        .brand { font-weight: 900; color: var(--primary); font-size: 18px; display: flex; flex-direction: column; line-height: 1; }
-        .sync-badge { font-size: 9px; font-weight: 700; background: #FEF3C7; color: #B45309; padding: 2px 6px; border-radius: 4px; margin-top: 2px; text-transform: uppercase; width: fit-content; }
-        .sync-badge.ok { background: #DCFCE7; color: #166534; }
-        .sync-badge.error { background: #FEE2E2; color: #991B1B; }
-
-        /* --- NAVEGACIÓN FECHA --- */
-        .date-ctrl { 
-            display: flex; align-items: center; background: #F1F5F9; border-radius: 8px; 
-            padding: 2px; border: 1px solid var(--border); position: relative;
+        /* --- HEADER COMPACTO --- */
+        .top-nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 55px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); z-index: 50;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
         }
-        .btn-arrow { 
-            background: transparent; border: none; width: 45px; height: 35px; 
-            cursor: pointer; color: var(--text-dark); font-size: 18px; 
-            display: flex; align-items: center; justify-content: center; z-index: 10;
+        .brand { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; }
+        .date-pill {
+            background: #F1F5F9; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px; position: relative;
         }
-        .date-display { 
-            font-size: 12px; font-weight: 700; text-transform: uppercase; 
-            min-width: 100px; text-align: center; position: relative;
+        #dateInput { position: absolute; inset: 0; opacity: 0; width: 100%; }
+        
+        /* --- STORIES (INGRESOS) --- */
+        .stories-tray {
+            display: flex; gap: 12px; padding: 15px; overflow-x: auto; scrollbar-width: none;
+            border-bottom: 1px solid var(--border); background: var(--bg);
         }
-        #dateInput {
-            position: absolute; top: 0; left: 45px; width: 100px; height: 100%;
-            opacity: 0; cursor: pointer; z-index: 5;
+        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 60px; cursor: pointer; }
+        
+        .ring-container {
+            width: 56px; height: 56px; padding: 3px; border-radius: 50%;
+            background: conic-gradient(var(--border) 100%, transparent 0); /* Default grey */
+            display: flex; align-items: center; justify-content: center; position: relative;
+            transition: 0.3s;
+        }
+        .avatar {
+            width: 100%; height: 100%; background: #F1F5F9; border-radius: 50%; border: 2px solid var(--bg);
+            display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--txt);
+        }
+        .story-badge {
+            position: absolute; bottom: 0; right: 0; background: var(--inc); color: white;
+            font-size: 9px; font-weight: 800; padding: 2px 4px; border-radius: 6px; border: 2px solid white;
+        }
+        .story-name { font-size: 11px; margin-top: 5px; font-weight: 600; text-align: center; max-width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- KPI BALANCE (MINI) --- */
+        .mini-kpi { padding: 10px 15px; background: #F8FAFC; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--txt-sec); font-weight: 600; border-bottom: 1px solid var(--border); }
+        .bal-val { font-size: 16px; font-weight: 800; color: var(--txt); }
+
+        /* --- FEED LIST --- */
+        .feed-list { padding: 0; list-style: none; margin: 0; }
+        .feed-item {
+            padding: 12px 15px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;
+            background: white; transition: 0.1s;
+        }
+        .feed-item:active { background: #F1F5F9; }
+        .f-icon {
+            width: 40px; height: 40px; border-radius: 50%; background: #F1F5F9; 
+            display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+        }
+        .f-icon.inc { background: #ECFDF5; color: var(--inc); }
+        .f-icon.exp { background: #FEF2F2; color: var(--exp); }
+        
+        .f-content { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .f-top { display: flex; justify-content: space-between; align-items: center; }
+        .f-desc { font-weight: 700; font-size: 14px; color: var(--txt); }
+        .f-amt { font-weight: 800; font-size: 14px; }
+        .f-meta { font-size: 11px; color: var(--txt-sec); display: flex; gap: 8px; align-items: center; }
+        .tag-pill { background: #F1F5F9; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .link-pill { background: #EFF6FF; color: var(--acc); }
+
+        /* --- BOTTOM NAV --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+            background: white; border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-around; z-index: 100;
+        }
+        .nav-item { color: var(--txt-sec); font-size: 20px; padding: 10px; cursor: pointer; }
+        .nav-item.active { color: var(--txt); }
+        
+        .fab-center {
+            width: 50px; height: 50px; background: var(--txt); color: white; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+            transform: translateY(-10px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); cursor: pointer;
         }
 
-        /* --- VIEW TABS (NUEVO) --- */
-        .view-tabs { display: flex; padding: 15px 15px 0 15px; gap: 10px; }
-        .v-tab { 
-            flex: 1; text-align: center; padding: 10px; border-radius: 10px; 
-            font-size: 13px; font-weight: 700; color: var(--text-gray); 
-            background: white; border: 1px solid var(--border); cursor: pointer; transition: 0.2s;
-        }
-        .v-tab.active { background: var(--text-dark); color: white; border-color: var(--text-dark); }
-
-        /* --- KPI BALANCE --- */
-        .kpi-wrapper { padding: 15px 15px 5px 15px; }
-        .kpi-card { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; container-type: inline-size; }
-        .kpi-val { font-size: clamp(24px, 12cqw, 34px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; overflow-wrap: break-word; transition: 0.3s; }
-        
-        .copy-zone { padding: 15px; margin: 0 15px 10px 15px; display: none; background: white; border-radius: 12px; border: 1px dashed var(--border); }
-        .copy-controls { display: flex; gap: 8px; margin-top: 8px; }
-        .btn-copy-month { flex: 1; background: var(--text-dark); color: white; border: none; padding: 0 12px; border-radius: 8px; font-weight: 700; font-size: 13px; height: 40px; }
-
-        /* --- VISTA 1: LISTAS T (Clásica) --- */
-        #view-accounting { display: block; }
-        .t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; align-items: start; }
-        .t-col { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
-        .t-list { max-height: 60vh; overflow-y: auto; scrollbar-width: thin; }
-        
-        .col-header { padding: 8px; text-align: center; font-size: 11px; font-weight: 800; text-transform: uppercase; color: white; position: sticky; top: 0; z-index: 2; }
-        .bg-inc { background: var(--inc-color); } .bg-exp { background: var(--exp-color); }
-        .col-total { display: block; background: rgba(0,0,0,0.1); margin-top: 2px; border-radius: 4px; padding: 2px; }
-        
-        .row-item { background: white; padding: 12px 8px; border-bottom: 1px solid #F1F5F9; position: relative; }
-        .row-item.executed .desc-text { text-decoration: line-through; color: #94A3B8; }
-        .row-item.executed .amt-text { text-decoration: line-through; opacity: 0.6; }
-
-        .subtotal-tag { font-size: 9px; font-weight: 700; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-top: 3px; }
-        .st-ok { background: #DCFCE7; color: #166534; } 
-        .st-bad { background: #FEE2E2; color: #991B1B; }
-        .row-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
-
-        /* --- VISTA 2: ALLOCATION (Nueva) --- */
-        #view-allocation { display: none; padding: 15px; }
-        .alloc-card { background: white; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .alloc-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; border-bottom: 1px solid var(--border); }
-        .alloc-title { font-weight: 800; font-size: 14px; color: var(--text-dark); display: flex; flex-direction: column; }
-        .alloc-total { font-weight: 800; color: var(--inc-color); font-size: 15px; }
-        
-        .alloc-body { padding: 10px 15px; }
-        .alloc-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #E2E8F0; font-size: 13px; }
-        .alloc-item:last-child { border-bottom: none; }
-        .alloc-desc { color: var(--text-gray); font-weight: 500; }
-        .alloc-amt { font-weight: 700; color: var(--exp-color); }
-        
-        .alloc-footer { background: #F8FAFC; padding: 10px 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .prog-bar-bg { height: 6px; width: 100%; background: #E2E8F0; border-radius: 3px; margin-top: 5px; overflow: hidden; }
-        .prog-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: 0.5s; }
-        .alloc-remain { font-size: 12px; font-weight: 800; }
-        
-        /* Orphan Card Style */
-        .alloc-card.orphan .alloc-header { background: #FEF2F2; }
-        .alloc-card.orphan .alloc-total { color: var(--exp-color); }
-        .alloc-card.orphan .prog-bar-fill { background: var(--exp-color); }
-
-        /* --- GRÁFICO --- */
-        .section-header { padding: 0 20px; margin-top: 25px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .sec-title { font-size: 14px; font-weight: 800; color: var(--text-dark); }
-        .btn-reset-chart { font-size: 11px; color: var(--primary); font-weight: 700; border: none; background: none; cursor: pointer; display: none; }
-        .chart-box { background: var(--surface); margin: 0 15px; padding: 15px; border-radius: 16px; border: 1px solid var(--border); height: 360px; position: relative; }
-
-        /* --- BOTONES ACCIÓN --- */
-        .action-btns { padding: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .btn-big { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: white; color: var(--text-dark); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 45%; }
-        .btn-sync { width: 100%; margin-top: 5px; background: var(--primary); color: white; border: none; }
-        .btn-danger-zone { margin-top: 20px; font-size: 10px; color: #CBD5E1; text-decoration: underline; background: none; border: none; }
-
-        /* --- FORMULARIO --- */
-        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--text-dark); color: white; border-radius: 50%; border:none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 24px; z-index: 40; }
-        .sheet { position: fixed; bottom: 0; width: 100%; background: white; z-index: 100; border-radius: 20px 20px 0 0; transform: translateY(100%); transition: 0.3s; padding: 25px 20px; max-height: 90vh; overflow-y: auto; }
+        /* --- SHEET FORM (CHIPS STYLE) --- */
+        .sheet { position: fixed; inset: 0; background: white; z-index: 200; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; }
         .sheet.open { transform: translateY(0); }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 90; display: none; backdrop-filter: blur(3px); }
+        .sheet-head { padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .sheet-body { flex: 1; padding: 20px; overflow-y: auto; }
         
-        .sw-container { display: flex; background: #F1F5F9; padding: 5px; border-radius: 12px; margin-bottom: 20px; gap: 5px; }
-        .sw-item { flex: 1; padding: 15px; text-align: center; font-size: 14px; font-weight: 700; border-radius: 10px; cursor: pointer; color: var(--text-gray); display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s; }
-        .sw-item i { font-size: 18px; }
-        .sw-item.active.exp { background: var(--exp-color); color: white; }
-        .sw-item.active.inc { background: var(--inc-color); color: white; }
-        .inp { width: 100%; height: 48px; border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; background: #F8FAFC; margin-bottom: 12px; font-size: 16px; font-family: 'Inter'; }
-        .lbl { font-size: 11px; font-weight: 800; color: var(--text-gray); text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .btn-save { width: 100%; height: 55px; background: var(--text-dark); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px; }
-        .loader-overlay { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center; }
-        .spinner { width:40px; height:40px; border:4px solid #E2E8F0; border-top:4px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; }
-        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
-        .c-inc { color: var(--inc-color); font-weight: 800; } .c-exp { color: var(--exp-color); font-weight: 800; }
+        .form-group { margin-bottom: 20px; }
+        .lbl { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--txt-sec); margin-bottom: 8px; }
+        .big-input { width: 100%; border: none; font-size: 40px; font-weight: 900; color: var(--txt); background: transparent; padding: 0; letter-spacing: -1px; }
+        .big-input::placeholder { color: #E2E8F0; }
         
-        /* Select de Asignación */
-        #linkGroup { display: none; background: #FFF7ED; padding: 10px; border-radius: 8px; border: 1px solid #FFEDD5; margin-bottom: 12px; }
+        /* CHIPS SCROLLER */
+        .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .chip {
+            padding: 8px 16px; border-radius: 20px; background: #F1F5F9; color: var(--txt-sec);
+            font-size: 13px; font-weight: 700; border: 1px solid transparent; white-space: nowrap; cursor: pointer; transition: 0.2s;
+        }
+        .chip.active { background: var(--txt); color: white; border-color: var(--txt); }
+        .chip.link-chip.active { background: var(--acc); border-color: var(--acc); }
+
+        .btn-save { width: 100%; background: var(--acc); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px; }
+        
+        /* Utility */
+        .hidden { display: none !important; }
+        .loader { position:fixed; inset:0; background:rgba(255,255,255,0.8); z-index:300; display:flex; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
 
-<div id="loader" class="loader-overlay"><div class="spinner"></div></div>
-<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div id="loader" class="loader hidden"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
 
-<header class="top-bar">
-    <div class="brand">J&M <div id="syncBadge" class="sync-badge">Cargando...</div></div>
-    <div class="date-ctrl">
-        <button class="btn-arrow" type="button" onclick="navMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="date-display"><span id="monthTxt">...</span><input type="month" id="dateInput" onchange="loadData()"></div>
-        <button class="btn-arrow" type="button" onclick="navMonth(1)"><i class="fas fa-chevron-right"></i></button>
+<nav class="top-nav">
+    <div class="brand">J&M <i class="fas fa-circle" id="statusDot" style="font-size:8px; color:#CBD5E1; vertical-align:middle;"></i></div>
+    <div class="date-pill">
+        <i class="far fa-calendar"></i> <span id="monthDisplay">...</span>
+        <input type="month" id="dateInput" onchange="loadData()">
     </div>
-</header>
+    <div style="font-size:18px;"><i class="fas fa-search"></i></div>
+</nav>
 
-<div class="kpi-wrapper">
-    <div class="kpi-card">
-        <div class="kpi-label">Balance Neto</div>
-        <div id="kpiBal" class="kpi-val">$0</div>
-        <div style="margin-top: 10px; font-size: 13px; color: var(--text-gray); display: flex; justify-content: center; gap: 15px;">
-            <span>USD <span id="kpiUsd" style="font-weight:800; color: var(--text-dark);">0.00</span></span>
-            <span>TC: <input type="number" id="usdRate" value="1200" style="width:55px; border:none; background:#F1F5F9; font-weight:700; text-align:right;" onchange="loadData()"></span>
-        </div>
+<div class="stories-tray" id="storiesTray">
     </div>
+
+<div class="mini-kpi">
+    <span>Balance Mensual</span>
+    <span class="bal-val" id="kpiBal">$0</span>
 </div>
 
-<div class="view-tabs">
-    <div class="v-tab active" id="tab-acc" onclick="switchView('accounting')"><i class="fas fa-list"></i> Cuentas T</div>
-    <div class="v-tab" id="tab-all" onclick="switchView('allocation')"><i class="fas fa-stream"></i> Flujo Fondos</div>
+<div id="view-feed" class="view-section">
+    <ul class="feed-list" id="feedList"></ul>
 </div>
 
-<div class="copy-zone" id="copyZone">
-    <div style="font-size:12px; color:var(--text-gray); font-weight:700;">Mes vacío. Importar movimientos de:</div>
-    <div class="copy-controls">
-        <input type="month" id="copySourcePicker" class="inp" style="height:40px; margin:0;">
-        <button class="btn-copy-month" onclick="copyFromSelected()">CLONAR MES</button>
-    </div>
-</div>
-
-<div id="view-accounting">
-    <div class="t-grid">
-        <div class="t-col">
-            <div class="col-header bg-inc">Ingresos<br><span id="sum-inc" class="col-total">$0</span></div>
-            <div class="t-list" id="list-inc"></div>
-        </div>
-        <div class="t-col">
-            <div class="col-header bg-exp">Egresos<br><span id="sum-exp" class="col-total">$0</span></div>
-            <div class="t-list" id="list-exp"></div>
-        </div>
-    </div>
-</div>
-
-<div id="view-allocation">
-    <div id="allocation-container"></div>
-</div>
-
-<div class="section-header">
-    <span class="sec-title">Distribución</span>
-    <button id="chartReset" class="btn-reset-chart" onclick="resetChart()">
-        <i class="fas fa-arrow-left"></i> VOLVER
-    </button>
-</div>
-<div class="chart-box">
-    <canvas id="myChart"></canvas>
-    <div id="chartCenterText" style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); font-size:10px; color:#64748B; pointer-events:none; font-weight:600; text-align:center;">Toca para<br>detalle</div>
-</div>
-
-<div class="action-btns">
-    <button class="btn-big" onclick="backup()"><i class="fas fa-download"></i> Backup Local</button>
-    <button class="btn-big" onclick="document.getElementById('fileIn').click()"><i class="fas fa-upload"></i> Restaurar</button>
+<div id="view-stats" class="view-section hidden" style="padding:15px;">
+    <div style="height:300px;"><canvas id="myChart"></canvas></div>
+    <button onclick="document.getElementById('fileIn').click()" style="margin-top:20px; width:100%; padding:10px; background:#F1F5F9; border:none; border-radius:8px; font-weight:700;">Restaurar Backup</button>
     <input type="file" id="fileIn" hidden onchange="restoreSmart(this)">
-    <button class="btn-big btn-sync" onclick="forceSync()"><i class="fas fa-sync"></i> Sincronizar Nube</button>
-    <button class="btn-danger-zone" onclick="deleteCurrentMonth()">Eliminar datos del mes actual</button>
+    <button onclick="backup()" style="margin-top:10px; width:100%; padding:10px; background:#F1F5F9; border:none; border-radius:8px; font-weight:700;">Descargar Backup</button>
 </div>
 
-<button class="fab" onclick="openSheet()"><i class="fas fa-plus"></i></button>
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="nav('feed')"><i class="fas fa-home"></i></div>
+    <div class="fab-center" onclick="openNew()"><i class="fas fa-plus"></i></div>
+    <div class="nav-item" onclick="nav('stats')"><i class="fas fa-chart-pie"></i></div>
+</div>
 
 <div class="sheet" id="sheet">
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-        <span style="font-size:18px; font-weight:800;" id="formTitle">Nuevo</span>
-        <span onclick="closeSheet()" style="font-size:20px; color:#94A3B8;"><i class="fas fa-times"></i></span>
+    <div class="sheet-head">
+        <span style="font-weight:800; font-size:16px;">Transacción</span>
+        <span onclick="closeSheet()" style="font-size:24px;"><i class="fas fa-times"></i></span>
     </div>
+    <div class="sheet-body">
+        <form id="txForm" onsubmit="saveTx(event)">
+            
+            <div class="form-group" style="text-align:center;">
+                <input type="number" id="fAmount" class="big-input" placeholder="$0" step="0.01" required style="text-align:center;">
+                <div style="margin-top:10px; display:flex; justify-content:center; gap:10px;">
+                    <div class="chip active" id="type-exp" onclick="setType('exp')">Gasto</div>
+                    <div class="chip" id="type-inc" onclick="setType('inc')">Ingreso</div>
+                </div>
+            </div>
 
-    <form id="txForm">
-        <div class="sw-container">
-            <div class="sw-item" id="sw-exp" onclick="setType('exp')"><i class="fas fa-minus-circle"></i> Gasto</div>
-            <div class="sw-item" id="sw-inc" onclick="setType('inc')"><i class="fas fa-plus-circle"></i> Ingreso</div>
-        </div>
-        <input type="hidden" id="fType" value="exp">
-        
-        <div id="linkGroup">
-            <label class="lbl" style="color:#C2410C;">Pagar con Ingreso:</label>
-            <select id="fLink" class="inp" style="margin-bottom:0; border-color:#FED7AA;">
-                <option value="">-- Fondo General (Sin asignar) --</option>
-            </select>
-            <div style="font-size:10px; color:#EA580C; margin-top:4px;">* Vincula este gasto a un ingreso específico del mes.</div>
-        </div>
+            <div class="form-group">
+                <label class="lbl">Concepto</label>
+                <div class="chip-scroll" id="conceptChips"></div>
+                <input type="text" id="fCustomDesc" placeholder="Escribe..." style="width:100%; padding:10px; border:1px solid #E2E8F0; border-radius:8px; margin-top:8px; display:none;">
+            </div>
 
-        <label class="lbl">Monto</label>
-        <input type="number" id="fAmount" class="inp" placeholder="0.00" step="0.01" required>
-        <label class="lbl">Fecha</label>
-        <input type="date" id="fDate" class="inp" required>
-        <label class="lbl">Categoría</label>
-        <select id="fCat" class="inp" onchange="renderConcepts()" required></select>
-        <label class="lbl">Concepto</label>
-        <select id="fConcept" class="inp" onchange="checkNewConcept()" required></select>
-        <input type="text" id="fConceptCustom" class="inp" style="margin-top:5px; display:none;" placeholder="Nombre...">
-        <div style="margin:20px 0; display:flex; align-items:center; gap:10px;"><input type="checkbox" id="fExec" checked style="width:22px; height:22px;"> <label style="font-weight:700; font-size:14px;">Ejecutado (Consolidado)</label></div>
-        <button type="submit" id="btnSave" class="btn-save">GUARDAR</button>
-        <button type="button" id="btnDel" onclick="del(editId)" style="width:100%; color:red; border:none; background:none; margin-top:15px; font-weight:800; display:none;">ELIMINAR</button>
-    </form>
+            <div class="form-group" id="catGroup">
+                <label class="lbl">Categoría</label>
+                <div class="chip-scroll" id="catChips"></div>
+            </div>
+
+            <div class="form-group" id="linkGroup">
+                <label class="lbl" style="color:#2563EB;">¿Con qué pagas?</label>
+                <div class="chip-scroll" id="linkChips"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="lbl">Detalles</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="date" id="fDate" style="padding:10px; background:#F1F5F9; border:none; border-radius:8px; font-family:'Inter';">
+                    <div style="display:flex; align-items:center; gap:5px; background:#F1F5F9; padding:0 10px; border-radius:8px;">
+                        <input type="checkbox" id="fExec" checked> <label style="font-size:12px; font-weight:700;">Ejecutado</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save">GUARDAR</button>
+            <button type="button" onclick="delTx()" id="btnDel" style="width:100%; padding:15px; color:#EF4444; background:none; border:none; font-weight:700; display:none;">Eliminar</button>
+        </form>
+    </div>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
-    let data = { txs: [], cats: { exp:['Esenciales','Deudas','Personal','Ahorro'], inc:['Sueldo','Ventas','Varios'] }, concepts: {} };
-    let editId = null, chartInstance = null, currentTxs = [];
-    let currentView = 'accounting'; // 'accounting' | 'allocation'
+    const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec"; // TU URL AQUI
+    let data = { txs: [], cats: { exp:['Super','Casa','Salidas','Servicios'], inc:['Sueldo','Ventas'] }, concepts: { 'Super':['Coto','Chino'], 'Casa':['Alquiler','Internet'] } };
+    let editId = null, currentTxs = [], chartInstance = null;
+    let selCat = '', selLink = null, fType='exp';
 
     window.onload = () => {
         const d = new Date();
         document.getElementById('dateInput').value = d.toISOString().slice(0, 7);
-        let prevM = new Date(); prevM.setMonth(prevM.getMonth()-1);
-        document.getElementById('copySourcePicker').value = prevM.toISOString().slice(0, 7);
         document.getElementById('fDate').value = d.toISOString().split('T')[0];
-        if(localStorage.getItem('usdRate')) document.getElementById('usdRate').value = localStorage.getItem('usdRate');
         forceSync();
     };
 
-    function switchView(view) {
-        currentView = view;
-        document.getElementById('tab-acc').className = `v-tab ${view==='accounting'?'active':''}`;
-        document.getElementById('tab-all').className = `v-tab ${view==='allocation'?'active':''}`;
-        document.getElementById('view-accounting').style.display = view==='accounting'?'block':'none';
-        document.getElementById('view-allocation').style.display = view==='allocation'?'block':'none';
-        if(view === 'allocation') renderAllocationView();
-    }
-
+    /* --- DATA & SYNC --- */
     async function forceSync() {
-        showLoad(true);
+        loader(true);
         try {
-            const res = await fetch(API_URL);
-            const cloudData = await res.json();
-            if(cloudData && cloudData.txs) { data = cloudData; loadData(); status("EN LÍNEA", "ok"); }
-        } catch(e) { status("ERROR NUBE", "error"); }
-        showLoad(false);
+            let res = await fetch(API_URL);
+            let cloud = await res.json();
+            if(cloud.txs) { data = cloud; loadData(); document.getElementById('statusDot').style.color='#10B981'; }
+        } catch(e) { document.getElementById('statusDot').style.color='#EF4444'; }
+        loader(false);
     }
+    
     async function saveData() {
-        showLoad(true);
-        try {
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
-            status("GUARDADO", "ok"); loadData();
-        } catch(e) { status("ERROR NUBE", "error"); }
-        showLoad(false);
+        loader(true);
+        try { await fetch(API_URL, {method:'POST', body:JSON.stringify(data)}); loadData(); } catch(e){}
+        loader(false);
     }
 
     function loadData() {
         const ym = document.getElementById('dateInput').value;
         const [y, m] = ym.split('-');
-        const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-        document.getElementById('monthTxt').innerText = `${months[parseInt(m)-1]} ${y}`;
+        const months = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+        document.getElementById('monthDisplay').innerText = `${months[parseInt(m)-1]} ${y}`;
+        
         currentTxs = (data.txs || []).filter(t => t.date.startsWith(ym));
-        document.getElementById('copyZone').style.display = currentTxs.length === 0 ? 'block' : 'none';
-        
-        renderLists(currentTxs); 
-        resetChart(); 
-        renderCats();
-        
-        if(currentView === 'allocation') renderAllocationView();
+        renderStories();
+        renderFeed();
+        calcTotal();
     }
 
-    /* --- NUEVA LOGICA: ALLOCATION VIEW --- */
-    function renderAllocationView() {
-        const container = document.getElementById('allocation-container');
-        container.innerHTML = '';
-
-        // 1. Obtener Ingresos
-        const incomes = currentTxs.filter(t => t.type === 'inc').sort((a,b) => b.amount - a.amount);
-        // 2. Obtener Egresos
-        const expenses = currentTxs.filter(t => t.type === 'exp');
-
-        // Renderizar Tarjetas de Ingresos
-        incomes.forEach(inc => {
-            const linkedExps = expenses.filter(e => e.linkId == inc.id);
-            const totalSpent = linkedExps.reduce((acc, curr) => acc + curr.amount, 0);
-            const remaining = inc.amount - totalSpent;
-            const percent = inc.amount > 0 ? (totalSpent / inc.amount) * 100 : 0;
-
-            let listHtml = '';
-            linkedExps.forEach(ex => {
-                listHtml += `
-                    <div class="alloc-item" onclick="edit(${ex.id})">
-                        <span class="alloc-desc">${ex.desc}</span>
-                        <span class="alloc-amt">$${Math.floor(ex.amount).toLocaleString()}</span>
-                    </div>
-                `;
-            });
-
-            const card = document.createElement('div');
-            card.className = 'alloc-card';
-            card.innerHTML = `
-                <div class="alloc-header" onclick="edit(${inc.id})">
-                    <div class="alloc-title">
-                        <span>${inc.desc}</span>
-                        <span style="font-size:10px; color:#64748B; font-weight:500;">${inc.cat}</span>
-                    </div>
-                    <div class="alloc-total">$${Math.floor(inc.amount).toLocaleString()}</div>
-                </div>
-                <div class="alloc-body">
-                    ${linkedExps.length ? listHtml : '<div style="font-size:12px;color:#ccc;text-align:center;">Sin gastos asignados</div>'}
-                </div>
-                <div class="alloc-footer">
-                    <div style="flex:1; margin-right:15px;">
-                        <div class="alloc-remain" style="color:${remaining>=0 ? '#166534' : '#991B1B'}">
-                            Quedan: $${Math.floor(remaining).toLocaleString()}
-                        </div>
-                        <div class="prog-bar-bg">
-                            <div class="prog-bar-fill" style="width:${Math.min(percent, 100)}%; background:${remaining<0?'#EF4444':'#2563EB'}"></div>
-                        </div>
-                    </div>
-                    <div style="font-size:10px; font-weight:700; color:#64748B;">${Math.round(percent)}%</div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-
-        // 3. Renderizar "Huérfanos" (Gastos sin asignar o link roto)
-        const orphanExps = expenses.filter(e => !e.linkId || !incomes.find(i => i.id == e.linkId));
-        if (orphanExps.length > 0) {
-            const totalOrphan = orphanExps.reduce((a,b)=>a+b.amount,0);
-            let orphanHtml = '';
-            orphanExps.forEach(ex => {
-                orphanHtml += `
-                    <div class="alloc-item" onclick="edit(${ex.id})">
-                        <span class="alloc-desc">${ex.desc}</span>
-                        <span class="alloc-amt">$${Math.floor(ex.amount).toLocaleString()}</span>
-                    </div>
-                `;
-            });
-            
-            const oCard = document.createElement('div');
-            oCard.className = 'alloc-card orphan';
-            oCard.innerHTML = `
-                <div class="alloc-header">
-                    <div class="alloc-title">
-                        <span>Fondo Común / Sin Asignar</span>
-                        <span style="font-size:10px; color:#64748B; font-weight:500;">Gastos Generales</span>
-                    </div>
-                    <div class="alloc-total">$${Math.floor(totalOrphan).toLocaleString()}</div>
-                </div>
-                <div class="alloc-body">
-                    ${orphanHtml}
-                </div>
-            `;
-            container.appendChild(oCard);
-        }
-    }
-
-    /* --- FIN NUEVA LOGICA --- */
-
-    function renderLists(txs) {
-        const lInc = document.getElementById('list-inc'), lExp = document.getElementById('list-exp');
-        lInc.innerHTML = ''; lExp.innerHTML = '';
+    /* --- RENDERERS --- */
+    function renderStories() {
+        const tray = document.getElementById('storiesTray');
+        const incomes = currentTxs.filter(t => t.type === 'inc');
+        const exps = currentTxs.filter(t => t.type === 'exp');
         
-        let tIncTotal=0, tExpTotal=0;
+        let html = '';
         
-        let timeLine = [...txs];
-        timeLine.sort((a,b) => {
-            if (a.date !== b.date) return a.date.localeCompare(b.date);
-            if (a.type !== b.type) return a.type === 'inc' ? -1 : 1;
-            if (a.exec !== b.exec) return b.exec - a.exec;
-            return Math.abs(b.amount) - Math.abs(a.amount);
-        });
-
-        let runningBalance = 0;
-        timeLine.forEach(t => {
-            const amt = Math.abs(t.amount);
-            if(t.type === 'inc') {
-                runningBalance += amt;
-                tIncTotal += amt;
-            } else {
-                runningBalance -= amt;
-                tExpTotal += amt;
-            }
-            t._calculatedBal = runningBalance;
-        });
-
-        let incs = timeLine.filter(t => t.type === 'inc');
-        let exps = timeLine.filter(t => t.type === 'exp');
-
-        incs.forEach(t => lInc.appendChild(createRow(t, true, null)));
-        exps.forEach(t => lExp.appendChild(createRow(t, false, t._calculatedBal)));
-
-        document.getElementById('sum-inc').innerText = `$${tIncTotal.toLocaleString()}`;
-        document.getElementById('sum-exp').innerText = `$${tExpTotal.toLocaleString()}`;
-        const bal = tIncTotal - tExpTotal;
-        const balEl = document.getElementById('kpiBal');
-        balEl.innerText = `$${bal.toLocaleString()}`;
-        balEl.style.color = bal >= 0 ? '#10B981' : '#EF4444';
-        const rate = parseFloat(document.getElementById('usdRate').value) || 1;
-        document.getElementById('kpiUsd').innerText = (bal/rate).toFixed(2);
-    }
-
-    function createRow(t, isInc, balanceVal) {
-        const div = document.createElement('div');
-        div.className = `row-item ${t.exec ? 'executed' : ''}`;
-        div.onclick = () => edit(t.id);
-        
-        let balHtml = '';
-        if (!isInc && balanceVal !== null) {
-            balHtml = `<span class="subtotal-tag ${balanceVal >= 0 ? 'st-ok' : 'st-bad'}">Quedan: $${Math.floor(balanceVal).toLocaleString()}</span>`;
-        }
-        
-        // Si tiene asignación, mostrar pequeño badge
-        let linkBadge = '';
-        if(t.linkId && !isInc) {
-            // Buscar nombre del link
-            const parent = currentTxs.find(x => x.id == t.linkId);
-            if(parent) linkBadge = `<div style="font-size:9px; background:#EFF6FF; color:#1D4ED8; padding:1px 4px; border-radius:3px; display:inline-block; margin-right:5px;"><i class="fas fa-link"></i> ${parent.desc.substring(0,8)}...</div>`;
-        }
-
-        const amt = Math.abs(t.amount);
-        div.innerHTML = `
-            <div class="desc-text" style="font-weight:800;font-size:13px">${t.desc}</div>
-            <div class="row-meta">
-                <div style="font-size:10px;color:gray;font-weight:700;">
-                    ${linkBadge} ${t.cat} | DÍA ${t.date.split('-')[2]}
-                </div>
-                <div style="font-size:12px; font-weight:800; text-align:right;">
-                    <span class="${isInc?'c-inc':'c-exp'}">$${Math.floor(amt).toLocaleString()}</span>
-                </div>
+        // 1. Botón de "Todo" (Resumen) o "Fondo"
+        html += `
+        <div class="story-item" onclick="filterFeed(null)">
+            <div class="ring-container" style="background: conic-gradient(#0F172A 100%, transparent 0);">
+                <div class="avatar" style="background:#0F172A; color:white;"><i class="fas fa-wallet"></i></div>
             </div>
-            <div style="text-align:right;">${balHtml}</div>
-        `;
-        return div;
+            <span class="story-name">Todo</span>
+        </div>`;
+
+        // 2. Ingresos Individuales
+        incomes.forEach(inc => {
+            const linked = exps.filter(e => e.linkId == inc.id).reduce((a,b)=>a+b.amount,0);
+            const total = inc.amount || 1; 
+            const pct = Math.min((linked/total)*100, 100);
+            const remain = total - linked;
+            
+            // Color logic: Verde si queda mucho, Rojo si queda poco
+            const color = remain < 0 ? '#EF4444' : (pct > 90 ? '#F59E0B' : '#10B981');
+            
+            html += `
+            <div class="story-item" onclick="filterFeed(${inc.id})" oncontextmenu="quickAdd(${inc.id}); return false;">
+                <div class="ring-container" style="background: conic-gradient(${color} ${pct}%, #E2E8F0 0);">
+                    <div class="avatar"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="story-badge" style="background:${color}">${Math.floor(remain/1000)}k</div>
+                </div>
+                <span class="story-name">${inc.desc}</span>
+            </div>`;
+        });
+        tray.innerHTML = html;
     }
 
-    function renderChart(txs, filterCat) {
-        const ctx = document.getElementById('myChart'); if(chartInstance) chartInstance.destroy();
-        const btnReset = document.getElementById('chartReset'); const centerTxt = document.getElementById('chartCenterText');
-        let exps = txs.filter(t => t.type === 'exp');
-        let totalVal = 0;
+    function renderFeed(filterId = null) {
+        const list = document.getElementById('feedList');
+        list.innerHTML = '';
         
-        let map = !filterCat ? exps.reduce((a,t)=>{ a[t.cat]=(a[t.cat]||0)+t.amount; totalVal+=t.amount; return a; }, {}) 
-                             : exps.filter(t => t.cat === filterCat).reduce((a,t)=>{ a[t.desc]=(a[t.desc]||0)+t.amount; totalVal+=t.amount; return a; }, {});
-        
-        btnReset.style.display = filterCat ? 'block' : 'none'; 
-        centerTxt.innerText = filterCat || "Toca para detalle";
-        
-        chartInstance = new Chart(ctx, { 
-            type: 'doughnut', 
-            data: { 
-                labels: Object.keys(map), 
-                datasets: [{ 
-                    data: Object.values(map), 
-                    backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#6366F1'], 
-                    borderWidth: 2, 
-                    borderColor: '#ffffff' 
-                }] 
-            }, 
-            options: { 
-                responsive:true, 
-                maintainAspectRatio:false, 
-                cutout:'65%', 
-                plugins: { 
-                    legend: { 
-                        display: true, position: 'bottom', 
-                        labels: { 
-                            boxWidth: 10, font: { size: 10 }, padding: 10,
-                            generateLabels: function(chart) {
-                                const data = chart.data;
-                                if (data.labels.length && data.datasets.length) {
-                                    return data.labels.map((label, i) => {
-                                        const ds = data.datasets[0];
-                                        const val = ds.data[i];
-                                        const perc = totalVal > 0 ? Math.round((val / totalVal) * 100) : 0;
-                                        return {
-                                            text: `${label} ($${Math.floor(val).toLocaleString()} - ${perc}%)`,
-                                            fillStyle: ds.backgroundColor[i],
-                                            hidden: isNaN(ds.data[i]) || chart.getDatasetMeta(0).data[i].hidden,
-                                            index: i
-                                        };
-                                    });
-                                }
-                                return [];
-                            }
-                        } 
-                    },
-                    tooltip: { enabled: true }
-                }, 
-                onClick: (e, el) => { if (el.length > 0 && !filterCat) renderChart(txs, Object.keys(map)[el[0].index]); } 
-            } 
-        });
-    }
-
-    function copyFromSelected() {
-        const sourceYM = document.getElementById('copySourcePicker').value;
-        const targetYM = document.getElementById('dateInput').value;
-        if(!sourceYM || sourceYM === targetYM) return alert("Selecciona un mes origen distinto al actual");
-        const sourceTxs = (data.txs || []).filter(t => t.date.startsWith(sourceYM));
-        if(sourceTxs.length === 0) return alert("El mes origen no tiene datos");
-        const newTxs = sourceTxs.map(t => {
-            const day = t.date.split('-')[2];
-            // Al copiar, removemos links antiguos para evitar inconsistencias
-            return { ...t, id: Date.now() + Math.random(), date: `${targetYM}-${day}`, exec: false, linkId: null };
-        });
-        data.txs = [...data.txs, ...newTxs];
-        saveData();
-    }
-    function deleteCurrentMonth() {
-        const ym = document.getElementById('dateInput').value;
-        if(confirm(`ATENCIÓN: ¿Borrar mes ${ym}?`)) {
-            data.txs = data.txs.filter(t => !t.date.startsWith(ym));
-            saveData();
+        let txs = [...currentTxs];
+        if(filterId) {
+            // Mostrar el ingreso seleccionado Y sus gastos
+            txs = txs.filter(t => t.id == filterId || t.linkId == filterId);
         }
+        
+        // Sort: Fecha DESC
+        txs.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+        txs.forEach(t => {
+            const isInc = t.type === 'inc';
+            const li = document.createElement('li');
+            li.className = 'feed-item';
+            li.onclick = () => edit(t.id);
+            
+            // Icon logic
+            const icon = isInc ? 'fa-arrow-down' : 'fa-shopping-bag';
+            
+            li.innerHTML = `
+                <div class="f-icon ${isInc?'inc':'exp'}"><i class="fas ${icon}"></i></div>
+                <div class="f-content">
+                    <div class="f-top">
+                        <span class="f-desc" style="${t.exec?'':'opacity:0.5'}">${t.desc}</span>
+                        <span class="f-amt" style="color:${isInc?'var(--inc)':'var(--txt)'}">
+                            ${isInc?'+':'-'} $${Math.floor(t.amount).toLocaleString()}
+                        </span>
+                    </div>
+                    <div class="f-meta">
+                        <span class="tag-pill">${t.cat}</span>
+                        <span>${t.date.split('-')[2]}/${t.date.split('-')[1]}</span>
+                        ${t.linkId && !isInc ? '<span class="tag-pill link-pill"><i class="fas fa-link"></i> Linked</span>' : ''}
+                    </div>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+        
+        if(txs.length === 0) list.innerHTML = '<div style="padding:40px; text-align:center; color:#94A3B8;">No hay movimientos</div>';
     }
 
-    function setType(t) { 
-        document.getElementById('fType').value = t; 
-        document.getElementById('sw-inc').className = `sw-item ${t=='inc'?'active inc':''}`; 
-        document.getElementById('sw-exp').className = `sw-item ${t=='exp'?'active exp':''}`; 
-        // Mostrar selector de link SOLO si es gasto
-        document.getElementById('linkGroup').style.display = t === 'exp' ? 'block' : 'none';
-        renderCats(); 
+    function calcTotal() {
+        const inc = currentTxs.filter(t=>t.type=='inc').reduce((a,b)=>a+b.amount,0);
+        const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
+        document.getElementById('kpiBal').innerText = `$ ${(inc-exp).toLocaleString()}`;
+        renderChart();
     }
+
+    /* --- FORM LOGIC (CHIPS) --- */
+    function openNew() { resetForm(); document.getElementById('sheet').classList.add('open'); }
+    function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
     
-    function populateLinkSelect() {
-        const sel = document.getElementById('fLink');
-        const currentLink = sel.value; // Guardar selección si estamos editando
-        sel.innerHTML = '<option value="">-- Fondo General (Sin asignar) --</option>';
+    function resetForm() {
+        editId = null;
+        document.getElementById('txForm').reset();
+        document.getElementById('btnDel').style.display='none';
+        document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+        setType('exp');
+    }
+
+    function setType(t) {
+        fType = t;
+        document.getElementById('type-exp').className = `chip ${t=='exp'?'active':''}`;
+        document.getElementById('type-inc').className = `chip ${t=='inc'?'active':''}`;
         
-        // Obtener Ingresos del mes actual
+        document.getElementById('linkGroup').style.display = t=='exp'?'block':'none';
+        
+        renderCatChips();
+    }
+
+    function renderCatChips() {
+        const div = document.getElementById('catChips');
+        div.innerHTML = '';
+        (data.cats[fType] || []).forEach(c => {
+            const chip = document.createElement('div');
+            chip.className = `chip ${selCat === c ? 'active' : ''}`;
+            chip.innerText = c;
+            chip.onclick = () => { selCat=c; renderCatChips(); renderConceptChips(c); };
+            div.appendChild(chip);
+        });
+        // Auto select first if none
+        if(!selCat && data.cats[fType].length) { selCat = data.cats[fType][0]; renderConceptChips(selCat); }
+    }
+
+    function renderConceptChips(cat) {
+        const div = document.getElementById('conceptChips');
+        div.innerHTML = '';
+        const concepts = (data.concepts[cat] || []);
+        
+        concepts.forEach(c => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.innerText = c;
+            chip.onclick = () => { 
+                document.querySelectorAll('#conceptChips .chip').forEach(x=>x.classList.remove('active'));
+                chip.classList.add('active');
+                document.getElementById('fCustomDesc').style.display='none';
+                document.getElementById('fCustomDesc').value = c; // Hack to store value
+            };
+            div.appendChild(chip);
+        });
+        
+        // Add + button
+        const add = document.createElement('div');
+        add.className = 'chip';
+        add.innerHTML = '<i class="fas fa-plus"></i>';
+        add.onclick = () => {
+             document.querySelectorAll('#conceptChips .chip').forEach(x=>x.classList.remove('active'));
+             add.classList.add('active');
+             document.getElementById('fCustomDesc').style.display='block';
+             document.getElementById('fCustomDesc').value = '';
+             document.getElementById('fCustomDesc').focus();
+        };
+        div.appendChild(add);
+        
+        // Render Links (Incomes)
+        renderLinkChips();
+    }
+
+    function renderLinkChips() {
+        const div = document.getElementById('linkChips');
+        div.innerHTML = '';
+        
+        const none = document.createElement('div');
+        none.className = `chip ${selLink===null?'active link-chip':''}`;
+        none.innerText = 'General';
+        none.onclick = () => { selLink=null; renderLinkChips(); };
+        div.appendChild(none);
+
         const incomes = currentTxs.filter(t => t.type === 'inc');
         incomes.forEach(inc => {
-            const opt = document.createElement('option');
-            opt.value = inc.id;
-            opt.text = `${inc.desc} ($${Math.floor(inc.amount)})`;
-            sel.appendChild(opt);
+            const chip = document.createElement('div');
+            chip.className = `chip ${selLink==inc.id?'active link-chip':''}`;
+            chip.innerText = inc.desc;
+            chip.onclick = () => { selLink=inc.id; renderLinkChips(); };
+            div.appendChild(chip);
         });
-        sel.value = currentLink;
     }
 
-    function renderCats() { const t = document.getElementById('fType').value, s = document.getElementById('fCat'); s.innerHTML=''; (data.cats[t]||[]).forEach(c=>s.add(new Option(c,c))); s.add(new Option('+ Crear...','new')); renderConcepts(); }
-    function renderConcepts() { const cVal = document.getElementById('fCat').value; if(cVal==='new'){ const n=prompt('Nueva Categoría:'); if(n){ data.cats[document.getElementById('fType').value].push(n); data.concepts[n]=[]; saveData(); renderCats(); document.getElementById('fCat').value=n; } else { renderCats(); return; } } const s = document.getElementById('fConcept'); s.innerHTML=''; (data.concepts[cVal]||[]).forEach(c=>s.add(new Option(c,c))); s.add(new Option('+ Nuevo...','new_c')); checkNewConcept(); }
-    function checkNewConcept() { const isNew = document.getElementById('fConcept').value==='new_c'; document.getElementById('fConceptCustom').style.display=isNew?'block':'none'; }
-    
-    function openSheet() { 
-        if(!editId) resetForm(); 
-        populateLinkSelect(); // Llenar selector de ingresos
-        document.getElementById('sheet').classList.add('open'); 
-        document.getElementById('overlay').style.display='block'; 
-    }
-    
-    function closeSheet() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display='none'; }
-    function resetForm() { 
-        editId=null; 
-        document.getElementById('txForm').reset(); 
-        document.getElementById('fDate').value=new Date().toISOString().split('T')[0]; 
-        document.getElementById('btnDel').style.display='none'; 
-        setType('exp'); 
-        document.getElementById('fLink').value = "";
-    }
-    
-    function navMonth(n) { const i = document.getElementById('dateInput'); let [y,m]=i.value.split('-'); const d = new Date(y, m-1+n, 1); i.value = d.toISOString().slice(0,7); loadData(); }
-    function resetChart() { renderChart(currentTxs, null); }
-    
-    document.getElementById('txForm').onsubmit = (e) => {
+    /* --- ACTIONS --- */
+    function saveTx(e) {
         e.preventDefault();
-        let cat = document.getElementById('fCat').value, desc = document.getElementById('fConcept').value;
-        if(desc==='new_c') { desc=document.getElementById('fConceptCustom').value; if(!data.concepts[cat]) data.concepts[cat]=[]; data.concepts[cat].push(desc); }
+        const amt = parseFloat(document.getElementById('fAmount').value);
+        if(!amt) return;
         
-        // Capturar el linkId
-        const linkId = document.getElementById('fLink').value || null;
+        let desc = document.getElementById('fCustomDesc').value;
+        // If custom desc used, add to memory
+        if(desc && selCat && !data.concepts[selCat].includes(desc)) {
+            data.concepts[selCat].push(desc);
+        }
 
-        const tx = { 
-            id: editId||Date.now(), 
-            date: document.getElementById('fDate').value, 
-            amount: parseFloat(document.getElementById('fAmount').value), 
-            type: document.getElementById('fType').value, 
-            cat, 
-            desc, 
+        const tx = {
+            id: editId || Date.now(),
+            date: document.getElementById('fDate').value,
+            amount: amt,
+            type: fType,
+            cat: selCat,
+            desc: desc || selCat,
             exec: document.getElementById('fExec').checked,
-            linkId: linkId // Nuevo campo
+            linkId: fType === 'exp' ? selLink : null
         };
-
-        if(editId) { const i=data.txs.findIndex(x=>x.id==editId); data.txs[i]=tx; } else { if(!data.txs) data.txs=[]; data.txs.push(tx); }
-        saveData(); closeSheet();
+        
+        if(editId) {
+            const idx = data.txs.findIndex(x=>x.id==editId);
+            data.txs[idx] = tx;
+        } else {
+            data.txs.push(tx);
+        }
+        
+        saveData();
+        closeSheet();
     }
     
     function edit(id) {
-        const t = data.txs.find(x=>x.id==id); editId=id; document.getElementById('fDate').value=t.date; document.getElementById('fAmount').value=Math.abs(t.amount); document.getElementById('fExec').checked=t.exec;
-        setType(t.type); document.getElementById('fCat').value=t.cat; renderConcepts(); document.getElementById('fConcept').value=t.desc;
+        const t = data.txs.find(x=>x.id==id);
+        if(!t) return;
+        editId = id;
+        document.getElementById('fAmount').value = t.amount;
+        document.getElementById('fDate').value = t.date;
+        document.getElementById('fExec').checked = t.exec;
+        document.getElementById('fCustomDesc').value = t.desc; // Pre-fill logic simplified
         
-        // Pre-seleccionar link si existe
-        populateLinkSelect();
-        if(t.linkId) document.getElementById('fLink').value = t.linkId;
-
-        document.getElementById('btnDel').style.display='block'; openSheet();
+        setType(t.type);
+        selCat = t.cat; renderCatChips();
+        selLink = t.linkId; renderLinkChips();
+        renderConceptChips(t.cat);
+        
+        // Visual updates for chips
+        document.getElementById('btnDel').style.display='block';
+        document.getElementById('sheet').classList.add('open');
     }
-    
-    function del(id) { if(confirm('¿Borrar?')) { data.txs=data.txs.filter(x=>x.id!=id); saveData(); closeSheet(); } }
-    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`Finanzas_JM.json`; a.click(); }
+
+    function quickAdd(incId) {
+        if(confirm("¿Agregar gasto rápido a este ingreso?")) {
+             openNew();
+             selLink = incId;
+             renderLinkChips();
+        }
+    }
+
+    function delTx() {
+        if(confirm("¿Eliminar?")) {
+            data.txs = data.txs.filter(x => x.id != editId);
+            saveData();
+            closeSheet();
+        }
+    }
+
+    /* --- UTIL --- */
+    function filterFeed(id) { renderFeed(id); }
+    function nav(v) { 
+        document.querySelectorAll('.view-section').forEach(x=>x.classList.add('hidden'));
+        document.getElementById('view-'+v).classList.remove('hidden');
+    }
+    function loader(s) { document.getElementById('loader').className = s ? 'loader' : 'loader hidden'; }
+    function backup() { const a=document.createElement('a'); a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data)); a.download=`Back_V38.json`; a.click(); }
     function restoreSmart(i) { const r=new FileReader(); r.onload=e=>{ data=JSON.parse(e.target.result); saveData(); }; r.readAsText(i.files[0]); }
-    function showLoad(s) { document.getElementById('loader').style.display = s ? 'flex' : 'none'; }
-    function status(t, c) { const b = document.getElementById('syncBadge'); b.innerText = t; b.className = `sync-badge ${c}`; }
+    
+    function renderChart() {
+        // Chart.js logic simplified
+        const ctx = document.getElementById('myChart');
+        if(chartInstance) chartInstance.destroy();
+        const map = {}; 
+        currentTxs.filter(t=>t.type=='exp').forEach(t=>{ map[t.cat]=(map[t.cat]||0)+t.amount; });
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ['#3B82F6','#10B981','#F59E0B','#EF4444'] }] }
+        });
+    }
 </script>
 </body>
 </html>
