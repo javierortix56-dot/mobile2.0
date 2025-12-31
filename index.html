@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V50 Final</title>
+    <title>J&M V51 Final</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -39,7 +39,7 @@
         .view-section { display: none; height: 100%; overflow-y: auto; padding-bottom: 80px; } 
         .view-section.active { display: block; }
 
-        /* KPI DASHBOARD - ORIGINAL RESTAURADO */
+        /* KPI DASHBOARD */
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
         .kpi-card { background: var(--surface); padding: 15px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .kpi-card.main { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; }
@@ -79,11 +79,12 @@
         .alloc-details { display: none; padding: 0 15px 15px 15px; border-top: 1px solid var(--border); }
         .alloc-group.open .alloc-details { display: block; }
         
-        /* ESTILO FILA ASIGNACIÓN MEJORADO */
-        .alloc-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dashed #E2E8F0; font-size: 12px; gap: 10px; }
-        .ar-date { font-family: 'Inter'; font-weight: 600; color: var(--txt-sec); font-size: 10px; background: #F1F5F9; padding: 2px 6px; border-radius: 4px; min-width: 45px; text-align: center; }
-        .ar-desc { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .ar-amt { font-weight: 700; }
+        /* ESTILO NUEVO FILA ASIGNACIÓN */
+        .alloc-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dashed #E2E8F0; font-size: 12px; gap:10px; }
+        /* FECHA EN ASIGNACION */
+        .date-badge { background:#F1F5F9; color:var(--txt-sec); padding:2px 6px; border-radius:6px; font-weight:700; font-size:10px; min-width:40px; text-align:center; }
+        .ar-desc { flex:1; font-weight:500; }
+        .ar-amt { font-weight:800; }
 
         .bar-bg { height: 6px; background: #F1F5F9; border-radius: 3px; overflow: hidden; margin: 10px 0; }
         .bar-fill { height: 100%; transition: 0.5s; }
@@ -115,7 +116,6 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 40; padding-bottom: 10px; }
         .nav-btn { font-size: 22px; color: #94A3B8; background: none; border: none; padding: 10px; cursor: pointer; }
         .nav-btn.active { color: var(--primary); }
-        /* FAB UPDATED: resetForm evita que se sobrescriban datos viejos */
         .fab { width: 55px; height: 55px; background: var(--primary); border-radius: 20px; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2); transform: translateY(-15px); border: 4px solid white; cursor: pointer; }
         
         .sheet { position: fixed; inset: 0; background: var(--surface); z-index: 100; transform: translateY(100%); transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
@@ -238,7 +238,7 @@
 
 <div class="bottom-nav">
     <button class="nav-btn active" id="nav-home" onclick="nav('home')"><i class="fas fa-home"></i></button>
-    <div class="fab" onclick="resetForm(); openSheet()"><i class="fas fa-plus"></i></div>
+    <div class="fab" onclick="openNewTx()"><i class="fas fa-plus"></i></div>
     <button class="nav-btn" id="nav-stats" onclick="nav('stats')"><i class="fas fa-chart-pie"></i></button>
 </div>
 
@@ -300,7 +300,7 @@
     let pickerYear = currentDate.getFullYear();
     let drillDownCat = null;
 
-    // Helper para formato 1.000,00 (Argentina)
+    // --- HELPER FORMATO ARGENTINA (Puntos miles, Coma decimales) ---
     const fmt = (n) => n.toLocaleString('es-AR', {minimumFractionDigits: 0, maximumFractionDigits: 2});
 
     window.onload = () => {
@@ -318,7 +318,7 @@
     function initMonthGrid() { const grid = document.getElementById('monthsGrid'); MONTHS_ES.forEach((m, i) => { const btn = document.createElement('div'); btn.className = 'month-btn'; btn.innerText = m; btn.onclick = () => { currentDate.setFullYear(pickerYear); currentDate.setMonth(i); updateDateUI(); closeDatePicker(); }; grid.appendChild(btn); }); }
     function updatePickerUI() { document.getElementById('pickerYearTxt').innerText = pickerYear; Array.from(document.getElementById('monthsGrid').children).forEach((btn, i) => { btn.classList.toggle('active', i === currentDate.getMonth() && pickerYear === currentDate.getFullYear()); }); }
 
-    // --- DATA & KPI (RESTAURADO) ---
+    // --- DATA ---
     function loadData() {
         const y = currentDate.getFullYear(), m = currentDate.getMonth() + 1;
         currentTxs = (data.txs || []).filter(t => !t.deletedAt && parseInt(t.date.split('-')[0]) === y && parseInt(t.date.split('-')[1]) === m);
@@ -331,10 +331,8 @@
         const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
         const bal = inc - exp;
         
-        // Logica Original Restaurada con Formato
-        const kpiBal = document.getElementById('kpiBal'); 
-        kpiBal.innerText = `$${fmt(bal)}`; 
-        kpiBal.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
+        // Logica de colores original + Formato nuevo
+        const kpiBal = document.getElementById('kpiBal'); kpiBal.innerText = `$${fmt(bal)}`; kpiBal.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
         
         const tc = parseFloat(document.getElementById('usdRate').value) || 1; 
         const kpiUsd = document.getElementById('kpiUsd');
@@ -357,7 +355,7 @@
         });
     }
 
-    // --- ALLOC ---
+    // --- ALLOC (ASIGNACIÓN) CON FECHA ---
     function renderAllocWithAccordions() {
         const cont = document.getElementById('alloc-container'); cont.innerHTML = '';
         const incs = currentTxs.filter(t=>t.type=='inc'); const exps = currentTxs.filter(t=>t.type=='exp');
@@ -366,15 +364,15 @@
             const sub = exps.filter(e => e.linkId == inc.id);
             const spent = sub.reduce((a,b)=>a+b.amount,0); const remaining = inc.amount - spent; const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
             
-            // FILAS CON FECHA AGREGADA
+            // AQUI AGREGAMOS LA FECHA VISIBLE
             let rows = ''; 
             sub.forEach(s => {
                 const day = s.date.split('-')[2]; const month = s.date.split('-')[1];
                 rows += `<div class="alloc-row" onclick="edit(${s.id})">
-                    <div class="ar-date">${day}/${month}</div>
-                    <div class="ar-desc">${s.desc}</div>
-                    <div class="ar-amt">$${fmt(s.amount)}</div>
-                </div>`;
+                            <div class="date-badge">${day}/${month}</div>
+                            <div class="ar-desc">${s.desc}</div>
+                            <div class="ar-amt">$${fmt(s.amount)}</div>
+                         </div>`;
             });
             
             const headerHtml = `<div class="alloc-header" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">${inc.desc}</div><div class="ah-meta"><span class="ah-amt" style="color:${remaining>=0?'var(--inc)':'var(--exp)'}">$${fmt(remaining)}</span><i class="fas fa-chevron-down chevron"></i></div></div>`;
@@ -387,7 +385,7 @@
             let rows = ''; 
             orphans.forEach(s => {
                 const day = s.date.split('-')[2]; const month = s.date.split('-')[1];
-                rows += `<div class="alloc-row" onclick="edit(${s.id})"><div class="ar-date">${day}/${month}</div><div class="ar-desc">${s.desc}</div><div class="ar-amt">$${fmt(s.amount)}</div></div>`;
+                rows += `<div class="alloc-row" onclick="edit(${s.id})"><div class="date-badge">${day}/${month}</div><div class="ar-desc">${s.desc}</div><div class="ar-amt">$${fmt(s.amount)}</div></div>`;
             });
             const headerHtml = `<div class="alloc-header orphan" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">Por asignar</div><div class="ah-meta"><span class="ah-amt" style="color:var(--exp)">-$${fmt(total)}</span><i class="fas fa-chevron-down chevron"></i></div></div>`;
             cont.innerHTML += `<div class="alloc-group">${headerHtml}<div class="alloc-details">${rows}</div></div>`;
@@ -432,17 +430,45 @@
     function cloneFromSelected() { const srcYM = document.getElementById('cloneSource').value; if(!srcYM) return alert("Selecciona origen"); if(!confirm(`¿Clonar ${srcYM}?`)) return; const srcTxs = data.txs.filter(t => !t.deletedAt && t.date.startsWith(srcYM)); const targetYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; srcTxs.forEach(t => data.txs.push({ ...t, id: Date.now()+Math.random(), date: `${targetYM}-${t.date.split('-')[2]}`, exec: false, linkId: null })); saveData(); }
     function deleteCurrentMonth() { if(confirm(`¿ELIMINAR MES ACTUAL?`)) { const ym = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; data.txs.forEach(t => { if(t.date.startsWith(ym)) t.deletedAt = Date.now(); }); saveData(); } }
 
-    // --- FORM ---
+    // --- FORM LOGIC ---
+    // Nueva funcion EXCLUSIVA para crear nuevos movimientos y limpiar cualquier residuo
+    function openNewTx() {
+        editId = null; // FORCE CLEAR
+        resetForm();
+        openSheet();
+    }
+
     function openSheet() { document.getElementById('sheet').classList.add('open'); }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
-    function resetForm() { editId=null; document.getElementById('txForm').reset(); const today=new Date(); const isCur = today.getMonth()===currentDate.getMonth() && today.getFullYear()===currentDate.getFullYear(); document.getElementById('fDate').value=`${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}-${isCur?today.getDate().toString().padStart(2,'0'):'01'}`; document.getElementById('btnDel').style.display='none'; setType('exp'); tempCat=''; tempLink=''; renderLinkChips(); }
+    function resetForm() { 
+        if(!editId) { // Solo reseteamos valores si no estamos editando (o si openNewTx lo forzó a null)
+            document.getElementById('txForm').reset(); 
+            const today=new Date(); 
+            const isCur = today.getMonth()===currentDate.getMonth() && today.getFullYear()===currentDate.getFullYear(); 
+            document.getElementById('fDate').value=`${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}-${isCur?today.getDate().toString().padStart(2,'0'):'01'}`; 
+            document.getElementById('btnDel').style.display='none'; 
+            setType('exp'); tempCat=''; tempLink=''; renderLinkChips(); 
+        }
+    }
+    
     function setType(t) { document.getElementById('fType').value = t; document.getElementById('seg-exp').className=`seg-btn ${t=='exp'?'active':''}`; document.getElementById('seg-inc').className=`seg-btn ${t=='inc'?'active':''}`; document.getElementById('linkSection').style.display = t=='exp'?'block':'none'; renderCatChips(t); }
     function renderCatChips(type) { const div = document.getElementById('catChips'); div.innerHTML = ''; (data.cats[type]||[]).forEach(c => { const el = document.createElement('div'); el.className=`chip ${tempCat==c?'active':''}`; el.innerText=c; el.onclick=()=>{tempCat=c;document.getElementById('fCat').value=c;renderCatChips(type);renderConChips(c);}; div.appendChild(el); }); const add=document.createElement('div'); add.className='chip'; add.innerHTML='<i class="fas fa-plus"></i>'; add.onclick=()=>{const n=prompt('Nueva Cat:');if(n){data.cats[type].push(n);data.concepts[n]=[];saveData();renderCatChips(type);}}; div.appendChild(add); if(tempCat && data.cats[type].includes(tempCat)) renderConChips(tempCat); else document.getElementById('conChips').innerHTML=''; }
     function renderConChips(cat) { const div = document.getElementById('conChips'); div.innerHTML=''; (data.concepts[cat]||[]).forEach(c => { const el = document.createElement('div'); el.className=`chip ${document.getElementById('fConcept').value==c?'active':''}`; el.innerText=c; el.onclick=()=>{document.getElementById('fConcept').value=c;document.getElementById('fCustomDesc').style.display='none';renderConChips(cat);}; div.appendChild(el); }); const add=document.createElement('div'); add.className='chip'; add.innerText='+'; add.onclick=()=>{document.getElementById('fConcept').value='new';document.getElementById('fCustomDesc').style.display='block';document.getElementById('fCustomDesc').focus();}; div.appendChild(add); }
     function renderLinkChips() { const div = document.getElementById('linkChips'); div.innerHTML=''; const def = document.createElement('div'); def.className=`chip ${!tempLink?'active':''}`; def.innerText='Ninguno'; def.onclick=()=>{tempLink=''; document.getElementById('fLink').value=''; renderLinkChips();}; div.appendChild(def); currentTxs.filter(t=>t.type=='inc').forEach(i => { const el = document.createElement('div'); el.className=`chip ${tempLink==i.id?'active':''}`; el.innerText=i.desc; el.onclick=()=>{tempLink=i.id; document.getElementById('fLink').value=i.id; renderLinkChips();}; div.appendChild(el); }); }
 
     document.getElementById('txForm').onsubmit = (e) => { e.preventDefault(); let cat=document.getElementById('fCat').value, desc=document.getElementById('fConcept').value; if(desc=='new' || !desc) { desc=document.getElementById('fCustomDesc').value; if(desc && !data.concepts[cat].includes(desc)) data.concepts[cat].push(desc); } const tx = { id: editId || Date.now(), date: document.getElementById('fDate').value, amount: parseFloat(document.getElementById('fAmount').value), type: document.getElementById('fType').value, cat, desc, exec: document.getElementById('fExec').checked, linkId: document.getElementById('fType').value=='exp' ? document.getElementById('fLink').value : null }; if(editId) data.txs[data.txs.findIndex(x=>x.id==editId)]=tx; else data.txs.push(tx); saveData(); closeSheet(); }
-    function edit(id) { const t = data.txs.find(x=>x.id==id); editId=id; document.getElementById('fAmount').value=t.amount; document.getElementById('fDate').value=t.date; document.getElementById('fExec').checked=t.exec; document.getElementById('btnDel').style.display='block'; setType(t.type); tempCat=t.cat; document.getElementById('fCat').value=t.cat; renderCatChips(t.type); document.getElementById('fConcept').value=t.desc; renderConChips(t.cat); tempLink=t.linkId||''; document.getElementById('fLink').value=tempLink; renderLinkChips(); openSheet(); }
+    
+    // Al editar, seteamos el ID y abrimos
+    function edit(id) { 
+        editId = id; // IMPORTANTE
+        const t = data.txs.find(x=>x.id==id); 
+        document.getElementById('fAmount').value=t.amount; 
+        document.getElementById('fDate').value=t.date; 
+        document.getElementById('fExec').checked=t.exec; 
+        document.getElementById('btnDel').style.display='block'; 
+        setType(t.type); tempCat=t.cat; document.getElementById('fCat').value=t.cat; renderCatChips(t.type); document.getElementById('fConcept').value=t.desc; renderConChips(t.cat); tempLink=t.linkId||''; document.getElementById('fLink').value=tempLink; renderLinkChips(); 
+        openSheet(); 
+    }
     function delTx() { if(confirm('¿Borrar?')) { data.txs.find(x=>x.id==editId).deletedAt=Date.now(); saveData(); closeSheet(); } }
 
     async function forceSync() { loader(true); try{ let r=await fetch(API_URL); let c=await r.json(); if(c.txs){data=c;loadData();document.getElementById('syncDot').style.background='#10B981';} }catch(e){document.getElementById('syncDot').style.background='#EF4444';} loader(false); }
