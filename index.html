@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V47 Precision</title>
+    <title>J&M V48 Concepts</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -39,7 +39,7 @@
         .view-section { display: none; height: 100%; overflow-y: auto; padding-bottom: 80px; } 
         .view-section.active { display: block; }
 
-        /* KPI */
+        /* KPI DASHBOARD */
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
         .kpi-card { background: var(--surface); padding: 15px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .kpi-card.main { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; }
@@ -66,7 +66,7 @@
         .executed { text-decoration: line-through; opacity: 0.5; }
         .amt-inc { color: var(--inc); } .amt-exp { color: var(--txt); }
 
-        /* ALLOCATION (FLUJO) */
+        /* ALLOCATION (ASIGNACIÓN) */
         .alloc-list { padding: 15px; }
         .alloc-group { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
         .alloc-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #F8FAFC; }
@@ -86,12 +86,14 @@
         /* CHARTS & ADMIN */
         .chart-container { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 15px; margin-bottom: 15px; position: relative; }
         .chart-title { margin:0 0 15px 0; font-size:13px; text-transform:uppercase; color:var(--txt-sec); display: flex; justify-content: space-between; align-items: center; }
-        .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+        .legend-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; border-bottom: 1px dashed #F1F5F9; padding-bottom: 4px; }
         .l-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .l-txt { flex: 1; font-weight: 500; }
+        .l-val { font-weight: 800; }
         .btn-back-chart { border: none; background: none; color: var(--accent); font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-        /* ADMIN COMPACTO (UPDATED) */
+        /* ADMIN COMPACTO */
         .admin-box-compact { background: #F8FAFC; padding: 15px; border-radius: 16px; margin-top: 20px; border: 1px solid var(--border); }
         .admin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
         .btn-adm-c { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 5px; cursor: pointer; gap: 5px; min-height: 60px; }
@@ -161,7 +163,7 @@
             </div>
             <div style="text-align:right;">
                 <div class="kpi-lbl" style="margin-bottom:2px;">Estimado USD</div>
-                <div style="font-weight:800; font-size:16px;">$<span id="kpiUsd">0</span></div>
+                <div style="font-weight:800; font-size:16px; color:var(--txt-sec);" id="kpiUsd">$0</div>
                 <div style="font-size:11px; color:var(--txt-sec);">TC: <input type="number" id="usdRate" value="1200" class="tc-inp" onchange="loadData()"></div>
             </div>
         </div>
@@ -177,7 +179,7 @@
 
     <div class="int-tabs">
         <div class="i-tab active" id="tab-txs" onclick="setSubTab('txs')">Movimientos</div>
-        <div class="i-tab" id="tab-alloc" onclick="setSubTab('alloc')">Flujo</div>
+        <div class="i-tab" id="tab-alloc" onclick="setSubTab('alloc')">Asignación</div>
     </div>
 
     <div id="sec-txs" class="t-grid">
@@ -215,10 +217,10 @@
     <div class="admin-box-compact">
         <h4 style="margin:0 0 15px 0; font-size:11px; text-transform:uppercase; color:var(--txt-sec); text-align:center;">Herramientas</h4>
         <div class="admin-grid">
-            <button class="btn-adm-c btn-sync-c" onclick="forceSync()"><i class="fas fa-cloud-upload-alt"></i><span>Sincronizar</span></button>
+            <button class="btn-adm-c btn-sync-c" onclick="forceSync()"><i class="fas fa-cloud-upload-alt"></i><span>Sync</span></button>
             <button class="btn-adm-c" onclick="backup()"><i class="fas fa-file-download"></i><span>Backup</span></button>
             <button class="btn-adm-c" onclick="document.getElementById('fileIn').click()"><i class="fas fa-file-upload"></i><span>Restaurar</span></button>
-            <button class="btn-adm-c btn-danger" onclick="deleteCurrentMonth()"><i class="fas fa-trash-alt"></i><span>Eliminar<br>Mes</span></button>
+            <button class="btn-adm-c btn-danger" onclick="deleteCurrentMonth()"><i class="fas fa-trash-alt"></i><span>Borrar<br>Mes</span></button>
         </div>
         <div class="btn-adm-row">
             <select id="cloneSource" class="clone-sel-c"><option>Cargando...</option></select>
@@ -278,8 +280,7 @@
 <input type="file" hidden id="fileIn" onchange="restoreSmart(this)">
 
 <script>
-    // --- CONFIG ---
-    // NO OLVIDES PEGAR TU URL DE GOOGLE SCRIPT AQUÍ
+    // --- PEGA TU URL AQUI ---
     const API_URL = "https://script.google.com/macros/s/AKfycbxEni9GJ4gxmbhmNsbzoYxS_SfhcorqsXj4zh93-qWIy5i2R4jwvgJ8L25GcU3h3Bkh/exec";
     
     const MONTHS_ES = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
@@ -298,7 +299,7 @@
         forceSync();
     };
 
-    // --- DATE LOGIC ---
+    // --- DATE ---
     function updateDateUI() { document.getElementById('monthTxt').innerText = `${MONTHS_ES[currentDate.getMonth()]} ${currentDate.getFullYear()}`; loadData(); updateCloneSelector(); }
     function changeMonth(delta) { currentDate.setMonth(currentDate.getMonth() + delta); updateDateUI(); }
     function openDatePicker() { pickerYear = currentDate.getFullYear(); updatePickerUI(); document.getElementById('dateModal').classList.add('open'); }
@@ -307,23 +308,11 @@
     function initMonthGrid() { const grid = document.getElementById('monthsGrid'); MONTHS_ES.forEach((m, i) => { const btn = document.createElement('div'); btn.className = 'month-btn'; btn.innerText = m; btn.onclick = () => { currentDate.setFullYear(pickerYear); currentDate.setMonth(i); updateDateUI(); closeDatePicker(); }; grid.appendChild(btn); }); }
     function updatePickerUI() { document.getElementById('pickerYearTxt').innerText = pickerYear; Array.from(document.getElementById('monthsGrid').children).forEach((btn, i) => { btn.classList.toggle('active', i === currentDate.getMonth() && pickerYear === currentDate.getFullYear()); }); }
 
-    // --- DATA LOAD (FIXED TIMEZONE & SORT) ---
+    // --- DATA ---
     function loadData() {
-        const selectedYear = currentDate.getFullYear();
-        const selectedMonth = currentDate.getMonth() + 1; // 1-12
-
-        currentTxs = (data.txs || []).filter(t => {
-            if(t.deletedAt) return false;
-            // PARSEO MANUAL - EVITA BUG DE ZONA HORARIA
-            const parts = t.date.split('-');
-            const tY = parseInt(parts[0]);
-            const tM = parseInt(parts[1]);
-            return tY === selectedYear && tM === selectedMonth;
-        });
-
-        // Ordenar: Dia 1 arriba
+        const y = currentDate.getFullYear(), m = currentDate.getMonth() + 1;
+        currentTxs = (data.txs || []).filter(t => !t.deletedAt && parseInt(t.date.split('-')[0]) === y && parseInt(t.date.split('-')[1]) === m);
         currentTxs.sort((a,b) => a.date.localeCompare(b.date) || a.id - b.id);
-        
         calcKPI(); renderClassic(); renderAllocWithAccordions(); resetDrillDown(); renderCharts();
     }
 
@@ -331,9 +320,16 @@
         const inc = currentTxs.filter(t=>t.type=='inc').reduce((a,b)=>a+b.amount,0);
         const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
         const bal = inc - exp;
-        document.getElementById('kpiBal').innerText = `$${Math.floor(bal).toLocaleString()}`; document.getElementById('kpiBal').style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
-        const tc = parseFloat(document.getElementById('usdRate').value) || 1; document.getElementById('kpiUsd').innerText = Math.round(bal/tc).toLocaleString();
-        document.getElementById('sum-inc').innerText = `$${Math.floor(inc).toLocaleString()}`; document.getElementById('sum-exp').innerText = `$${Math.floor(exp).toLocaleString()}`;
+        
+        const kpiBal = document.getElementById('kpiBal'); kpiBal.innerText = `$${Math.floor(bal).toLocaleString()}`; kpiBal.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
+        
+        const tc = parseFloat(document.getElementById('usdRate').value) || 1; 
+        const kpiUsd = document.getElementById('kpiUsd');
+        kpiUsd.innerText = Math.round(bal/tc).toLocaleString();
+        kpiUsd.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)'; // COLOR FIX
+
+        document.getElementById('sum-inc').innerText = `$${Math.floor(inc).toLocaleString()}`; 
+        document.getElementById('sum-exp').innerText = `$${Math.floor(exp).toLocaleString()}`;
     }
 
     function renderClassic() {
@@ -348,68 +344,69 @@
         });
     }
 
-    // --- ALLOCATION CON COLOR Y MONTO RESTANTE ---
+    // --- ALLOC ---
     function renderAllocWithAccordions() {
         const cont = document.getElementById('alloc-container'); cont.innerHTML = '';
         const incs = currentTxs.filter(t=>t.type=='inc'); const exps = currentTxs.filter(t=>t.type=='exp');
         
         incs.forEach(inc => {
             const sub = exps.filter(e => e.linkId == inc.id);
-            const spent = sub.reduce((a,b)=>a+b.amount,0);
-            const remaining = inc.amount - spent;
-            const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
-            
+            const spent = sub.reduce((a,b)=>a+b.amount,0); const remaining = inc.amount - spent; const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
             let rows = ''; sub.forEach(s => rows += `<div class="alloc-row" onclick="edit(${s.id})"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`);
             
-            // Header con monto restante y color
-            const headerHtml = `
-            <div class="alloc-header" onclick="this.parentElement.classList.toggle('open')">
-                <div class="ah-title">${inc.desc}</div>
-                <div class="ah-meta">
-                    <span class="ah-amt" style="color:${remaining>=0?'var(--inc)':'var(--exp)'}">$${Math.floor(remaining)}</span>
-                    <i class="fas fa-chevron-down chevron"></i>
-                </div>
-            </div>`;
-
+            const headerHtml = `<div class="alloc-header" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">${inc.desc}</div><div class="ah-meta"><span class="ah-amt" style="color:${remaining>=0?'var(--inc)':'var(--exp)'}">$${Math.floor(remaining)}</span><i class="fas fa-chevron-down chevron"></i></div></div>`;
             cont.innerHTML += `<div class="alloc-group">${headerHtml}<div class="alloc-details">${rows||'<div style="text-align:center;color:#ccc;padding:10px;">Sin gastos</div>'}<div style="margin-top:10px;"><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(pct,100)}%; background:${remaining<0?'var(--exp)':'var(--accent)'}"></div></div><div class="alloc-footer"><span>Gastado: $${Math.floor(spent)}</span><span style="color:${remaining<0?'var(--exp)':'var(--inc)'}">${remaining>=0?'Sobra':'Falta'}: $${Math.floor(Math.abs(remaining))}</span></div></div></div></div>`;
         });
-
-        // Huérfanos
+        // Por asignar
         const orphans = exps.filter(e => !e.linkId);
         if(orphans.length > 0) {
             const total = orphans.reduce((a,b)=>a+b.amount,0);
             let rows = ''; orphans.forEach(s => rows += `<div class="alloc-row" onclick="edit(${s.id})"><span>${s.desc}</span><span>$${Math.floor(s.amount)}</span></div>`);
-            const headerHtml = `
-            <div class="alloc-header orphan" onclick="this.parentElement.classList.toggle('open')">
-                <div class="ah-title">Fondo Común</div>
-                <div class="ah-meta">
-                    <span class="ah-amt" style="color:var(--exp)">-$${Math.floor(total)}</span>
-                    <i class="fas fa-chevron-down chevron"></i>
-                </div>
-            </div>`;
+            const headerHtml = `<div class="alloc-header orphan" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">Por asignar</div><div class="ah-meta"><span class="ah-amt" style="color:var(--exp)">-$${Math.floor(total)}</span><i class="fas fa-chevron-down chevron"></i></div></div>`;
             cont.innerHTML += `<div class="alloc-group">${headerHtml}<div class="alloc-details">${rows}</div></div>`;
         }
     }
 
-    // --- CHARTS ---
+    // --- CHARTS & SORTING ---
     function renderCharts() { renderDoughnut('doughnutChartExp', 'doughnutLegendExp', 'exp', drillDownCat); renderDoughnut('doughnutChartInc', 'doughnutLegendInc', 'inc', null); }
+    
     function renderDoughnut(canvasId, legendId, type, filterCat) {
         const ctx = document.getElementById(canvasId); if(type=='exp' && chartExp) chartExp.destroy(); if(type=='inc' && chartInc) chartInc.destroy();
         const legend = document.getElementById(legendId); legend.innerHTML = '';
         const map = {}; let total=0;
         const txs = currentTxs.filter(t=>t.type==type);
-        txs.forEach(t=>{ if(!filterCat || t.cat==filterCat) { const key = filterCat ? t.desc : t.cat; map[key]=(map[key]||0)+t.amount; total+=t.amount; }});
-        Object.keys(map).forEach((lbl, i) => { const val=map[lbl]; const pct=total>0?Math.round((val/total)*100):0; legend.innerHTML += `<div class="legend-item"><div class="l-dot" style="background:${COLORS[i%COLORS.length]}"></div><div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${lbl}</div><div style="font-weight:700;">$${Math.floor(val).toLocaleString()} (${pct}%)</div></div>`; });
-        const chartConfig = { type:'doughnut', data:{labels:Object.keys(map), datasets:[{data:Object.values(map), backgroundColor:COLORS, borderWidth:0}]}, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, layout:{padding:10}} };
+        
+        txs.forEach(t=>{
+            if(!filterCat || t.cat==filterCat) {
+                // Si es ingreso, SIEMPRE usar Descripcion (Concepto).
+                // Si es gasto, usar Descripcion SOLO si hay filtro (drilldown), sino Categoria.
+                const key = (type === 'inc' || filterCat) ? t.desc : t.cat;
+                map[key]=(map[key]||0)+t.amount; total+=t.amount;
+            }
+        });
+        
+        // SORTING: Descending value
+        const entries = Object.entries(map).sort((a,b) => b[1] - a[1]);
+        const sortedLabels = entries.map(e => e[0]);
+        const sortedData = entries.map(e => e[1]);
+
+        entries.forEach((entry, i) => { 
+            const lbl = entry[0]; const val = entry[1];
+            const pct=total>0?Math.round((val/total)*100):0; 
+            legend.innerHTML += `<div class="legend-item"><div class="l-dot" style="background:${COLORS[i%COLORS.length]}"></div><div class="l-txt">${lbl}</div><div class="l-val">$${Math.floor(val).toLocaleString()} (${pct}%)</div></div>`; 
+        });
+        
+        const chartConfig = { type:'doughnut', data:{labels:sortedLabels, datasets:[{data:sortedData, backgroundColor:COLORS, borderWidth:0}]}, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, layout:{padding:10}} };
         if(type == 'exp' && !filterCat) { chartConfig.options.onClick = (e, el) => { if(el.length > 0) { drillDownCat = chartConfig.data.labels[el[0].index]; document.getElementById('btnBackExp').style.display='flex'; renderCharts(); }}; }
+        
         if(type=='exp') chartExp = new Chart(ctx, chartConfig); else chartInc = new Chart(ctx, chartConfig);
     }
     function resetDrillDown() { drillDownCat = null; document.getElementById('btnBackExp').style.display='none'; renderCharts(); }
 
-    // --- TOOLS ---
-    function updateCloneSelector() { const sel = document.getElementById('cloneSource'); sel.innerHTML = ''; const currentYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; const monthsMap = new Set(); (data.txs||[]).forEach(t => { if(!t.deletedAt) monthsMap.add(t.date.slice(0,7)); }); Array.from(monthsMap).sort().reverse().forEach(ym => { if(ym !== currentYM) { const [y, m] = ym.split('-'); const opt = document.createElement('option'); opt.value = ym; opt.text = `${MONTHS_ES[parseInt(m)-1]} ${y}`; sel.appendChild(opt); } }); if(sel.options.length === 0) sel.add(new Option("Sin datos previos", "")); }
-    function cloneFromSelected() { const srcYM = document.getElementById('cloneSource').value; if(!srcYM) return alert("Selecciona mes origen"); if(!confirm(`¿Clonar ${srcYM}?`)) return; const srcTxs = data.txs.filter(t => !t.deletedAt && t.date.startsWith(srcYM)); const targetYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; srcTxs.forEach(t => data.txs.push({ ...t, id: Date.now()+Math.random(), date: `${targetYM}-${t.date.split('-')[2]}`, exec: false, linkId: null })); saveData(); }
-    function deleteCurrentMonth() { if(confirm(`¿ELIMINAR TODO DE ESTE MES?`)) { const ym = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; data.txs.forEach(t => { if(t.date.startsWith(ym)) t.deletedAt = Date.now(); }); saveData(); } }
+    // --- ADMIN ---
+    function updateCloneSelector() { const sel = document.getElementById('cloneSource'); sel.innerHTML = ''; const currentYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; const monthsMap = new Set(); (data.txs||[]).forEach(t => { if(!t.deletedAt) monthsMap.add(t.date.slice(0,7)); }); Array.from(monthsMap).sort().reverse().forEach(ym => { if(ym !== currentYM) { const [y, m] = ym.split('-'); const opt = document.createElement('option'); opt.value = ym; opt.text = `${MONTHS_ES[parseInt(m)-1]} ${y}`; sel.appendChild(opt); } }); if(sel.options.length === 0) sel.add(new Option("Sin datos", "")); }
+    function cloneFromSelected() { const srcYM = document.getElementById('cloneSource').value; if(!srcYM) return alert("Selecciona origen"); if(!confirm(`¿Clonar ${srcYM}?`)) return; const srcTxs = data.txs.filter(t => !t.deletedAt && t.date.startsWith(srcYM)); const targetYM = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; srcTxs.forEach(t => data.txs.push({ ...t, id: Date.now()+Math.random(), date: `${targetYM}-${t.date.split('-')[2]}`, exec: false, linkId: null })); saveData(); }
+    function deleteCurrentMonth() { if(confirm(`¿ELIMINAR MES ACTUAL?`)) { const ym = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; data.txs.forEach(t => { if(t.date.startsWith(ym)) t.deletedAt = Date.now(); }); saveData(); } }
 
     // --- FORM ---
     function openSheet() { if(!editId) resetForm(); document.getElementById('sheet').classList.add('open'); }
