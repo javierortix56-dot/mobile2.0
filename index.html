@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V51 Final</title>
+    <title>J&M V51.1 Final</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -355,7 +355,7 @@
         });
     }
 
-    // --- ALLOC (ASIGNACIÓN) CON FECHA ---
+    // --- ALLOC (ASIGNACIÓN) CON FECHA Y EJECUTADO ---
     function renderAllocWithAccordions() {
         const cont = document.getElementById('alloc-container'); cont.innerHTML = '';
         const incs = currentTxs.filter(t=>t.type=='inc'); const exps = currentTxs.filter(t=>t.type=='exp');
@@ -364,11 +364,12 @@
             const sub = exps.filter(e => e.linkId == inc.id);
             const spent = sub.reduce((a,b)=>a+b.amount,0); const remaining = inc.amount - spent; const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
             
-            // AQUI AGREGAMOS LA FECHA VISIBLE
+            // AQUI AGREGAMOS LA FECHA VISIBLE Y EL STATUS DE EJECUTADO
             let rows = ''; 
             sub.forEach(s => {
                 const day = s.date.split('-')[2]; const month = s.date.split('-')[1];
-                rows += `<div class="alloc-row" onclick="edit(${s.id})">
+                // AQUI AGREGUE: ${s.exec ? 'executed' : ''}
+                rows += `<div class="alloc-row ${s.exec ? 'executed' : ''}" onclick="edit(${s.id})">
                             <div class="date-badge">${day}/${month}</div>
                             <div class="ar-desc">${s.desc}</div>
                             <div class="ar-amt">$${fmt(s.amount)}</div>
@@ -385,7 +386,8 @@
             let rows = ''; 
             orphans.forEach(s => {
                 const day = s.date.split('-')[2]; const month = s.date.split('-')[1];
-                rows += `<div class="alloc-row" onclick="edit(${s.id})"><div class="date-badge">${day}/${month}</div><div class="ar-desc">${s.desc}</div><div class="ar-amt">$${fmt(s.amount)}</div></div>`;
+                // AQUI TAMBIEN: ${s.exec ? 'executed' : ''}
+                rows += `<div class="alloc-row ${s.exec ? 'executed' : ''}" onclick="edit(${s.id})"><div class="date-badge">${day}/${month}</div><div class="ar-desc">${s.desc}</div><div class="ar-amt">$${fmt(s.amount)}</div></div>`;
             });
             const headerHtml = `<div class="alloc-header orphan" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">Por asignar</div><div class="ah-meta"><span class="ah-amt" style="color:var(--exp)">-$${fmt(total)}</span><i class="fas fa-chevron-down chevron"></i></div></div>`;
             cont.innerHTML += `<div class="alloc-group">${headerHtml}<div class="alloc-details">${rows}</div></div>`;
