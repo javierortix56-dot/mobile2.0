@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <title>J&M V51.1 Final</title>
+    <title>J&M V51.2 Final</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -63,7 +63,12 @@
         .r-top { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 2px; }
         .r-sub { display: flex; justify-content: space-between; color: var(--txt-sec); font-size: 10px; align-items: center; }
         .link-badge { color: var(--accent); font-weight: 600; background: #EFF6FF; padding: 1px 4px; border-radius: 4px; margin-right: 4px; }
-        .executed { text-decoration: line-through; opacity: 0.5; }
+        
+        /* ESTILOS DE EJECUTADO CORREGIDOS PARA ASEGURAR VISIBILIDAD */
+        .executed { opacity: 0.5; }
+        /* Esto fuerza el tachado en los elementos hijos directos */
+        .executed .r-top, .executed .ar-desc, .executed .ar-amt { text-decoration: line-through; }
+        
         .amt-inc { color: var(--inc); } .amt-exp { color: var(--txt); }
 
         /* ALLOCATION (ASIGNACIÓN) */
@@ -331,7 +336,6 @@
         const exp = currentTxs.filter(t=>t.type=='exp').reduce((a,b)=>a+b.amount,0);
         const bal = inc - exp;
         
-        // Logica de colores original + Formato nuevo
         const kpiBal = document.getElementById('kpiBal'); kpiBal.innerText = `$${fmt(bal)}`; kpiBal.style.color = bal >= 0 ? 'var(--inc)' : 'var(--exp)';
         
         const tc = parseFloat(document.getElementById('usdRate').value) || 1; 
@@ -355,7 +359,7 @@
         });
     }
 
-    // --- ALLOC (ASIGNACIÓN) CON FECHA Y EJECUTADO ---
+    // --- ALLOC (ASIGNACIÓN) ---
     function renderAllocWithAccordions() {
         const cont = document.getElementById('alloc-container'); cont.innerHTML = '';
         const incs = currentTxs.filter(t=>t.type=='inc'); const exps = currentTxs.filter(t=>t.type=='exp');
@@ -364,11 +368,10 @@
             const sub = exps.filter(e => e.linkId == inc.id);
             const spent = sub.reduce((a,b)=>a+b.amount,0); const remaining = inc.amount - spent; const pct = inc.amount>0 ? (spent/inc.amount)*100 : 0;
             
-            // AQUI AGREGAMOS LA FECHA VISIBLE Y EL STATUS DE EJECUTADO
             let rows = ''; 
             sub.forEach(s => {
                 const day = s.date.split('-')[2]; const month = s.date.split('-')[1];
-                // AQUI AGREGUE: ${s.exec ? 'executed' : ''}
+                // AQUI APLICAMOS LA CLASE 'executed' SI s.exec ES TRUE
                 rows += `<div class="alloc-row ${s.exec ? 'executed' : ''}" onclick="edit(${s.id})">
                             <div class="date-badge">${day}/${month}</div>
                             <div class="ar-desc">${s.desc}</div>
@@ -379,14 +382,13 @@
             const headerHtml = `<div class="alloc-header" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">${inc.desc}</div><div class="ah-meta"><span class="ah-amt" style="color:${remaining>=0?'var(--inc)':'var(--exp)'}">$${fmt(remaining)}</span><i class="fas fa-chevron-down chevron"></i></div></div>`;
             cont.innerHTML += `<div class="alloc-group">${headerHtml}<div class="alloc-details">${rows||'<div style="text-align:center;color:#ccc;padding:10px;">Sin gastos</div>'}<div style="margin-top:10px;"><div class="bar-bg"><div class="bar-fill" style="width:${Math.min(pct,100)}%; background:${remaining<0?'var(--exp)':'var(--accent)'}"></div></div><div class="alloc-footer"><span>Gastado: $${fmt(spent)}</span><span style="color:${remaining<0?'var(--exp)':'var(--inc)'}">${remaining>=0?'Sobra':'Falta'}: $${fmt(Math.abs(remaining))}</span></div></div></div></div>`;
         });
-        // Por asignar
+        
         const orphans = exps.filter(e => !e.linkId);
         if(orphans.length > 0) {
             const total = orphans.reduce((a,b)=>a+b.amount,0);
             let rows = ''; 
             orphans.forEach(s => {
                 const day = s.date.split('-')[2]; const month = s.date.split('-')[1];
-                // AQUI TAMBIEN: ${s.exec ? 'executed' : ''}
                 rows += `<div class="alloc-row ${s.exec ? 'executed' : ''}" onclick="edit(${s.id})"><div class="date-badge">${day}/${month}</div><div class="ar-desc">${s.desc}</div><div class="ar-amt">$${fmt(s.amount)}</div></div>`;
             });
             const headerHtml = `<div class="alloc-header orphan" onclick="this.parentElement.classList.toggle('open')"><div class="ah-title">Por asignar</div><div class="ah-meta"><span class="ah-amt" style="color:var(--exp)">-$${fmt(total)}</span><i class="fas fa-chevron-down chevron"></i></div></div>`;
@@ -433,17 +435,11 @@
     function deleteCurrentMonth() { if(confirm(`¿ELIMINAR MES ACTUAL?`)) { const ym = `${currentDate.getFullYear()}-${(currentDate.getMonth()+1).toString().padStart(2,'0')}`; data.txs.forEach(t => { if(t.date.startsWith(ym)) t.deletedAt = Date.now(); }); saveData(); } }
 
     // --- FORM LOGIC ---
-    // Nueva funcion EXCLUSIVA para crear nuevos movimientos y limpiar cualquier residuo
-    function openNewTx() {
-        editId = null; // FORCE CLEAR
-        resetForm();
-        openSheet();
-    }
-
+    function openNewTx() { editId = null; resetForm(); openSheet(); }
     function openSheet() { document.getElementById('sheet').classList.add('open'); }
     function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
     function resetForm() { 
-        if(!editId) { // Solo reseteamos valores si no estamos editando (o si openNewTx lo forzó a null)
+        if(!editId) { 
             document.getElementById('txForm').reset(); 
             const today=new Date(); 
             const isCur = today.getMonth()===currentDate.getMonth() && today.getFullYear()===currentDate.getFullYear(); 
@@ -460,9 +456,8 @@
 
     document.getElementById('txForm').onsubmit = (e) => { e.preventDefault(); let cat=document.getElementById('fCat').value, desc=document.getElementById('fConcept').value; if(desc=='new' || !desc) { desc=document.getElementById('fCustomDesc').value; if(desc && !data.concepts[cat].includes(desc)) data.concepts[cat].push(desc); } const tx = { id: editId || Date.now(), date: document.getElementById('fDate').value, amount: parseFloat(document.getElementById('fAmount').value), type: document.getElementById('fType').value, cat, desc, exec: document.getElementById('fExec').checked, linkId: document.getElementById('fType').value=='exp' ? document.getElementById('fLink').value : null }; if(editId) data.txs[data.txs.findIndex(x=>x.id==editId)]=tx; else data.txs.push(tx); saveData(); closeSheet(); }
     
-    // Al editar, seteamos el ID y abrimos
     function edit(id) { 
-        editId = id; // IMPORTANTE
+        editId = id; 
         const t = data.txs.find(x=>x.id==id); 
         document.getElementById('fAmount').value=t.amount; 
         document.getElementById('fDate').value=t.date; 
